@@ -1,0 +1,8 @@
+{
+  "basedOn": "SimpleFarming:BerryBush",
+  "displayName": "Blueberry Bush",
+  "entity": {
+    "prefab": "BlueberryBushFull"
+  },
+  "shape": "cube"
+}

@@ -1,0 +1,9 @@
+{
+    "id" : "SimpleFarming",
+    "version" : "0.1.0",
+    "author" : "Josharias",
+    "displayName" : "SimpleFarming",
+    "description" : "Easy to understand growing of foods",
+    "dependencies" : [],
+    "isServerSideOnly" : false
+}

@@ -1,0 +1,10 @@
+{
+  "DisplayName": {
+    "name": "Blueberry"
+  },
+  "Item": {
+    "icon": "SimpleFarming:SimpleFarming.blueberry",
+    "renderWithIcon": true,
+    "stackId": "Blueberry"
+  }
+}
