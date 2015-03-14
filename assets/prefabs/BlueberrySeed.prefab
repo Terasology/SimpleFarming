@@ -1,4 +1,5 @@
 {
+  "parent": "engine:iconItem",
   "DisplayName": {
     "name": "Blueberry Seed"
   },

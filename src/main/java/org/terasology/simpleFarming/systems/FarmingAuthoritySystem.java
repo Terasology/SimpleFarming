@@ -35,6 +35,8 @@ import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.PlantDefinitionComponent;
 import org.terasology.simpleFarming.components.PlantProduceComponent;
@@ -43,6 +45,8 @@ import org.terasology.simpleFarming.components.UnGrowPlantOnHarvestComponent;
 import org.terasology.simpleFarming.events.OnPlantGrowth;
 import org.terasology.simpleFarming.events.OnPlantHarvest;
 import org.terasology.simpleFarming.events.OnPlantUnGrowth;
+import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -77,6 +81,8 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     BlockEntityRegistry blockEntityRegistry;
     @In
     PrefabManager prefabManager;
+
+    Random random = new FastRandom();
 
     @ReceiveEvent
     public void onPlantSeed(ActivateEvent event, EntityRef seedItem, PlantDefinitionComponent plantDefinitionComponent, ItemComponent itemComponent) {
@@ -137,7 +143,9 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         event.consume();
         EntityRef seedItem = entityManager.create(plantDefinitionComponent.seedPrefab);
         PickupBuilder pickupBuilder = new PickupBuilder(entityManager);
-        pickupBuilder.createPickupFor(seedItem, blockComponent.getPosition().toVector3f(), 6000, true);
+        Vector3f position = blockComponent.getPosition().toVector3f().add(0, 0.5f, 0);
+        pickupBuilder.createPickupFor(seedItem, position, 6000, true);
+        seedItem.send(new ImpulseEvent(random.nextVector3f(30.0f)));
     }
 
     private void schedulePlantGrowth(EntityRef entity, PlantDefinitionComponent.TimeRange timeRange) {
