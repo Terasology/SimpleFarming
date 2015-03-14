@@ -19,8 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -49,6 +52,12 @@ import org.terasology.world.block.entity.CreateBlockDropsEvent;
 
 import java.util.Map;
 
+/**
+ * Seeds contain the initial growth stages.  When planted, the plant definition is copied to the plant.
+ * When the plant is broken, a seed with the same uri is created and the plant definition is copied back to the seed for its next use.
+ * Harvesting a plant puts the produce directly in the instigator's inventory.
+ * Growth happens by matching the current block with an item in the plant definition.  The next/previous stage can then replace the existing block.
+ */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class FarmingAuthoritySystem extends BaseComponentSystem {
     private static final String GROWTH_ACTION = "PLANTGROWTH";
@@ -66,6 +75,8 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     EntityManager entityManager;
     @In
     BlockEntityRegistry blockEntityRegistry;
+    @In
+    PrefabManager prefabManager;
 
     @ReceiveEvent
     public void onPlantSeed(ActivateEvent event, EntityRef seedItem, PlantDefinitionComponent plantDefinitionComponent, ItemComponent itemComponent) {
@@ -99,8 +110,8 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
                 return;
             }
 
-
             PlantDefinitionComponent newPlantDefinitionComponent = new PlantDefinitionComponent(plantDefinitionComponent);
+            newPlantDefinitionComponent.seedPrefab = seedItem.getPrefabURI().toSimpleString();
             worldProvider.setBlock(plantPosition, plantBlock);
             EntityRef plantEntity = blockEntityRegistry.getBlockEntityAt(plantPosition);
             plantEntity.addComponent(newPlantDefinitionComponent);
@@ -126,11 +137,10 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         event.consume();
         EntityRef seedItem = entityManager.create(plantDefinitionComponent.seedPrefab);
         PickupBuilder pickupBuilder = new PickupBuilder(entityManager);
-        pickupBuilder.createPickupFor(seedItem, blockComponent.getPosition().toVector3f(), 60, true);
+        pickupBuilder.createPickupFor(seedItem, blockComponent.getPosition().toVector3f(), 6000, true);
     }
 
     private void schedulePlantGrowth(EntityRef entity, PlantDefinitionComponent.TimeRange timeRange) {
-
         delayManager.addDelayedAction(entity, GROWTH_ACTION, timeRange.getTimeRange());
     }
 
@@ -199,39 +209,6 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         schedulePlantGrowth(entity, nextGrowthStage);
     }
 
-/*    private void schedulePlantProductionInDelayManager(EntityRef entity, PlantDefinitionComponent plantDefinitionComponent) {
-        long delay = plantDefinitionComponent.productionTimeFixed;
-        Random random = new FastRandom();
-        delay += random.nextFloat() * plantDefinitionComponent.productionTimeRandom;
-
-        delayManager.addDelayedAction(entity, PRODUCTION_ACTION, delay);
-    }
-
-    @ReceiveEvent
-    public void scheduledPlantProduction(DelayedActionTriggeredEvent event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
-        if (event.getActionId().equals(PRODUCTION_ACTION)) {
-            entity.send(new OnPlantProduction());
-        }
-    }
-
-    @ReceiveEvent
-    public void onPlantProduction(OnPlantProduction event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
-        if( delayManager.hasDelayedAction(entity, PRODUCTION_ACTION)) {
-            delayManager.cancelDelayedAction(entity, PRODUCTION_ACTION);
-        }
-
-        EntityRef newItem = entityManager.create(plantDefinitionComponent.producePrefab);
-        PlantProduceComponent plantProduceComponent = new PlantProduceComponent(newItem);
-        if( entity.hasComponent(PlantProduceComponent.class)) {
-            entity.saveComponent(plantProduceComponent);
-        } else {
-            entity.addComponent(plantProduceComponent);
-        }
-
-        schedulePlantProductionInDelayManager(entity, plantDefinitionComponent);
-    }
-*/
-
     @ReceiveEvent
     public void onHarvest(ActivateEvent event, EntityRef entity) {
         EntityRef target = event.getTarget();
@@ -261,5 +238,19 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void unGrowPlantOnHarvest(OnPlantHarvest event, EntityRef entityRef, UnGrowPlantOnHarvestComponent unGrowPlantOnHarvestComponent) {
         entityRef.send(new OnPlantUnGrowth());
+    }
+
+    @ReceiveEvent
+    public void copySeedPlantDefinitionFromSeedToBlock(OnActivatedComponent event, EntityRef entityRef, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
+        if (plantDefinitionComponent.growthStages.isEmpty() && !plantDefinitionComponent.seedPrefab.isEmpty()) {
+            Prefab seedPrefab = prefabManager.getPrefab(plantDefinitionComponent.seedPrefab);
+            PlantDefinitionComponent seedPlantDefinition = seedPrefab.getComponent(PlantDefinitionComponent.class);
+            if (seedPlantDefinition != null) {
+                plantDefinitionComponent.growthStages = seedPlantDefinition.growthStages;
+                plantDefinitionComponent.soilCategory = seedPlantDefinition.soilCategory;
+
+                entityRef.saveComponent(plantDefinitionComponent);
+            }
+        }
     }
 }

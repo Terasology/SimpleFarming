@@ -17,5 +17,8 @@ package org.terasology.simpleFarming.components;
 
 import org.terasology.entitySystem.Component;
 
+/**
+ * When this is added to a block, it will be set to an earlier growth stage when harvested.
+ */
 public class UnGrowPlantOnHarvestComponent implements Component {
 }

@@ -16,10 +16,10 @@
 package org.terasology.simpleFarming.components;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.Owns;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.world.block.ForceBlockActive;
 
+/**
+ * Adding this to a block will automatically create harvestable produce
+ */
 public class PlantProduceCreationComponent implements Component {
     public String producePrefab;
 }

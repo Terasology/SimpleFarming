@@ -29,7 +29,6 @@ public class PlantProduceComponent implements Component {
     }
 
     public PlantProduceComponent(EntityRef produceItem) {
-
         this.produceItem = produceItem;
     }
 }

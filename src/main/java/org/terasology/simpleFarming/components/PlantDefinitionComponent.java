@@ -28,6 +28,8 @@ import java.util.Map;
 
 @ForceBlockActive
 public class PlantDefinitionComponent implements Component {
+    // I would have prefered an plain list,  but serializing mapped containers is not yet possible.
+    // An array is simulated with getGrowthStages until serializing complex items is possible
     public Map<String, TimeRange> growthStages = Maps.newTreeMap();
     public String soilCategory = "Soil";
     public String seedPrefab;
