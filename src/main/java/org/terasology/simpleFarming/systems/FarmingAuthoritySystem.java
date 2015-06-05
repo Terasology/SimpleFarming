@@ -23,7 +23,6 @@ import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.math.Side;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
@@ -34,8 +33,9 @@ import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.PlantDefinitionComponent;
@@ -105,19 +105,19 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         }
         Block soilBlock = soilBlockComponent.getBlock();
 
-        if (soilBlock.getBlockFamily().hasCategory(plantDefinitionComponent.soilCategory) && currentPlantBlock == blockManager.getAir()) {
+        if (soilBlock.getBlockFamily().hasCategory(plantDefinitionComponent.soilCategory) && currentPlantBlock == blockManager.getBlock(BlockManager.AIR_ID)) {
             event.consume();
 
             PlantDefinitionComponent.PlantGrowth growthStage = plantDefinitionComponent.getGrowthStages()[0];
 
             Block plantBlock = blockManager.getBlock(growthStage.block);
-            if (plantBlock == blockManager.getAir()) {
+            if (plantBlock == blockManager.getBlock(BlockManager.AIR_ID)) {
                 logger.error("Could not find plant: " + growthStage.block);
                 return;
             }
 
             PlantDefinitionComponent newPlantDefinitionComponent = new PlantDefinitionComponent(plantDefinitionComponent);
-            newPlantDefinitionComponent.seedPrefab = seedItem.getPrefabURI().toSimpleString();
+            newPlantDefinitionComponent.seedPrefab = seedItem.getParentPrefab().getName();
             worldProvider.setBlock(plantPosition, plantBlock);
             EntityRef plantEntity = blockEntityRegistry.getBlockEntityAt(plantPosition);
             plantEntity.addComponent(newPlantDefinitionComponent);
@@ -172,7 +172,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             PlantDefinitionComponent.PlantGrowth growthStage = plantDefinitionComponent.getGrowthStages()[i];
             Block block = blockManager.getBlock(growthStage.block);
 
-            if (block.equals(currentBlock) && block != blockManager.getAir()) {
+            if (block.equals(currentBlock) && block != blockManager.getBlock(BlockManager.AIR_ID)) {
                 nextGrowthStage = plantDefinitionComponent.getGrowthStages()[i + 1];
                 break;
             }
@@ -183,7 +183,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         }
 
         Block newPlantBlock = blockManager.getBlock(nextGrowthStage.block);
-        if (newPlantBlock == blockManager.getAir()) {
+        if (newPlantBlock == blockManager.getBlock(BlockManager.AIR_ID)) {
             logger.error("Could not find the next growth stage block: " + nextGrowthStage.block);
             return;
         }
@@ -201,14 +201,14 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             PlantDefinitionComponent.PlantGrowth growthStage = plantDefinitionComponent.getGrowthStages()[i];
             Block block = blockManager.getBlock(growthStage.block);
 
-            if (block.equals(currentBlock) && block != blockManager.getAir()) {
+            if (block.equals(currentBlock) && block != blockManager.getBlock(BlockManager.AIR_ID)) {
                 nextGrowthStage = plantDefinitionComponent.getGrowthStages()[i - 1];
                 break;
             }
         }
 
         Block newPlantBlock = blockManager.getBlock(nextGrowthStage.block);
-        if (newPlantBlock == blockManager.getAir()) {
+        if (newPlantBlock == blockManager.getBlock(BlockManager.AIR_ID)) {
             logger.error("Could not find the next growth stage block: " + nextGrowthStage.block);
             return;
         }
