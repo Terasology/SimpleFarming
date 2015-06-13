@@ -221,7 +221,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     public void onHarvest(ActivateEvent event, EntityRef entity) {
         EntityRef target = event.getTarget();
         EntityRef instigator = event.getInstigator();
-        if (target.exists() && instigator.exists()) {
+        if (target.exists() && instigator.exists() && entity.equals(instigator)) {
             PlantProduceComponent plantProduceComponent = target.getComponent(PlantProduceComponent.class);
             if (plantProduceComponent != null) {
                 inventoryManager.giveItem(instigator, target, plantProduceComponent.produceItem);
