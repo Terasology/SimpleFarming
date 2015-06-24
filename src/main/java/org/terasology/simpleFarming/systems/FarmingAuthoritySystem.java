@@ -28,8 +28,10 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
+import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
@@ -188,7 +190,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             return;
         }
 
-        blockEntityRegistry.setBlockRetainComponent(blockComponent.getPosition(), newPlantBlock, PlantDefinitionComponent.class);
+        blockEntityRegistry.setBlockRetainComponent(blockComponent.getPosition(), newPlantBlock, PlantDefinitionComponent.class, DisplayNameComponent.class);
         schedulePlantGrowth(entity, nextGrowthStage);
     }
 
@@ -213,7 +215,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             return;
         }
 
-        blockEntityRegistry.setBlockRetainComponent(blockComponent.getPosition(), newPlantBlock, PlantDefinitionComponent.class);
+        blockEntityRegistry.setBlockRetainComponent(blockComponent.getPosition(), newPlantBlock, PlantDefinitionComponent.class, DisplayNameComponent.class);
         schedulePlantGrowth(entity, nextGrowthStage);
     }
 
@@ -221,13 +223,19 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     public void onHarvest(ActivateEvent event, EntityRef entity) {
         EntityRef target = event.getTarget();
         EntityRef instigator = event.getInstigator();
-        if (target.exists() && instigator.exists() && entity.equals(instigator)) {
+        EntityRef harvestingEntity = entity;
+        if (entity.equals(event.getTarget())) {
+            harvestingEntity = instigator;
+        }
+
+        if (!event.isConsumed() && target.exists() && harvestingEntity.exists() && harvestingEntity.hasComponent(InventoryComponent.class)) {
             PlantProduceComponent plantProduceComponent = target.getComponent(PlantProduceComponent.class);
             if (plantProduceComponent != null) {
-                inventoryManager.giveItem(instigator, target, plantProduceComponent.produceItem);
+                inventoryManager.giveItem(entity, target, plantProduceComponent.produceItem);
                 plantProduceComponent.produceItem = EntityRef.NULL;
                 target.saveComponent(plantProduceComponent);
                 target.send(new OnPlantHarvest());
+                event.consume();
             }
         }
     }
@@ -250,14 +258,26 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void copySeedPlantDefinitionFromSeedToBlock(OnActivatedComponent event, EntityRef entityRef, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
+        // ensure that the important bits get copied from the seed prefab
         if (plantDefinitionComponent.growthStages.isEmpty() && !plantDefinitionComponent.seedPrefab.isEmpty()) {
             Prefab seedPrefab = prefabManager.getPrefab(plantDefinitionComponent.seedPrefab);
             PlantDefinitionComponent seedPlantDefinition = seedPrefab.getComponent(PlantDefinitionComponent.class);
             if (seedPlantDefinition != null) {
-                plantDefinitionComponent.growthStages = seedPlantDefinition.growthStages;
-                plantDefinitionComponent.soilCategory = seedPlantDefinition.soilCategory;
-
+                plantDefinitionComponent = new PlantDefinitionComponent(seedPlantDefinition);
                 entityRef.saveComponent(plantDefinitionComponent);
+            }
+        }
+
+        // update the name of the block if there is a static name present
+        if (plantDefinitionComponent.plantName != null) {
+            DisplayNameComponent displayNameComponent = entityRef.getComponent(DisplayNameComponent.class);
+            if (displayNameComponent == null) {
+                displayNameComponent = new DisplayNameComponent();
+                displayNameComponent.name = plantDefinitionComponent.plantName;
+                entityRef.addComponent(displayNameComponent);
+            } else {
+                displayNameComponent.name = plantDefinitionComponent.plantName;
+                entityRef.saveComponent(displayNameComponent);
             }
         }
     }

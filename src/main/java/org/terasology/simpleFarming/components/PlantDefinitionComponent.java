@@ -32,7 +32,10 @@ public class PlantDefinitionComponent implements Component {
     // An array is simulated with getGrowthStages until serializing complex items is possible
     public Map<String, TimeRange> growthStages = Maps.newTreeMap();
     public String soilCategory = "Soil";
+    // the item that this block turns into upon destruction
     public String seedPrefab;
+    // Allows a static name for the plant that doesnt change with the block
+    public String plantName;
 
     public PlantDefinitionComponent() {
     }
@@ -41,6 +44,7 @@ public class PlantDefinitionComponent implements Component {
         growthStages = other.growthStages;
         soilCategory = other.soilCategory;
         seedPrefab = other.seedPrefab;
+        plantName = other.plantName;
     }
 
     public PlantGrowth[] getGrowthStages() {

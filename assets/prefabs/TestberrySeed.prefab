@@ -9,8 +9,9 @@
     "stackId": "TestberrySeed"
   },
   "PlantDefinition": {
+    "plantName": "Testberry Bush",
     "growthStages": {
-      "SimpleFarming:SmallBerryBush": {
+      "SimpleFarming:BerryBush:engine:halfblock": {
         "maxRandom": 5000,
         "fixed": 10000
       },
@@ -18,7 +19,7 @@
         "maxRandom": 5000,
         "fixed": 10000
       },
-      "SimpleFarming:TestberryBush": {
+      "SimpleFarming:MatureBerryBush": {
         "maxRandom": 5000,
         "fixed": 10000
       },
