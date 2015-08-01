@@ -231,7 +231,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         if (!event.isConsumed() && target.exists() && harvestingEntity.exists() && harvestingEntity.hasComponent(InventoryComponent.class)) {
             PlantProduceComponent plantProduceComponent = target.getComponent(PlantProduceComponent.class);
             if (plantProduceComponent != null) {
-                inventoryManager.giveItem(entity, target, plantProduceComponent.produceItem);
+                inventoryManager.giveItem(harvestingEntity, target, plantProduceComponent.produceItem);
                 plantProduceComponent.produceItem = EntityRef.NULL;
                 target.saveComponent(plantProduceComponent);
                 target.send(new OnPlantHarvest());
@@ -263,8 +263,10 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             Prefab seedPrefab = prefabManager.getPrefab(plantDefinitionComponent.seedPrefab);
             PlantDefinitionComponent seedPlantDefinition = seedPrefab.getComponent(PlantDefinitionComponent.class);
             if (seedPlantDefinition != null) {
-                plantDefinitionComponent = new PlantDefinitionComponent(seedPlantDefinition);
-                entityRef.saveComponent(plantDefinitionComponent);
+                PlantDefinitionComponent updatedPlantDefinitionComponent = new PlantDefinitionComponent(seedPlantDefinition);
+                // recopy the block's seed prefab in case the seed does not supply one. Not ideal.
+                updatedPlantDefinitionComponent.seedPrefab = plantDefinitionComponent.seedPrefab;
+                entityRef.saveComponent(updatedPlantDefinitionComponent);
             }
         }
 
