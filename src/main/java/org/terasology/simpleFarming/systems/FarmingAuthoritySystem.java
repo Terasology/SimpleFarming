@@ -144,7 +144,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     public void onPlantDestroyed(CreateBlockDropsEvent event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
         event.consume();
         EntityRef seedItem = entityManager.create(plantDefinitionComponent.seedPrefab);
-        PickupBuilder pickupBuilder = new PickupBuilder(entityManager);
+        PickupBuilder pickupBuilder = new PickupBuilder(entityManager, inventoryManager);
         Vector3f position = blockComponent.getPosition().toVector3f().add(0, 0.5f, 0);
         pickupBuilder.createPickupFor(seedItem, position, 6000, true);
         seedItem.send(new ImpulseEvent(random.nextVector3f(30.0f)));
