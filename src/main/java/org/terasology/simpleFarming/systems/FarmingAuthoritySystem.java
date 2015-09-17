@@ -193,7 +193,12 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
 
         worldProvider.setBlock(blockComponent.getPosition(), newPlantBlock);
         EntityRef newEntity = blockEntityRegistry.getBlockEntityAt(blockComponent.getPosition());
-        newEntity.addOrSaveComponent(plantDefinitionComponent);
+        if (newEntity.hasComponent(PlantDefinitionComponent.class)) {
+            newEntity.saveComponent(plantDefinitionComponent);
+        } else {
+            newEntity.addComponent(plantDefinitionComponent);
+        }
+
 
         schedulePlantGrowth(newEntity, nextGrowthStage);
     }
@@ -225,7 +230,12 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
 
         worldProvider.setBlock(blockComponent.getPosition(), newPlantBlock);
         EntityRef newEntity = blockEntityRegistry.getBlockEntityAt(blockComponent.getPosition());
-        newEntity.addOrSaveComponent(plantDefinitionComponent);
+        if (newEntity.hasComponent(PlantDefinitionComponent.class)) {
+            newEntity.saveComponent(plantDefinitionComponent);
+        } else {
+            newEntity.addComponent(plantDefinitionComponent);
+        }
+
 
         schedulePlantGrowth(newEntity, nextGrowthStage);
     }
