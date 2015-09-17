@@ -21,6 +21,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
@@ -190,12 +191,19 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             return;
         }
 
-        blockEntityRegistry.setBlockRetainComponent(blockComponent.getPosition(), newPlantBlock, PlantDefinitionComponent.class, DisplayNameComponent.class);
-        schedulePlantGrowth(entity, nextGrowthStage);
+        worldProvider.setBlock(blockComponent.getPosition(), newPlantBlock);
+        EntityRef newEntity = blockEntityRegistry.getBlockEntityAt(blockComponent.getPosition());
+        newEntity.addOrSaveComponent(plantDefinitionComponent);
+
+        schedulePlantGrowth(newEntity, nextGrowthStage);
     }
 
     @ReceiveEvent
     public void onPlantUnGrowth(OnPlantUnGrowth event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
+        if (plantDefinitionComponent.getGrowthStages().length == 0) {
+            return;
+        }
+
         PlantDefinitionComponent.PlantGrowth nextGrowthStage = plantDefinitionComponent.getGrowthStages()[0];
         // find the previous growth stage
         Block currentBlock = blockComponent.getBlock();
@@ -215,8 +223,11 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             return;
         }
 
-        blockEntityRegistry.setBlockRetainComponent(blockComponent.getPosition(), newPlantBlock, PlantDefinitionComponent.class, DisplayNameComponent.class);
-        schedulePlantGrowth(entity, nextGrowthStage);
+        worldProvider.setBlock(blockComponent.getPosition(), newPlantBlock);
+        EntityRef newEntity = blockEntityRegistry.getBlockEntityAt(blockComponent.getPosition());
+        newEntity.addOrSaveComponent(plantDefinitionComponent);
+
+        schedulePlantGrowth(newEntity, nextGrowthStage);
     }
 
     @ReceiveEvent
@@ -258,6 +269,15 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void copySeedPlantDefinitionFromSeedToBlock(OnActivatedComponent event, EntityRef entityRef, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
+        updatePlantDefinitionAndDisplayName(entityRef, plantDefinitionComponent);
+    }
+
+    @ReceiveEvent
+    public void copySeedPlantDefinitionFromSeedToBlock(OnChangedComponent event, EntityRef entityRef, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
+        updatePlantDefinitionAndDisplayName(entityRef, plantDefinitionComponent);
+    }
+
+    void updatePlantDefinitionAndDisplayName(EntityRef entityRef, PlantDefinitionComponent plantDefinitionComponent) {
         // ensure that the important bits get copied from the seed prefab
         if (plantDefinitionComponent.growthStages.isEmpty() && !plantDefinitionComponent.seedPrefab.isEmpty()) {
             Prefab seedPrefab = prefabManager.getPrefab(plantDefinitionComponent.seedPrefab);
@@ -277,7 +297,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
                 displayNameComponent = new DisplayNameComponent();
                 displayNameComponent.name = plantDefinitionComponent.plantName;
                 entityRef.addComponent(displayNameComponent);
-            } else {
+            } else if (!displayNameComponent.name.equals(plantDefinitionComponent.plantName)) {
                 displayNameComponent.name = plantDefinitionComponent.plantName;
                 entityRef.saveComponent(displayNameComponent);
             }
