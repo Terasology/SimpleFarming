@@ -252,9 +252,10 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         if (!event.isConsumed() && target.exists() && harvestingEntity.exists() && harvestingEntity.hasComponent(InventoryComponent.class)) {
             PlantProduceComponent plantProduceComponent = target.getComponent(PlantProduceComponent.class);
             if (plantProduceComponent != null) {
-                inventoryManager.giveItem(harvestingEntity, target, plantProduceComponent.produceItem);
+                EntityRef produceItem = plantProduceComponent.produceItem;
                 plantProduceComponent.produceItem = EntityRef.NULL;
                 target.saveComponent(plantProduceComponent);
+                inventoryManager.giveItem(harvestingEntity, target, produceItem);
                 target.send(new OnPlantHarvest());
                 event.consume();
             }
