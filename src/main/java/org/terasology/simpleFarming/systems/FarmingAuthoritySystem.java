@@ -35,7 +35,7 @@ import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.inventory.PickupBuilder;
+import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -145,9 +145,8 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     public void onPlantDestroyed(CreateBlockDropsEvent event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
         event.consume();
         EntityRef seedItem = entityManager.create(plantDefinitionComponent.seedPrefab);
-        PickupBuilder pickupBuilder = new PickupBuilder(entityManager, inventoryManager);
         Vector3f position = blockComponent.getPosition().toVector3f().add(0, 0.5f, 0);
-        pickupBuilder.createPickupFor(seedItem, position, 6000, true);
+        seedItem.send(new DropItemEvent(position));
         seedItem.send(new ImpulseEvent(random.nextVector3f(30.0f)));
     }
 
@@ -279,12 +278,16 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    public void copySeedPlantDefinitionFromSeedToBlock(OnActivatedComponent event, EntityRef entityRef, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
+    public void copySeedPlantDefinitionFromSeedToBlock(OnActivatedComponent event, EntityRef entityRef,
+                                                       PlantDefinitionComponent plantDefinitionComponent,
+                                                       BlockComponent blockComponent) {
         updatePlantDefinitionAndDisplayName(entityRef, plantDefinitionComponent);
     }
 
     @ReceiveEvent
-    public void copySeedPlantDefinitionFromSeedToBlock(OnChangedComponent event, EntityRef entityRef, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
+    public void copySeedPlantDefinitionFromSeedToBlock(OnChangedComponent event, EntityRef entityRef,
+                                                       PlantDefinitionComponent plantDefinitionComponent,
+                                                       BlockComponent blockComponent) {
         updatePlantDefinitionAndDisplayName(entityRef, plantDefinitionComponent);
     }
 
