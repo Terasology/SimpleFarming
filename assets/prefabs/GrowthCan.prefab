@@ -5,7 +5,6 @@
   },
   "Item": {
     "icon": "SimpleFarming:SimpleFarming#GrowthCan",
-    "renderWithIcon": true,
     "stackId": "SimpleFarming:GrowthCan"
   },
   "CheatGrowth": {

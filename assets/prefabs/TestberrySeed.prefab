@@ -5,7 +5,6 @@
   },
   "Item": {
     "icon": "SimpleFarming:SimpleFarming#berryseed",
-    "renderWithIcon": true,
     "stackId": "TestberrySeed"
   },
   "PlantDefinition": {
