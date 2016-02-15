@@ -4,6 +4,11 @@
     "author" : "Josharias",
     "displayName" : "SimpleFarming",
     "description" : "Easy to understand growing of foods",
-    "dependencies" : [],
+    "dependencies" : [
+         {
+             "id" : "Core",
+             "minVersion" : "1.0.0"
+         }
+     ],
     "isServerSideOnly" : false
 }
