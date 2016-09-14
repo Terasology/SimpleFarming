@@ -21,10 +21,18 @@ import org.terasology.utilities.random.Random;
 
 @MappedContainer
 public class TimeRange {
+    /** Minimum bounds of variation. */
     public long minRandom = 0;
+
+    /** Maximum bounds of variation. */
     public long maxRandom = 5000;
+
+    /** The base number before random variation is applied. */
     public long fixed = 10000;
 
+    /**
+     * Return the total time or time range using the values stored in this instance. This will be random per call.
+     */
     public long getTimeRange() {
         long total = fixed;
         Random random = new FastRandom();

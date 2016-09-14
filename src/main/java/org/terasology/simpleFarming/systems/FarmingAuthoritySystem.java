@@ -59,7 +59,6 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.entity.CreateBlockDropsEvent;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -123,14 +122,13 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
                 logger.error("Could not find plant: " + growthStages.get(0).getKey());
                 return;
             }
-            
+
             PlantDefinitionComponent newPlantDefinitionComponent = new PlantDefinitionComponent();
             newPlantDefinitionComponent.growthStages = plantDefinitionComponent.growthStages;
             newPlantDefinitionComponent.soilCategory = plantDefinitionComponent.soilCategory;
-            newPlantDefinitionComponent.seedPrefab = plantDefinitionComponent.seedPrefab;
+            newPlantDefinitionComponent.seedPrefab = seedItem.getParentPrefab().getName();
             newPlantDefinitionComponent.plantName = plantDefinitionComponent.plantName;
 
-            newPlantDefinitionComponent.seedPrefab = seedItem.getParentPrefab().getName();
             worldProvider.setBlock(plantPosition, plantBlock);
             EntityRef plantEntity = blockEntityRegistry.getBlockEntityAt(plantPosition);
             plantEntity.addComponent(newPlantDefinitionComponent);
@@ -197,6 +195,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             }
         }
 
+        // If there's no next growth stage, return null.
         if (nextGrowthStage == null) {
             return;
         }
@@ -227,8 +226,8 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             return;
         }
 
-        String nextGrowthStageBlockName = "";
-        TimeRange nextGrowthStage = growthStages.get(0).getValue();
+        String previousGrowthStageBlockName = "";
+        TimeRange previousGrowthStage = growthStages.get(0).getValue();
 
         // Find the previous growth stage.
         Block currentBlock = blockComponent.getBlock();
@@ -237,15 +236,20 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             Block block = blockManager.getBlock(growthStages.get(i).getKey());
 
             if (block.equals(currentBlock) && block != blockManager.getBlock(BlockManager.AIR_ID)) {
-                nextGrowthStage = growthStages.get(i - 1).getValue();
-                nextGrowthStageBlockName = growthStages.get(i - 1).getKey();
+                previousGrowthStage = growthStages.get(i - 1).getValue();
+                previousGrowthStageBlockName = growthStages.get(i - 1).getKey();
                 break;
             }
         }
 
-        Block newPlantBlock = blockManager.getBlock(nextGrowthStageBlockName);
+        // In case there are no growth stages, or it was found that this is the first growth stage, return null.
+        if (previousGrowthStage == null || previousGrowthStageBlockName.equals("")) {
+            return;
+        }
+
+        Block newPlantBlock = blockManager.getBlock(previousGrowthStageBlockName);
         if (newPlantBlock == blockManager.getBlock(BlockManager.AIR_ID)) {
-            logger.error("Could not find the next growth stage block: " + nextGrowthStageBlockName);
+            logger.error("Could not find the previous growth stage block: " + previousGrowthStageBlockName);
             return;
         }
 
@@ -257,7 +261,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             newEntity.addComponent(plantDefinitionComponent);
         }
 
-        schedulePlantGrowth(newEntity, nextGrowthStage);
+        schedulePlantGrowth(newEntity, previousGrowthStage);
     }
 
     @ReceiveEvent
@@ -312,8 +316,14 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         updatePlantDefinitionAndDisplayName(entityRef, plantDefinitionComponent);
     }
 
+    /**
+     * Update the plant definition and display name.
+     *
+     * @param entityRef                    Reference to the plant entity.
+     * @param plantDefinitionComponent     The definition of the plant.
+     */
     void updatePlantDefinitionAndDisplayName(EntityRef entityRef, PlantDefinitionComponent plantDefinitionComponent) {
-        // ensure that the important bits get copied from the seed prefab
+        // Ensure that the important bits get copied from the seed prefab
         if (plantDefinitionComponent.growthStages.isEmpty() && !plantDefinitionComponent.seedPrefab.isEmpty()) {
             Prefab seedPrefab = prefabManager.getPrefab(plantDefinitionComponent.seedPrefab);
             PlantDefinitionComponent seedPlantDefinition = seedPrefab.getComponent(PlantDefinitionComponent.class);
@@ -322,16 +332,15 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
                 PlantDefinitionComponent updatedPlantDefinitionComponent = new PlantDefinitionComponent();
                 updatedPlantDefinitionComponent.growthStages = seedPlantDefinition.growthStages;
                 updatedPlantDefinitionComponent.soilCategory = seedPlantDefinition.soilCategory;
-                updatedPlantDefinitionComponent.seedPrefab = seedPlantDefinition.seedPrefab;
                 updatedPlantDefinitionComponent.plantName = seedPlantDefinition.plantName;
 
-                // recopy the block's seed prefab in case the seed does not supply one. Not ideal.
+                // Recopy the block's seed prefab in case the seed does not supply one. Not ideal.
                 updatedPlantDefinitionComponent.seedPrefab = plantDefinitionComponent.seedPrefab;
                 entityRef.saveComponent(updatedPlantDefinitionComponent);
             }
         }
 
-        // update the name of the block if there is a static name present
+        // Update the name of the block if there is a static name present
         if (plantDefinitionComponent.plantName != null) {
             DisplayNameComponent displayNameComponent = entityRef.getComponent(DisplayNameComponent.class);
             if (displayNameComponent == null) {
@@ -345,7 +354,11 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         }
     }
 
-    // Return the growth stages of this plant in list format.
+    /**
+     * Return the growth stages of this plant definition in list format.
+     *
+     * @param p     The definition of the plant.
+     */
     public List<Map.Entry<String, TimeRange>> getGrowthStages(PlantDefinitionComponent p) {
         List<Map.Entry<String, TimeRange>> output = Lists.newLinkedList();
         for (Map.Entry<String, TimeRange> item : p.growthStages.entrySet()) {
