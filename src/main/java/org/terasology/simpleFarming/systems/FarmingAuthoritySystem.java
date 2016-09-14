@@ -123,8 +123,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
                 logger.error("Could not find plant: " + growthStages.get(0).getKey());
                 return;
             }
-
-            //PlantDefinitionComponent newPlantDefinitionComponent = new PlantDefinitionComponent(plantDefinitionComponent);
+            
             PlantDefinitionComponent newPlantDefinitionComponent = new PlantDefinitionComponent();
             newPlantDefinitionComponent.growthStages = plantDefinitionComponent.growthStages;
             newPlantDefinitionComponent.soilCategory = plantDefinitionComponent.soilCategory;
@@ -319,7 +318,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             Prefab seedPrefab = prefabManager.getPrefab(plantDefinitionComponent.seedPrefab);
             PlantDefinitionComponent seedPlantDefinition = seedPrefab.getComponent(PlantDefinitionComponent.class);
             if (seedPlantDefinition != null) {
-                //PlantDefinitionComponent updatedPlantDefinitionComponent = new PlantDefinitionComponent(seedPlantDefinition);
+
                 PlantDefinitionComponent updatedPlantDefinitionComponent = new PlantDefinitionComponent();
                 updatedPlantDefinitionComponent.growthStages = seedPlantDefinition.growthStages;
                 updatedPlantDefinitionComponent.soilCategory = seedPlantDefinition.soilCategory;
