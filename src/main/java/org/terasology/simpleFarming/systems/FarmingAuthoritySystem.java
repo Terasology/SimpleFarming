@@ -15,6 +15,7 @@
  */
 package org.terasology.simpleFarming.systems;
 
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -44,6 +45,7 @@ import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.PlantDefinitionComponent;
 import org.terasology.simpleFarming.components.PlantProduceComponent;
 import org.terasology.simpleFarming.components.PlantProduceCreationComponent;
+import org.terasology.simpleFarming.components.TimeRange;
 import org.terasology.simpleFarming.components.UnGrowPlantOnHarvestComponent;
 import org.terasology.simpleFarming.events.OnPlantGrowth;
 import org.terasology.simpleFarming.events.OnPlantHarvest;
@@ -57,6 +59,8 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.entity.CreateBlockDropsEvent;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -111,15 +115,22 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         if (soilBlock.getBlockFamily().hasCategory(plantDefinitionComponent.soilCategory) && currentPlantBlock == blockManager.getBlock(BlockManager.AIR_ID)) {
             event.consume();
 
-            PlantDefinitionComponent.PlantGrowth growthStage = plantDefinitionComponent.getGrowthStages()[0];
+            List<Map.Entry<String, TimeRange>> growthStages = getGrowthStages(plantDefinitionComponent);
+            TimeRange growthStage = growthStages.get(0).getValue();
 
-            Block plantBlock = blockManager.getBlock(growthStage.block);
+            Block plantBlock = blockManager.getBlock(growthStages.get(0).getKey());
             if (plantBlock == blockManager.getBlock(BlockManager.AIR_ID)) {
-                logger.error("Could not find plant: " + growthStage.block);
+                logger.error("Could not find plant: " + growthStages.get(0).getKey());
                 return;
             }
 
-            PlantDefinitionComponent newPlantDefinitionComponent = new PlantDefinitionComponent(plantDefinitionComponent);
+            //PlantDefinitionComponent newPlantDefinitionComponent = new PlantDefinitionComponent(plantDefinitionComponent);
+            PlantDefinitionComponent newPlantDefinitionComponent = new PlantDefinitionComponent();
+            newPlantDefinitionComponent.growthStages = plantDefinitionComponent.growthStages;
+            newPlantDefinitionComponent.soilCategory = plantDefinitionComponent.soilCategory;
+            newPlantDefinitionComponent.seedPrefab = plantDefinitionComponent.seedPrefab;
+            newPlantDefinitionComponent.plantName = plantDefinitionComponent.plantName;
+
             newPlantDefinitionComponent.seedPrefab = seedItem.getParentPrefab().getName();
             worldProvider.setBlock(plantPosition, plantBlock);
             EntityRef plantEntity = blockEntityRegistry.getBlockEntityAt(plantPosition);
@@ -129,10 +140,10 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         }
     }
 
-    private Map.Entry<String, PlantDefinitionComponent.TimeRange> getGrowthStage(PlantDefinitionComponent plantDefinitionComponent, int index) {
-        Map.Entry<String, PlantDefinitionComponent.TimeRange> growthStage = null;
+    private Map.Entry<String, TimeRange> getGrowthStage(PlantDefinitionComponent plantDefinitionComponent, int index) {
+        Map.Entry<String, TimeRange> growthStage = null;
         int i = 0;
-        for (Map.Entry<String, PlantDefinitionComponent.TimeRange> item : plantDefinitionComponent.growthStages.entrySet()) {
+        for (Map.Entry<String, TimeRange> item : plantDefinitionComponent.growthStages.entrySet()) {
             if (i == index) {
                 return item;
             }
@@ -150,7 +161,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         seedItem.send(new ImpulseEvent(random.nextVector3f(30.0f)));
     }
 
-    private void schedulePlantGrowth(EntityRef entity, PlantDefinitionComponent.TimeRange timeRange) {
+    private void schedulePlantGrowth(EntityRef entity, TimeRange timeRange) {
         delayManager.addDelayedAction(entity, GROWTH_ACTION, timeRange.getTimeRange());
     }
 
@@ -167,15 +178,22 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             delayManager.cancelDelayedAction(entity, GROWTH_ACTION);
         }
 
-        PlantDefinitionComponent.PlantGrowth nextGrowthStage = null;
+        // growthStages.
+
+        TimeRange nextGrowthStage = null;
+        String nextGrowthStageBlockName = "";
+
         // find the next growth stage
+        List<Map.Entry<String, TimeRange>> growthStages = getGrowthStages(plantDefinitionComponent);
         Block currentBlock = blockComponent.getBlock();
-        for (int i = 0; i < plantDefinitionComponent.getGrowthStages().length - 1; i++) {
-            PlantDefinitionComponent.PlantGrowth growthStage = plantDefinitionComponent.getGrowthStages()[i];
-            Block block = blockManager.getBlock(growthStage.block);
+
+        for (int i = 0; i < growthStages.size() - 1; i++) {
+            TimeRange growthStage = growthStages.get(i).getValue();
+            Block block = blockManager.getBlock(growthStages.get(i).getKey());
 
             if (block.equals(currentBlock) && block != blockManager.getBlock(BlockManager.AIR_ID)) {
-                nextGrowthStage = plantDefinitionComponent.getGrowthStages()[i + 1];
+                nextGrowthStage = growthStages.get(i + 1).getValue();
+                nextGrowthStageBlockName = growthStages.get(i + 1).getKey();
                 break;
             }
         }
@@ -184,9 +202,9 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             return;
         }
 
-        Block newPlantBlock = blockManager.getBlock(nextGrowthStage.block);
+        Block newPlantBlock = blockManager.getBlock(nextGrowthStageBlockName);
         if (newPlantBlock == blockManager.getBlock(BlockManager.AIR_ID)) {
-            logger.error("Could not find the next growth stage block: " + nextGrowthStage.block);
+            logger.error("Could not find the next growth stage block: " + nextGrowthStageBlockName);
             return;
         }
 
@@ -204,26 +222,31 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void onPlantUnGrowth(OnPlantUnGrowth event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
-        if (plantDefinitionComponent.getGrowthStages().length == 0) {
+        List<Map.Entry<String, TimeRange>> growthStages = getGrowthStages(plantDefinitionComponent);
+
+        if (growthStages.size() == 0) {
             return;
         }
 
-        PlantDefinitionComponent.PlantGrowth nextGrowthStage = plantDefinitionComponent.getGrowthStages()[0];
-        // find the previous growth stage
+        String nextGrowthStageBlockName = "";
+        TimeRange nextGrowthStage = growthStages.get(0).getValue();
+
+        // Find the previous growth stage.
         Block currentBlock = blockComponent.getBlock();
-        for (int i = 1; i < plantDefinitionComponent.getGrowthStages().length; i++) {
-            PlantDefinitionComponent.PlantGrowth growthStage = plantDefinitionComponent.getGrowthStages()[i];
-            Block block = blockManager.getBlock(growthStage.block);
+        for (int i = 1; i < growthStages.size(); i++) {
+            TimeRange growthStage = growthStages.get(i).getValue();
+            Block block = blockManager.getBlock(growthStages.get(i).getKey());
 
             if (block.equals(currentBlock) && block != blockManager.getBlock(BlockManager.AIR_ID)) {
-                nextGrowthStage = plantDefinitionComponent.getGrowthStages()[i - 1];
+                nextGrowthStage = growthStages.get(i - 1).getValue();
+                nextGrowthStageBlockName = growthStages.get(i - 1).getKey();
                 break;
             }
         }
 
-        Block newPlantBlock = blockManager.getBlock(nextGrowthStage.block);
+        Block newPlantBlock = blockManager.getBlock(nextGrowthStageBlockName);
         if (newPlantBlock == blockManager.getBlock(BlockManager.AIR_ID)) {
-            logger.error("Could not find the next growth stage block: " + nextGrowthStage.block);
+            logger.error("Could not find the next growth stage block: " + nextGrowthStageBlockName);
             return;
         }
 
@@ -234,7 +257,6 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         } else {
             newEntity.addComponent(plantDefinitionComponent);
         }
-
 
         schedulePlantGrowth(newEntity, nextGrowthStage);
     }
@@ -297,7 +319,13 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             Prefab seedPrefab = prefabManager.getPrefab(plantDefinitionComponent.seedPrefab);
             PlantDefinitionComponent seedPlantDefinition = seedPrefab.getComponent(PlantDefinitionComponent.class);
             if (seedPlantDefinition != null) {
-                PlantDefinitionComponent updatedPlantDefinitionComponent = new PlantDefinitionComponent(seedPlantDefinition);
+                //PlantDefinitionComponent updatedPlantDefinitionComponent = new PlantDefinitionComponent(seedPlantDefinition);
+                PlantDefinitionComponent updatedPlantDefinitionComponent = new PlantDefinitionComponent();
+                updatedPlantDefinitionComponent.growthStages = seedPlantDefinition.growthStages;
+                updatedPlantDefinitionComponent.soilCategory = seedPlantDefinition.soilCategory;
+                updatedPlantDefinitionComponent.seedPrefab = seedPlantDefinition.seedPrefab;
+                updatedPlantDefinitionComponent.plantName = seedPlantDefinition.plantName;
+
                 // recopy the block's seed prefab in case the seed does not supply one. Not ideal.
                 updatedPlantDefinitionComponent.seedPrefab = plantDefinitionComponent.seedPrefab;
                 entityRef.saveComponent(updatedPlantDefinitionComponent);
@@ -316,5 +344,15 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
                 entityRef.saveComponent(displayNameComponent);
             }
         }
+    }
+
+    // Return the growth stages of this plant in list format.
+    public List<Map.Entry<String, TimeRange>> getGrowthStages(PlantDefinitionComponent p) {
+        List<Map.Entry<String, TimeRange>> output = Lists.newLinkedList();
+        for (Map.Entry<String, TimeRange> item : p.growthStages.entrySet()) {
+            output.add(item);
+        }
+
+        return output;
     }
 }
