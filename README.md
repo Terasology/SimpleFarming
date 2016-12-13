@@ -39,7 +39,7 @@ Seed Prefab
 
 **:engine:halfblock** can be use to create a half-size block. This can be use if you are trying to characterize the plant being "small" in size during that particular growth stage. (Ex: In the first stage of TestBerry Plant, the plant is a half-block of berry bush block).
 
-![enter image description here](http://i.imgur.com/URLFbzo.png)
+![A compharison between a half-block and a full-block](http://i.imgur.com/URLFbzo.png)
 
     "growthStages": {
       "SimpleFarming:BerryBush:engine:halfblock": {
@@ -88,9 +88,13 @@ One thing that you need to pay attention when you want to create a stage that ca
          },
 This code will allow the game to know that this particular block is associated with a prefab that indicated that this stage is where the fruit is ripe and is ready to be harvested.
 
-#Produce Mechanisms
-- Periodic
-- Once
+Produce Mechanisms
+------------------
+There's 2 kind of produce mechanism that you can make using the SimpleFarming module.
+ 1. Periodic
+ 2. Once
+A **Periodic** produce will grow again after it's harvest. On the other hand, a **Once** produce will only be a one-time harvest and after you harvest it, you need to plant it again from the seed.
 
-#Other
-- Destroying plant with produce also drops produce
+To make a plant have a **periodic** produce mechanism, you need to add   `"UnGrowPlantOnHarvest": {},` in ripe stage of the plant prefab file, and vice versa.
+
+Destroying a plant with produce, will also yield a produce.
