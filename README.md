@@ -19,7 +19,7 @@ Creating New Plants
 -----------------
 You can start making new plants by creating a new prefab file at assets/prefabs.
 
-Usually for each plant you want to make these three prefabs:
+Usually for each plant you want to make these three prefabs:  
 1. **Seed Prefab** (e.g. TestberrySeed.prefab)  
 2. **Fruit prefab** (e.g. Testberry.prefab)  
 3. **Ripe Stage of The Plant Prefab** (e.g. TestberryBushFull.prefab)
