@@ -1,0 +1,10 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Strawberry"
+  },
+  "Item": {
+    "icon": "SimpleFarming:SimpleFarming#strawberry",
+    "stackId": "Strawberry"
+  }
+}
