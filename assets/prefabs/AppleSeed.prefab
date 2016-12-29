@@ -1,0 +1,31 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Apple Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:AppleSeed",
+    "stackId": "Apple seed"
+  },
+  "PlantDefinition": {
+    "plantName": "Apple Bush",
+    "growthStages": {
+      "SimpleFarming:AppleBush:engine:halfblock": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      },
+      "SimpleFarming:AppleBush": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      },
+      "SimpleFarming:MatureAppleBush": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      },
+      "SimpleFarming:AppleBushFull": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      }
+    }
+  }
+}
