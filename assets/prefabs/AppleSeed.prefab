@@ -11,20 +11,20 @@
     "plantName": "Apple Bush",
     "growthStages": {
       "SimpleFarming:AppleBush:engine:halfblock": {
-        "maxRandom": 5000,
-        "fixed": 10000
+        "maxRandom": 6000,
+        "fixed": 12000
       },
       "SimpleFarming:AppleBush": {
-        "maxRandom": 5000,
-        "fixed": 10000
+        "maxRandom": 7000,
+        "fixed": 14000
       },
       "SimpleFarming:MatureAppleBush": {
-        "maxRandom": 5000,
-        "fixed": 10000
+        "maxRandom": 8000,
+        "fixed": 16000
       },
       "SimpleFarming:AppleBushFull": {
-        "maxRandom": 5000,
-        "fixed": 10000
+        "maxRandom": 6000,
+        "fixed": 12000
       }
     }
   }
