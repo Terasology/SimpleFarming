@@ -98,3 +98,10 @@ A **Periodic** produce will grow again after it's harvest. On the other hand, a 
 To make a plant have a **periodic** produce mechanism, you need to add   `"UnGrowPlantOnHarvest": {},` in ripe stage of the plant prefab file, and vice versa.
 
 Destroying a plant with produce, will also yield a produce.
+
+### Credits for images:
+
+Apple: http://opengameart.org/content/good-fruits-m484-games
+Apple seed by gkaretka (own work)
+Apple bush full by gkaretka: merge of BerryBushFull and Apple
+

@@ -1,9 +1,9 @@
 {
   "PlantProduceCreation": {
-    "producePrefab": "SimpleFarming:Testberry"
+    "producePrefab": "SimpleFarming:Apple"
   },
   "UnGrowPlantOnHarvest": {},
   "PlantDefinition": {
-    "seedPrefab": "TestberrySeed"
+    "seedPrefab": "AppleSeed"
   }
 }
