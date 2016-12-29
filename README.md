@@ -102,4 +102,6 @@ Destroying a plant with produce, will also yield a produce.
 ### Credits for images:
 
 Apple: http://opengameart.org/content/good-fruits-m484-games
+Apple seed by gkaretka (own work)
+Apple bush full by gkaretka: merge of BerryBushFull and Apple
 
