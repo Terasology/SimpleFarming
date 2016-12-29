@@ -4,5 +4,5 @@
   "entity": {
     "prefab": "AppleBushFull"
   },
-  "tile": "SimpleFarming:AppleBush"
+  "tile": "SimpleFarming:AppleBushFull"
 }
