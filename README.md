@@ -99,6 +99,8 @@ To make a plant have a **periodic** produce mechanism, you need to add   `"UnGro
 
 Destroying a plant with produce, will also yield a produce.
 
-###Credits for images:
-
+Credits for Images:
+------------------
+* Blueberry: Made by TheJYKoder (original)
+* BlueberryBushFull: Made by TheJYKoder(original)
 * Strawberry: Created by Patrick Wang. Original.
