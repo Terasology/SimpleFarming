@@ -103,3 +103,5 @@ Credits for Images:
 ------------------
 * Blueberry: Made by TheJYKoder (original)
 * BlueberryBushFull: Made by TheJYKoder(original)
+* Gooseberry: Made by TheJYKoder (original)
+* GooseberryBushFull: Made by TheJYKoder(original)
