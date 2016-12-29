@@ -104,3 +104,5 @@ Credits for Images:
 * Blueberry: Made by TheJYKoder (original)
 * BlueberryBushFull: Made by TheJYKoder(original)
 * Strawberry: Created by Patrick Wang. Original.
+* GooseberryBushFull: http://www.quickcrop.co.uk
+* Gooseberry: https://www.dreamstime.com/stock-photography-one-gooseberry-fruits-isolated-image20607952
