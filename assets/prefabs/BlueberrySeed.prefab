@@ -1,0 +1,31 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Blueberry Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:SimpleFarming#BlueberrySeed",
+    "stackId": "BlueberrySeed"
+  },
+  "PlantDefinition": {
+    "plantName": "Blueberry Bush",
+    "growthStages": {
+      "SimpleFarming:BlueberryBush:engine:halfblock": {
+        "maxRandom": 3000,
+        "fixed": 6000
+      },
+      "SimpleFarming:BlueberryBush": {
+        "maxRandom": 3000,
+        "fixed": 6000
+      },
+      "SimpleFarming:MatureBlueberryBush": {
+        "maxRandom": 3000,
+        "fixed": 6000
+      },
+      "SimpleFarming:BlueberryBushFull": {
+        "maxRandom": 6000,
+        "fixed": 12000
+      }
+    }
+  }
+}
