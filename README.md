@@ -103,3 +103,5 @@ Credits for Images:
 ------------------
 * Blueberry: Made by TheJYKoder (original)
 * BlueberryBushFull: Made by TheJYKoder(original)
+* Raspberry: Made by TheJYKoder (original)
+* RaspberryBushFull: Made by TheJYKoder(original)
