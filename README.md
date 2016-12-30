@@ -104,5 +104,8 @@ Credits for Images:
 * Blueberry: Made by TheJYKoder (original)
 * BlueberryBushFull: Made by TheJYKoder(original)
 * Strawberry: Created by Patrick Wang. Original.
-* PineappleBushFull: Created MDJ117
+* ImmaturePineapple: Created MDJ117
+* MaturePineapple: Created MDJ117
+* PineappleSapling: Created MDJ117
 * Pineapple: https://pixabay.com/en/pineapple-fruit-exotic-tropical-1916996/
+* PineappleSeed: https://pixabay.com/en/chestnuts-conker-marron-nuts-seeds-151927/
