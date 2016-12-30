@@ -4,7 +4,7 @@
     "name": "Strawberry"
   },
   "Item": {
-    "icon": "SimpleFarming:SimpleFarming#strawberry",
+    "icon": "SimpleFarming:strawberry",
     "stackId": "Strawberry"
   }
 }

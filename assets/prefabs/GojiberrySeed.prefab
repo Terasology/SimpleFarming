@@ -1,0 +1,31 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Gojiberry Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:SimpleFarming#berryseed",
+    "stackId": "GojiberrySeed"
+  },
+  "PlantDefinition": {
+    "plantName": "Gojiberry Bush",
+    "growthStages": {
+      "SimpleFarming:BerryBush:engine:halfblock": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      },
+      "SimpleFarming:BerryBush": {
+        "maxRandom": 7000,
+        "fixed": 10000
+      },
+      "SimpleFarming:MatureBerryBush": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      },
+      "SimpleFarming:GojiberryBushFull": {
+        "maxRandom": 6000,
+        "fixed": 10000
+      }
+    }
+  }
+}
