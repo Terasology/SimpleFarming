@@ -1,0 +1,9 @@
+{
+  "PlantProduceCreation": {
+    "producePrefab": "SimpleFarming:Pineapple"
+  },
+  "UnGrowPlantOnHarvest": {},
+  "PlantDefinition": {
+    "seedPrefab": "PineappleSeed"
+  }
+}
