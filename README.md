@@ -104,6 +104,7 @@ Credits for Images:
 * Blueberry: Made by TheJYKoder (original)
 * BlueberryBushFull: Made by TheJYKoder(original)
 * Strawberry: Created by Patrick Wang. Original.
+* Gojiberry: Made by Harry Wang(original)
 * Apple: http://opengameart.org/content/good-fruits-m484-games
 * Apple seed by gkaretka (own work)
 * Apple bush full by gkaretka: merge of BerryBushFull and Apple
