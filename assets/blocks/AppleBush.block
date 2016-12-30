@@ -1,0 +1,7 @@
+{
+  "hardness": 3,
+  "mass": 100,
+  "translucent": true,
+  "doubleSided": true,
+  "tile": "SimpleFarming:AppleBush"
+}
