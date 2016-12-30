@@ -1,0 +1,27 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Pineapple Sapling"
+  },
+  "Item": {
+    "icon": "SimpleFarming:PineappleSapling",
+    "stackId": "PineappleSapling"
+  },
+  "PlantDefinition": {
+    "plantName": "Pineapple",
+    "growthStages": {
+      "SimpleFarming:ImmaturePineapple": {
+        "maxRandom": 4000,
+        "fixed": 6000
+      },
+      "SimpleFarming:MaturePineapple": {
+        "maxRandom": 5000,
+        "fixed": 8000
+      },
+      "SimpleFarming:RipePineapple": {
+        "maxRandom": 4000,
+        "fixed": 7000
+      }
+    }
+  }
+}
