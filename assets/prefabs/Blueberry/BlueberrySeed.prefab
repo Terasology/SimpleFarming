@@ -1,30 +1,30 @@
 {
   "parent": "engine:iconItem",
   "DisplayName": {
-    "name": "Testberry Seed"
+    "name": "Blueberry Seed"
   },
   "Item": {
     "icon": "SimpleFarming:SimpleFarming#berryseed",
-    "stackId": "TestberrySeed"
+    "stackId": "blueberrySeed"
   },
   "PlantDefinition": {
-    "plantName": "Testberry Bush",
+    "plantName": "Blueberry Bush",
     "growthStages": {
       "SimpleFarming:BerryBush:engine:halfblock": {
         "maxRandom": 5000,
         "fixed": 10000
       },
       "SimpleFarming:BerryBush": {
-        "maxRandom": 5000,
-        "fixed": 10000
+        "maxRandom": 7000,
+        "fixed": 14000
       },
       "SimpleFarming:MatureBerryBush": {
-        "maxRandom": 5000,
-        "fixed": 10000
+        "maxRandom": 7000,
+        "fixed": 14000
       },
-      "SimpleFarming:TestberryBushFull": {
-        "maxRandom": 5000,
-        "fixed": 10000
+      "SimpleFarming:BlueberryBushFull": {
+        "maxRandom": 7000,
+        "fixed": 14000
       }
     }
   }

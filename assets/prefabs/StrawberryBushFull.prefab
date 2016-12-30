@@ -1,9 +1,9 @@
 {
   "PlantProduceCreation": {
-    "producePrefab": "SimpleFarming:Blueberry"
+    "producePrefab": "SimpleFarming:Strawberry"
   },
   "UnGrowPlantOnHarvest": {},
   "PlantDefinition": {
-    "seedPrefab": "BlueberrySeed"
+    "seedPrefab": "StrawberrySeed"
   }
 }
