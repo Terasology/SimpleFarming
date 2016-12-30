@@ -1,0 +1,11 @@
+
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Raspberry"
+  },
+  "Item": {
+    "icon": "SimpleFarming:SimpleFarming#Raspberry",
+    "stackId": "raspberry"
+  }
+}
