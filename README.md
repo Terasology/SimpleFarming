@@ -104,3 +104,4 @@ Credits for Images:
 * Blueberry: Made by TheJYKoder (original)
 * BlueberryBushFull: Made by TheJYKoder(original)
 * Strawberry: Created by Patrick Wang. Original.
+* Raspberry: Created originally by SufurElite.
