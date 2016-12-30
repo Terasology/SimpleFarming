@@ -1,0 +1,31 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Raspberry Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:SimpleFarming#berryseed",
+    "stackId": "raspberrySeed"
+  },
+  "PlantDefinition": {
+    "plantName": "Raspberry Bush",
+    "growthStages": {
+      "SimpleFarming:BerryBush:engine:halfblock": {
+        "maxRandom": 10000,
+        "fixed": 20000
+      },
+      "SimpleFarming:BerryBush": {
+        "maxRandom": 10000,
+        "fixed": 20000
+      },
+      "SimpleFarming:MatureBerryBush": {
+        "maxRandom": 10000,
+        "fixed": 20000
+      },
+      "SimpleFarming:RaspberryBushFull": {
+        "maxRandom": 10000,
+        "fixed": 20000
+      }
+    }
+  }
+}
