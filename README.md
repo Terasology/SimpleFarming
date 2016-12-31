@@ -104,3 +104,8 @@ Credits for Images:
 * Blueberry: Made by TheJYKoder (original)
 * BlueberryBushFull: Made by TheJYKoder(original)
 * Strawberry: Created by Patrick Wang. Original.
+* BlackberrySeed: Made by VaibhavBajaj (based on Testberry)
+* BlackberryBush: Made by VaibhavBajaj (based on Testberry)
+* BlackberryBushFull: Made by VaibhavBajaj (based on Testberry)
+* MatureBlackberryBush: Made by VaibhavBajaj (based on Testberry)
+* Blackberry: Made by VaibhavBajaj (based on Testberry)
