@@ -109,3 +109,14 @@ Credits for Images:
 * BlackberryBushFull: Made by VaibhavBajaj (based on Testberry)
 * MatureBlackberryBush: Made by VaibhavBajaj (based on Testberry)
 * Blackberry: Made by VaibhavBajaj (based on Testberry)
+* Raspberry: Created originally by SufurElite.
+* Gojiberry: Made by Harry Wang(original)
+* Apple: http://opengameart.org/content/good-fruits-m484-games
+* Apple seed by gkaretka (own work)
+* Apple bush full by gkaretka: merge of BerryBushFull and Apple
+* Immature Pineapple : mdj117 (Original)
+* Mature Pineapple : mdj117 (Original)
+* Pineapple fruit : mdj117 (Original)
+* Ripe Pineapple : mdj117 (Original)
+* Pineapple : https://pixabay.com/en/pineapple-fruit-exotic-tropical-1916996/
+* Pineapple Sapling : https://pixabay.com/en/chestnuts-conker-marron-nuts-seeds-151927/

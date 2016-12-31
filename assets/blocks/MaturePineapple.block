@@ -1,0 +1,5 @@
+{
+  "basedOn": "SimpleFarming:ImmaturePineapple",
+  "displayName": "Mature Pineapple",
+  "tile": "SimpleFarming:MaturePineapple"
+}

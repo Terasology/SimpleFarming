@@ -2,7 +2,11 @@
   "basedOn": "SimpleFarming:MatureBerryBush",
   "displayName": "Blueberry Bush",
   "entity": {
-    "prefab": "BlueberryBushFull"
+    "prefab": "BlueberryBushFull",
+   "basedOn": "SimpleFarming:MatureBerryBush",
+   "displayName": "Blueberry Bush",
+   "entity": {
+     "prefab": "BlueberryBushFull"
   },
   "tile": "SimpleFarming:BlueberryBush"
 }
