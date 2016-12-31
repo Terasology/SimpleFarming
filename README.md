@@ -104,6 +104,11 @@ Credits for Images:
 * Blueberry: Made by TheJYKoder (original)
 * BlueberryBushFull: Made by TheJYKoder(original)
 * Strawberry: Created by Patrick Wang. Original.
+* BlackberrySeed: Made by VaibhavBajaj (based on Testberry)
+* BlackberryBush: Made by VaibhavBajaj (based on Testberry)
+* BlackberryBushFull: Made by VaibhavBajaj (based on Testberry)
+* MatureBlackberryBush: Made by VaibhavBajaj (based on Testberry)
+* Blackberry: Made by VaibhavBajaj (based on Testberry)
 * Raspberry: Created originally by SufurElite.
 * Gojiberry: Made by Harry Wang(original)
 * Apple: http://opengameart.org/content/good-fruits-m484-games
@@ -114,4 +119,5 @@ Credits for Images:
 * Pineapple fruit : mdj117 (Original)
 * Ripe Pineapple : mdj117 (Original)
 * Pineapple : https://pixabay.com/en/pineapple-fruit-exotic-tropical-1916996/
+* Pineapple Sapling : https://pixabay.com/en/chestnuts-conker-marron-nuts-seeds-151927/
 * Pineapple Sapling : https://pixabay.com/en/chestnuts-conker-marron-nuts-seeds-151927/
