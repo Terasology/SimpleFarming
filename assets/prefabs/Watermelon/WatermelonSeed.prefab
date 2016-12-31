@@ -1,0 +1,31 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Watermelon Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:WatermelonSeed",
+    "stackId": "WatermelonSeed"
+  },
+  "PlantDefinition": {
+    "plantName": "Watermelon Bush",
+    "growthStages": {
+      "SimpleFarming:BerryBush:engine:halfblock": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      },
+      "SimpleFarming:BerryBush": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      },
+      "SimpleFarming:MatureBerryBush": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      },
+      "SimpleFarming:WatermelonBushFull": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      }
+    }
+  }
+}
