@@ -1,7 +1,7 @@
 {
     "id" : "SimpleFarming",
     "version" : "1.0.0-SNAPSHOT",
-    "author" : "Josharias, patrick Wang, Harry Wang, mdj117, SufurElite",
+    "author" : "Josharias, patrick Wang, Harry Wang, mdj117, SufurElite, He Who Shall Not Be Named (VaibhavBajaj)",
 
     "displayName" : "Simple Farming",
     "description" : "Adds the capability to grow plants using seeds. Ripe plants can be harvested for the fruit that the plant produces.",

@@ -115,3 +115,8 @@ Credits for Images:
 * Ripe Pineapple : mdj117 (Original)
 * Pineapple : https://pixabay.com/en/pineapple-fruit-exotic-tropical-1916996/
 * Pineapple Sapling : https://pixabay.com/en/chestnuts-conker-marron-nuts-seeds-151927/
+* Blackberry: Made by VaibhavBajaj (inspired by Testberry)
+* BlackberrySeed: Made by VaibhavBajaj (inspired by Testberry)
+* BlackberryBush: Made by VaibhavBajaj (inspired by Testberry)
+* MatureBlackberryBush: Made by VaibhavBajaj (inspired by Testberry)
+* BlackberryBushFull: Made by VaibhavBajaj (inspired by Testberry)
