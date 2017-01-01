@@ -120,3 +120,4 @@ Credits for Images:
 * BlackberryBush: Made by VaibhavBajaj (inspired by Testberry)
 * MatureBlackberryBush: Made by VaibhavBajaj (inspired by Testberry)
 * BlackberryBushFull: Made by VaibhavBajaj (inspired by Testberry)
+* Pear: https://pixabay.com/en/fruit-owocostan-356522/
