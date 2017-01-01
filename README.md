@@ -120,3 +120,4 @@ Credits for Images:
 * BlackberryBush: Made by VaibhavBajaj (inspired by Testberry)
 * MatureBlackberryBush: Made by VaibhavBajaj (inspired by Testberry)
 * BlackberryBushFull: Made by VaibhavBajaj (inspired by Testberry)
+* Cranberry and all related: [András Ottó Földes](https://github.com/andriii25)
