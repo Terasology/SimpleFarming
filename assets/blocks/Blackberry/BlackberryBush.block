@@ -1,6 +1,6 @@
 {
-  "hardness": 10,
-  "mass": 200,
+  "hardness": 1,
+  "mass": 5,
   "translucent": true,
   "doubleSided": true
 }
