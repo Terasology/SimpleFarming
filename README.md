@@ -116,3 +116,8 @@ Credits for Images:
 * Pineapple Sapling : https://pixabay.com/en/chestnuts-conker-marron-nuts-seeds-151927/
 * Watermelon: http://www.freestockphotos.biz/stockphoto/14464
 * Watermelon Seed: Made by smsunarto (Original)
+* Blackberry: Made by VaibhavBajaj (inspired by Testberry)
+* BlackberrySeed: Made by VaibhavBajaj (inspired by Testberry)
+* BlackberryBush: Made by VaibhavBajaj (inspired by Testberry)
+* MatureBlackberryBush: Made by VaibhavBajaj (inspired by Testberry)
+* BlackberryBushFull: Made by VaibhavBajaj (inspired by Testberry)
