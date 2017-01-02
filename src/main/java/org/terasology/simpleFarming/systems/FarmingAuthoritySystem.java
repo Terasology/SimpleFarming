@@ -150,6 +150,14 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
+    /*
+     * Handles the seed drop on plant destroyed event.
+     * 
+     * @param event                     The event (onPlantDestroyed) corresponding to the event
+     * @param entity                    Reference to the plant entity.
+     * @param plantDefinitionComponent  The definition of the plant.
+     * @param blockComponent            The block component corresponding to the event
+     */
     public void onPlantDestroyed(CreateBlockDropsEvent event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
         event.consume();
         EntityRef seedItem = entityManager.create(plantDefinitionComponent.seedPrefab);
@@ -158,11 +166,25 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         seedItem.send(new ImpulseEvent(random.nextVector3f(30.0f)));
     }
 
+    /*
+     * Handles the growth schedule of plants
+     * 
+     * @param entity        Reference to the plant entity.
+     * @param timeRange     The time where the plant grow to the next stage
+     */
     private void schedulePlantGrowth(EntityRef entity, TimeRange timeRange) {
         delayManager.addDelayedAction(entity, GROWTH_ACTION, timeRange.getTimeRange());
     }
 
     @ReceiveEvent
+    /*
+     * Handles plant growth based on the schedule time from delayed action
+     * 
+     * @param event                     The delayed action event corresponding to the event
+     * @param entity                    The entity which is going to grown
+     * @param plantDefinitionComponent  The definition of the plant.
+     * @param blockComponent            The block component corresponding to the event
+     */
     public void scheduledPlantGrowth(DelayedActionTriggeredEvent event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
         if (event.getActionId().equals(GROWTH_ACTION)) {
             entity.send(new OnPlantGrowth());
@@ -170,13 +192,20 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
+    /*
+     * Handles plant growth event.
+     * 
+     * @param event                     The event corresponding to the plant growth.
+     * @param entity                    The entity which is going to grown
+     * @param plantDefinitionComponent  The definition of the plant.
+     * @param blockComponent            The block component corresponding to the event
+     */
     public void onPlantGrowth(OnPlantGrowth event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
         if (delayManager.hasDelayedAction(entity, GROWTH_ACTION)) {
             delayManager.cancelDelayedAction(entity, GROWTH_ACTION);
         }
 
         // growthStages.
-
         TimeRange nextGrowthStage = null;
         String nextGrowthStageBlockName = "";
 
@@ -219,6 +248,14 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
+    /*
+     * Handles plant ungrowth event.
+     * 
+     * @param event                     The event corresponding to the plant ungrowth.
+     * @param entity                    The entity which is going to ungrown.
+     * @param plantDefinitionComponent  The definition of the plant.
+     * @param blockComponent            The block component corresponding to the event.
+     */
     public void onPlantUnGrowth(OnPlantUnGrowth event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
         List<Map.Entry<String, TimeRange>> growthStages = getGrowthStages(plantDefinitionComponent);
 
@@ -265,6 +302,13 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
+    /*
+     * Handles harvest event.
+     * Gives player the produceItem to player.
+     *
+     * @param event     The event corresponding to the plant harvest
+     * @param entity    The entity which is going to be harvested
+     */
     public void onHarvest(ActivateEvent event, EntityRef entity) {
         EntityRef target = event.getTarget();
         EntityRef instigator = event.getInstigator();
@@ -287,6 +331,13 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
+    /*
+     * Handles plant produce creation event.
+     * 
+     * @param event                         The event corresponding to plant produce creation.
+     * @param entity                        Reference to the plant entity.
+     * @param plantProduceCreationComponent The plant produce creation component corresponding to the event.
+     */
     public void onPlantProduceCreation(OnAddedComponent event, EntityRef entityRef, PlantProduceCreationComponent plantProduceCreationComponent) {
         EntityRef newItem = entityManager.create(plantProduceCreationComponent.producePrefab);
         PlantProduceComponent plantProduceComponent = new PlantProduceComponent(newItem);
@@ -298,11 +349,26 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
+    /*
+     * Handles ungrowing of plan after harvest.
+     * 
+     * @param event                         The event corresponding to plant produce creation.
+     * @param EntityRef                     Reference to the plant entity.
+     * @param unGrowPlantOnHarvestComponent The ungrow plant on harvest component corresponding to the event.
+     */
     public void unGrowPlantOnHarvest(OnPlantHarvest event, EntityRef entityRef, UnGrowPlantOnHarvestComponent unGrowPlantOnHarvestComponent) {
         entityRef.send(new OnPlantUnGrowth());
     }
 
     @ReceiveEvent
+    /*
+     * Handles copying plant definition from seed to block
+     * 
+     * @param event                     The event corresponding to the plant.
+     * @param EntityRef                 Reference to the plant entity.
+     * @param plantDefinitionComponent  The definition of the plant.
+     * @param blockComponent            The block component corresponding to the event.
+     */
     public void copySeedPlantDefinitionFromSeedToBlock(OnActivatedComponent event, EntityRef entityRef,
                                                        PlantDefinitionComponent plantDefinitionComponent,
                                                        BlockComponent blockComponent) {

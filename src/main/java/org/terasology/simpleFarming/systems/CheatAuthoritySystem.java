@@ -30,6 +30,11 @@ import org.terasology.simpleFarming.events.OnPlantGrowth;
 import org.terasology.simpleFarming.events.OnPlantUnGrowth;
 import org.terasology.world.BlockEntityRegistry;
 
+/*
+ * Handles the cheat grow mechanic of Growth Can & Ungrowth Can
+ * Sends a OnPlantUnGrowth/OnPlantGrowth based on the item's causesUnGrowth property
+ */
+
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class CheatAuthoritySystem extends BaseComponentSystem {
 
