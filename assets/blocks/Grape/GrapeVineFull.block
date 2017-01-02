@@ -1,0 +1,8 @@
+{
+  "basedOn": "SimpleFarming:GrapeVine",
+  "displayName": "Grape Vine",
+  "entity": {
+    "prefab": "GrapeVineFull"
+  },
+  "tile": "SimpleFarming:GrapeVineFull"
+}
