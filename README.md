@@ -93,6 +93,7 @@ Produce Mechanisms
 There's 2 kind of produce mechanism that you can make using the SimpleFarming module.
  1. Periodic
  2. Once
+
 A **Periodic** produce will grow again after it's harvest. On the other hand, a **Once** produce will only be a one-time harvest and after you harvest it, you need to plant it again from the seed.
 
 To make a plant have a **periodic** produce mechanism, you need to add   `"UnGrowPlantOnHarvest": {},` in ripe stage of the plant prefab file, and vice versa.
@@ -101,20 +102,20 @@ Destroying a plant with produce, will also yield a produce.
 
 Credits for Images:
 ------------------
-* Blueberry: Made by TheJYKoder (original)
-* BlueberryBushFull: Made by TheJYKoder(original)
-* Strawberry: Created by Patrick Wang. Original.
-* Raspberry: Created originally by SufurElite.
-* Gojiberry: Made by Harry Wang(original)
+* Blueberry: Made by TheJYKoder (Original)
+* BlueberryBushFull: Made by TheJYKoder (Original)
+* Strawberry: Made by Patrick Wang (Original)
+* Raspberry: Made by SufurElite (Original)
+* Gojiberry: Made by Harry Wang (Original)
 * Apple: http://opengameart.org/content/good-fruits-m484-games
-* Apple seed by gkaretka (own work)
-* Apple bush full by gkaretka: merge of BerryBushFull and Apple
-* Immature Pineapple : mdj117 (Original)
-* Mature Pineapple : mdj117 (Original)
-* Pineapple fruit : mdj117 (Original)
-* Ripe Pineapple : mdj117 (Original)
-* Pineapple : https://pixabay.com/en/pineapple-fruit-exotic-tropical-1916996/
+* Apple Seed: Made by gkaretka (Original)
+* Apple Bush Full: Made by gkaretka (Merge of BerryBushFull and Apple)
+* Immature, Mature, and Ripe Pineapple: Made by mdj117 (Original)
+* Pineapple Fruit: Made by mdj117 (Original)
+* Pineapple: https://pixabay.com/en/pineapple-fruit-exotic-tropical-1916996/
 * Pineapple Sapling : https://pixabay.com/en/chestnuts-conker-marron-nuts-seeds-151927/
+* Watermelon: http://www.freestockphotos.biz/stockphoto/14464
+* Watermelon Seed: Made by smsunarto (Original)
 * Blackberry: Made by VaibhavBajaj (inspired by Testberry)
 * BlackberrySeed: Made by VaibhavBajaj (inspired by Testberry)
 * BlackberryBush: Made by VaibhavBajaj (inspired by Testberry)
