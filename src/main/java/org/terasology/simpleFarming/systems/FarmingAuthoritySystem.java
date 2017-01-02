@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -91,6 +91,14 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     Random random = new FastRandom();
 
     @ReceiveEvent
+    /**
+     * Handles the seed drop on plant destroyed event.
+     * 
+     * @param event                     The corresponding event.
+     * @param seedItem                  Reference to the seed entity.
+     * @param plantDefinitionComponent  The definition of the plant.
+     * @param itemComponent             The item component corresponding to the event
+     */
     public void onPlantSeed(ActivateEvent event, EntityRef seedItem, PlantDefinitionComponent plantDefinitionComponent, ItemComponent itemComponent) {
         if (!event.getTarget().exists() || event.getTargetLocation() == null) {
             return;
@@ -150,10 +158,10 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    /*
+    /**
      * Handles the seed drop on plant destroyed event.
      * 
-     * @param event                     The event (onPlantDestroyed) corresponding to the event
+     * @param event                     The event ccorresponding to the plant destroy.
      * @param entity                    Reference to the plant entity.
      * @param plantDefinitionComponent  The definition of the plant.
      * @param blockComponent            The block component corresponding to the event
@@ -166,7 +174,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         seedItem.send(new ImpulseEvent(random.nextVector3f(30.0f)));
     }
 
-    /*
+    /**
      * Handles the growth schedule of plants
      * 
      * @param entity        Reference to the plant entity.
@@ -177,10 +185,10 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    /*
+    /**
      * Handles plant growth based on the schedule time from delayed action
      * 
-     * @param event                     The delayed action event corresponding to the event
+     * @param event                     The delayed action event.
      * @param entity                    The entity which is going to grown
      * @param plantDefinitionComponent  The definition of the plant.
      * @param blockComponent            The block component corresponding to the event
@@ -192,7 +200,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    /*
+    /**
      * Handles plant growth event.
      * 
      * @param event                     The event corresponding to the plant growth.
@@ -229,14 +237,20 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             return;
         }
 
+        // Find the next growth stage block information.
         Block newPlantBlock = blockManager.getBlock(nextGrowthStageBlockName);
         if (newPlantBlock == blockManager.getBlock(BlockManager.AIR_ID)) {
+            // Log error if it can't find the next growth stage .block file.
             logger.error("Could not find the next growth stage block: " + nextGrowthStageBlockName);
             return;
         }
 
+        // Grow the plant into the next growth stage.
         worldProvider.setBlock(blockComponent.getPosition(), newPlantBlock);
+
+        // Creates new entity.
         EntityRef newEntity = blockEntityRegistry.getBlockEntityAt(blockComponent.getPosition());
+        // Check the new entity for PlantDefinitionComponent.
         if (newEntity.hasComponent(PlantDefinitionComponent.class)) {
             newEntity.saveComponent(plantDefinitionComponent);
         } else {
@@ -248,7 +262,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    /*
+    /**
      * Handles plant ungrowth event.
      * 
      * @param event                     The event corresponding to the plant ungrowth.
@@ -283,26 +297,31 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         if (previousGrowthStage == null || previousGrowthStageBlockName.equals("")) {
             return;
         }
-
+        // Find the previous growth stage block information.
         Block newPlantBlock = blockManager.getBlock(previousGrowthStageBlockName);
         if (newPlantBlock == blockManager.getBlock(BlockManager.AIR_ID)) {
+            // Logs error if it can't find the previous growth stage .block file.
             logger.error("Could not find the previous growth stage block: " + previousGrowthStageBlockName);
             return;
         }
 
+        // Change the block into the previous growth stage block.
         worldProvider.setBlock(blockComponent.getPosition(), newPlantBlock);
+        // Creates a new entity
         EntityRef newEntity = blockEntityRegistry.getBlockEntityAt(blockComponent.getPosition());
+        // Check the new entity for PlantDefinitionComponent.
         if (newEntity.hasComponent(PlantDefinitionComponent.class)) {
             newEntity.saveComponent(plantDefinitionComponent);
         } else {
             newEntity.addComponent(plantDefinitionComponent);
         }
 
+        // Schedules a plant growth.
         schedulePlantGrowth(newEntity, previousGrowthStage);
     }
 
     @ReceiveEvent
-    /*
+    /**
      * Handles harvest event.
      * Gives player the produceItem to player.
      *
@@ -331,7 +350,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    /*
+    /**
      * Handles plant produce creation event.
      * 
      * @param event                         The event corresponding to plant produce creation.
@@ -349,7 +368,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    /*
+    /**
      * Handles ungrowing of plan after harvest.
      * 
      * @param event                         The event corresponding to plant produce creation.
@@ -361,7 +380,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    /*
+    /**
      * Handles copying plant definition from seed to block
      * 
      * @param event                     The event corresponding to the plant.
