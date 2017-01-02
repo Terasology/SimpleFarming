@@ -17,5 +17,8 @@ package org.terasology.simpleFarming.events;
 
 import org.terasology.entitySystem.event.Event;
 
+/**
+ * An event that is trigerred when a plant grows into the next growth stage.
+ */
 public class OnPlantGrowth implements Event {
 }
