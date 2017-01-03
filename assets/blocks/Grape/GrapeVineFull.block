@@ -1,5 +1,5 @@
 {
-  "basedOn": "SimpleFarming:GrapeVine",
+  "basedOn": "SimpleFarming:GrapeVineBase",
   "displayName": "Grape Vine",
   "entity": {
     "prefab": "GrapeVineFull"

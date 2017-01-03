@@ -1,6 +1,5 @@
 {
-  "hardness": 3,
-  "mass": 100,
-  "translucent": true,
-  "doubleSided": false
+  "basedOn": "SimpleFarming:GrapeVineBase",
+  "displayName": "Grape Vine",
+  "tile": "SimpleFarming:GrapeVine"
 }
