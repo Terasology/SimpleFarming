@@ -36,4 +36,7 @@ public class PlantDefinitionComponent implements Component {
 
     /** Allows a static name for the plant that doesnt change with the block */
     public String plantName;
+
+    /** Whether the plant will become a tree after it has passed its growth stages */
+    public boolean growsIntoTree;
 }

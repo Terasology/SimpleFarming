@@ -1,0 +1,7 @@
+{
+    "basedOn": "SimpleFarming:PeachFruit",
+    "entity": {
+        "prefab":"PeachFruitFull"
+    },
+    "tile":"SimpleFarming:PeachFruitFull"
+}

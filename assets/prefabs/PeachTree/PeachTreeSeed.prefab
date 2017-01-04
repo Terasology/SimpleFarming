@@ -1,0 +1,44 @@
+{
+    "parent": "engine:iconItem",
+    "DisplayName": {
+        "name": "Peach Tree Seed"
+    },
+    "Item": {
+        "icon": "SimpleFarming:PeachTreeSeed",
+        "stackId": "PeachTreeSeed"
+    },
+    "PlantDefinition": {
+        "plantName": "Peach Tree",
+        "growsIntoTree": true,
+        "growthStages": {
+            "SimpleFarming:PeachTreeSaplingYoung": {
+                "maxRandom": 5000,
+                "fixed": 5000
+            },
+            "SimpleFarming:PeachTreeSaplingMature": {
+                "maxRandom": 5000,
+                "fixed": 5000
+            }
+        }
+    },
+    "TreeDefinition": {
+        "fruitName": "Peach Fruit",
+        "fruitGrowthStages": {
+            "SimpleFarming:PeachFruit": {
+                "maxRandom": 5000,
+                "fixed": 5000
+            },
+            "SimpleFarming:PeachFruitMature": {
+                "maxRandom": 5000,
+                "fixed": 5000
+            },
+            "SimpleFarming:PeachFruitFull": {
+                "maxRandom": 6000,
+                "fixed": 10000
+            }
+        },
+        "trunkHeight": 5,
+        "trunkBlock": "Core:PineTrunk",
+        "canopyLayers": [0, 0, 0, 3, 2, 1]
+    }
+}
