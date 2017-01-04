@@ -1,0 +1,31 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Grape Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:SimpleFarming#berryseed",
+    "stackId": "GrapeSeed"
+  },
+  "PlantDefinition": {
+    "plantName": "Grape Vine",
+    "growthStages": {
+      "SimpleFarming:GrapeVineSeedling": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      },
+      "SimpleFarming:GrapeVineSprout": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      },
+      "SimpleFarming:GrapeVine": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      },
+      "SimpleFarming:GrapeVineFull": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      }
+    }
+  }
+}
