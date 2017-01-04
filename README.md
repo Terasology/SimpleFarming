@@ -123,3 +123,8 @@ Credits for Images:
 * BlackberryBushFull: Made by VaibhavBajaj (inspired by Testberry)
 * Cranberry and all related: [András Ottó Földes](https://github.com/andriii25)
 * Grape images: Made by BenjaminAmos (Original)
+* Pear: https://pixabay.com/en/fruit-owocostan-356522/
+* PearSeed: Made by Thuckerz (Original)
+* PearBush: Made by Thuckerz (Original)
+* MaturePearBush: Made by Thuckerz (Original)
+* PearBushFull: Made by Thuckerz (Original)

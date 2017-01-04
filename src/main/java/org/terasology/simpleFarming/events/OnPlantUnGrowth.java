@@ -17,5 +17,8 @@ package org.terasology.simpleFarming.events;
 
 import org.terasology.entitySystem.event.Event;
 
+/**
+ * An event that is trigerred when a plant ungrows into the previous growth stage.
+ */
 public class OnPlantUnGrowth implements Event {
 }
