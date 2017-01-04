@@ -122,3 +122,5 @@ Credits for Images:
 * MatureBlackberryBush: Made by VaibhavBajaj (inspired by Testberry)
 * BlackberryBushFull: Made by VaibhavBajaj (inspired by Testberry)
 * Cranberry and all related: [András Ottó Földes](https://github.com/andriii25)
+* Normal, Mature and Full Orange Bush: Created from Cranberry and Apple bushes by Jellysnake
+* Orange & Orange Seeds: Created by Jellysnake
