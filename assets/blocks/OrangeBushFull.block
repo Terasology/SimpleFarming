@@ -1,0 +1,8 @@
+{
+  "basedOn": "SimpleFarming:MatureOrangeBush",
+  "displayName": "Orange Bush",
+  "entity": {
+    "prefab": "OrangeBushFull"
+  },
+  "tile": "SimpleFarming:OrangeBushFull"
+}
