@@ -18,7 +18,13 @@ package org.terasology.simpleFarming.components;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3i;
 
+/**
+ * A component attached to each part of a vine's trunk.
+ */
 public class VinePartComponent implements Component {
+    /** The vine definition component of the vine it belongs to. */
     public VineDefinitionComponent parentComponent;
+
+    /** The position of the part. */
     public Vector3i partPosition;
 }

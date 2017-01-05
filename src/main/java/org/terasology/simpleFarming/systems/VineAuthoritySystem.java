@@ -37,8 +37,6 @@ import org.terasology.simpleFarming.components.TimeRange;
 import org.terasology.simpleFarming.components.VineDefinitionComponent;
 import org.terasology.simpleFarming.components.VinePartComponent;
 import org.terasology.simpleFarming.events.OnVineGrowth;
-import org.terasology.utilities.random.FastRandom;
-import org.terasology.utilities.random.Random;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -68,8 +66,14 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     @In
     PrefabManager prefabManager;
 
-    Random random = new FastRandom();
-
+    /**
+     * Defines what to do when a vine seed is planted.
+     *
+     * @param event                   The event corresponding to the seed being planted
+     * @param seedItem                The seed item that was planted
+     * @param vineDefinitionComponent The vine definition component defined in the seed prefab
+     * @param itemComponent           The item component of the seed item
+     */
     @ReceiveEvent
     public void onPlantSeed(ActivateEvent event, EntityRef seedItem, VineDefinitionComponent vineDefinitionComponent, ItemComponent itemComponent) {
         if (!event.getTarget().exists() || event.getTargetLocation() == null) {
@@ -133,6 +137,14 @@ public class VineAuthoritySystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Sends an "start new growth cycle" signal.
+     *
+     * @param event                   The delayed action trigger due to which this function is called
+     * @param entity                  The vine entity whose growth action is to be triggered
+     * @param vineDefinitionComponent The vine definition component of the vine entity
+     * @param blockComponent          The block component of the vine entity
+     */
     @ReceiveEvent
     public void scheduledVineGrowth(DelayedActionTriggeredEvent event, EntityRef entity, VineDefinitionComponent vineDefinitionComponent, BlockComponent blockComponent) {
         if (event.getActionId().equals(GROW_ACTION)) {
@@ -140,6 +152,14 @@ public class VineAuthoritySystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Makes the vine grow when a growth signal is sent.
+     *
+     * @param event                   The growth signal that triggered the function
+     * @param entity                  The vine entity to be grown
+     * @param vineDefinitionComponent The vine definition component of the vine entity to be grown
+     * @param blockComponent          The block component of the vine entity
+     */
     @ReceiveEvent
     public void onPlantGrowth(OnVineGrowth event, EntityRef entity, VineDefinitionComponent vineDefinitionComponent, BlockComponent blockComponent) {
         if (delayManager.hasDelayedAction(entity, GROW_ACTION)) {
@@ -147,10 +167,14 @@ public class VineAuthoritySystem extends BaseComponentSystem {
         }
 
         if (!vineDefinitionComponent.isSapling) {
-            Vector3i newPartPosition = getNewPartPosition(vineDefinitionComponent.parts);
+            Vector3i newPartPosition = getNewPartPosition(vineDefinitionComponent);
+
+            if (newPartPosition == null) {
+                return;
+            }
 
             if (vineDefinitionComponent.growthsTillRipe <= 0) {
-                if (Math.random() > 0.75) {
+                if (Math.random() > 0.7) {
                     Block fruitBlock = blockManager.getBlock(vineDefinitionComponent.produce);
                     worldProvider.setBlock(newPartPosition, fruitBlock);
                     scheduleVineGrowth(entity, vineDefinitionComponent);
@@ -171,37 +195,106 @@ public class VineAuthoritySystem extends BaseComponentSystem {
             vineDefinitionComponent.growthsTillRipe = vineDefinitionComponent.growthsTillRipe - 1;
         } else {
             Block trunkBlock = blockManager.getBlock(vineDefinitionComponent.trunk);
-            worldProvider.setBlock(vineDefinitionComponent.parts.get(0).partPosition, trunkBlock);
+            VinePartComponent part = vineDefinitionComponent.parts.get(0);
+            worldProvider.setBlock(part.partPosition, trunkBlock);
             vineDefinitionComponent.isSapling = false;
+            EntityRef newPartEntity = blockEntityRegistry.getBlockEntityAt(part.partPosition);
+            newPartEntity.addComponent(vineDefinitionComponent);
+            newPartEntity.addComponent(part);
         }
 
         scheduleVineGrowth(entity, vineDefinitionComponent);
     }
 
+    /**
+     * Removes a part from the parent vine entity when it is destroyed.
+     *
+     * @param event             The event corresponding to the destruction of the part
+     * @param entity            The vine part that was destroyed
+     * @param vinePartComponent The vine part component of the vine part
+     * @param blockComponent    The block component of the vine part
+     */
     @ReceiveEvent
     public void onDestroy(DoDestroyEvent event, EntityRef entity, VinePartComponent vinePartComponent, BlockComponent blockComponent) {
         vinePartComponent.parentComponent.parts.remove(vinePartComponent);
     }
 
-    private Vector3i getNewPartPosition(List<VinePartComponent> parts) {
+    private Vector3i getNewPartPosition(VineDefinitionComponent vineDefinitionComponent) {
         java.util.Random randomGenerator = new java.util.Random();
+
         List<Vector3i> partsCopy = new ArrayList<>();
-        for (VinePartComponent partComponent: parts) {
+        for (VinePartComponent partComponent: vineDefinitionComponent.parts) {
             partsCopy.add(partComponent.partPosition);
         }
+
         Vector3i rand;
+        List<Vector3i> possible;
         while (true) {
+            if (partsCopy.size() == 0) {
+                return null;
+            }
+
+            possible = new ArrayList<>();
             rand = partsCopy.get(randomGenerator.nextInt(partsCopy.size()));
+
+            // add multiple times either in x direction or z direction (based on orientation) so that the vine becomes elongated and not square-ish
             if (worldProvider.getBlock((new Vector3i(rand)).add(1, 0, 0)) == blockManager.getBlock(BlockManager.AIR_ID)) {
-                return rand.add(1, 0, 0);
-            } else if (worldProvider.getBlock((new Vector3i(rand)).sub(1, 0, 0)) == blockManager.getBlock(BlockManager.AIR_ID)) {
-                return rand.sub(1, 0, 0);
-            } else if (worldProvider.getBlock((new Vector3i(rand)).add(0, 0, 1)) == blockManager.getBlock(BlockManager.AIR_ID)) {
-                return rand.add(0, 0, 1);
-            } else if (worldProvider.getBlock((new Vector3i(rand)).sub(0, 0, 1)) == blockManager.getBlock(BlockManager.AIR_ID)) {
-                return rand.sub(0, 0, 1);
-            } else {
+                if (worldProvider.getBlock((new Vector3i(rand)).add(1, -1, 0)) == blockManager.getBlock(BlockManager.AIR_ID)) {
+                    if (worldProvider.getBlock((new Vector3i(rand)).add(1, -2, 0)) != blockManager.getBlock(BlockManager.AIR_ID)) {
+                        possible.add((new Vector3i(rand)).add(1, -1, 0));
+                    }
+                } else {
+                    possible.add((new Vector3i(rand)).add(1, 0, 0));
+                    if (vineDefinitionComponent.orientation) {
+                        possible.add((new Vector3i(rand)).add(1, 0, 0));
+                        possible.add((new Vector3i(rand)).add(1, 0, 0));
+                    }
+                }
+            }
+            if (worldProvider.getBlock((new Vector3i(rand)).sub(1, 0, 0)) == blockManager.getBlock(BlockManager.AIR_ID)) {
+                if (worldProvider.getBlock((new Vector3i(rand)).sub(1, 1, 0)) == blockManager.getBlock(BlockManager.AIR_ID)) {
+                    if (worldProvider.getBlock((new Vector3i(rand)).sub(1, 2, 0)) != blockManager.getBlock(BlockManager.AIR_ID)) {
+                        possible.add((new Vector3i(rand)).sub(1, 1, 0));
+                    }
+                } else {
+                    possible.add((new Vector3i(rand)).sub(1, 0, 0));
+                    if (vineDefinitionComponent.orientation) {
+                        possible.add((new Vector3i(rand)).sub(1, 0, 0));
+                        possible.add((new Vector3i(rand)).sub(1, 0, 0));
+                    }
+                }
+            }
+            if (worldProvider.getBlock((new Vector3i(rand)).add(0, 0, 1)) == blockManager.getBlock(BlockManager.AIR_ID)) {
+                if (worldProvider.getBlock((new Vector3i(rand)).add(0, -1, 1)) == blockManager.getBlock(BlockManager.AIR_ID)) {
+                    if (worldProvider.getBlock((new Vector3i(rand)).add(0, -2, 1)) != blockManager.getBlock(BlockManager.AIR_ID)) {
+                        possible.add((new Vector3i(rand)).add(0, -1, 1));
+                    }
+                } else {
+                    possible.add((new Vector3i(rand)).add(0, 0, 1));
+                    if (!vineDefinitionComponent.orientation) {
+                        possible.add((new Vector3i(rand)).add(0, 0, 1));
+                        possible.add((new Vector3i(rand)).add(0, 0, 1));
+                    }
+                }
+            }
+            if (worldProvider.getBlock((new Vector3i(rand)).sub(0, 0, 1)) == blockManager.getBlock(BlockManager.AIR_ID)) {
+                if (worldProvider.getBlock((new Vector3i(rand)).sub(0, 1, 1)) == blockManager.getBlock(BlockManager.AIR_ID)) {
+                    if (worldProvider.getBlock((new Vector3i(rand)).sub(0, 2, 1)) != blockManager.getBlock(BlockManager.AIR_ID)) {
+                        possible.add((new Vector3i(rand)).sub(0, 1, 1));
+                    }
+                } else {
+                    possible.add((new Vector3i(rand)).sub(0, 0, 1));
+                    if (!vineDefinitionComponent.orientation) {
+                        possible.add((new Vector3i(rand)).sub(0, 0, 1));
+                        possible.add((new Vector3i(rand)).sub(0, 0, 1));
+                    }
+                }
+            }
+
+            if (possible.isEmpty()) {
                 partsCopy.remove(rand);
+            } else {
+                return possible.get(randomGenerator.nextInt(possible.size()));
             }
         }
     }

@@ -9,13 +9,13 @@
   },
   "VineDefinition": {
       "plantName": "Melon Vine",
-      "sapling": "Core:Snow",
-      "trunk": "Core:Snow",
-      "produce": "Core:Snowball",
+      "sapling": "SimpleFarming:MelonVineSapling",
+      "trunk": "SimpleFarming:MelonVineTrunk",
+      "produce": "SimpleFarming:Melon",
       "nextGrowth": {
           "maxRandom": 1000,
           "fixed": 2000
       },
-      "growthsTillRipe": 10
+      "growthsTillRipe": 15
   }
 }
