@@ -90,45 +90,101 @@ This code will allow the game to know that this particular block is associated w
 
 ## Creating New Trees
 
-Just like above, trees need to contain seed prefabs as well. However, to define a new tree, a few additional steps are required.
+Just like smaller plants, trees need to contain seed prefabs as well. 
 
-To indicate that a plant will become a tree, you will need to do so inside the seed prefab by setting `"growsIntoTree" : true`.
+To indicate that a plant will become a tree, you will need set 
+`"growsIntoTree" : true` inside the seed prefab. 
 
-After the tree has gone through the growth stages specified under `PlantDefinition` in the seed prefab, it will grow into a tree. The properties of this tree will have to be specified under `TreeDefinition` in the seed prefab. 
-
+`PeachTreeSeed.prefab`:
 ```javascript
-    "TreeDefinition": {
-        "fruitName": "Peach Fruit", // the name of the fruit
-        "fruitGrowthStages": {
-            "SimpleFarming:PeachFruit": {
+"PlantDefinition": {
+        "plantName": "Peach Tree",
+        "growsIntoTree": true,
+        "growthStages": {
+            "SimpleFarming:PeachTreeSaplingYoung": {
                 "maxRandom": 5000,
                 "fixed": 5000
             },
-            "SimpleFarming:PeachFruitMature": {
+            "SimpleFarming:PeachTreeSaplingMature": {
                 "maxRandom": 5000,
                 "fixed": 5000
-            },
-            "SimpleFarming:PeachFruitFull": {
-                "maxRandom": 6000,
-                "fixed": 10000
             }
-        },
-        "trunkHeight": 5, // the height of the trunk in blocks
-        "trunkBlock": "Core:PineTrunk", // the block that makes up the trunk
-        "canopyLayers": [0, 0, 0, 3, 2, 1]
+        }
     }
 ```
-This is an example definition of a tree definition. 
 
-The fruit growth stages are similar to plant growth stages, in that they define the changes that will occur to the leaf blocks over time. Ideally the first stage should be an empty leaf block, while the last stage would contain the block with the fruit to be harvested.
+`growthStages` defines the changes that the tree will undergo as a sapling before turning into a fully-grown tree. 
 
-The canopy layers define how the leaves will form on the tree. Each number corresponds to a higher layer of the tree, starting from the base of the trunk. It defines how large the canopy will be for that layer based on the number of blocks from the center.
+![](http://i.imgur.com/Rf6sN1R.png)
 
-0 would mean no leaves, 1 would mean a 1x1 region of leaves (1 block from the center), and 2 would mean a 3x3 region of leaves (2 blocks from the center). 
+After the tree has gone through the growth stages specified under `PlantDefinition`, it will grow into a tree!
 
-For instance, the above prefab would generate the following tree.
+![](http://i.imgur.com/rSZlcTO.png)
+
+The properties of the tree formed have to be specified under `TreeDefinition` in the seed prefab. 
+
+`PeachTreeSeed.prefab`:
+```javascript
+"TreeDefinition": {
+    "fruitGrowthStages": {
+        "SimpleFarming:PeachFruit": {
+            "maxRandom": 5000,
+            "fixed": 5000
+        },
+        "SimpleFarming:PeachFruitMature": {
+            "maxRandom": 5000,
+            "fixed": 5000
+        },
+        "SimpleFarming:PeachFruitFull": {
+            "maxRandom": 6000,
+            "fixed": 10000
+        }
+    },
+    "trunkHeight": 5,
+    "trunkBlock": "Core:PineTrunk", 
+    "canopyLayers": [0, 0, 0, 3, 2, 1]
+}
+```
+
+`fruitGrowthStages` is similar to `plantGrowthStages`, except that it now defines the changes that will occur to the leaf blocks of the tree over time. Ideally, the first stage should be an empty leaf block, while the last stage would contain the block showing the fruit to be harvested.
+
+`trunkHeight`, as the name suggests, defines how tall the trunk of the tree will be, starting from the base of the tree. 
+
+`trunkBlock` determines what block makes up the trunk of the tree. If not defined in the prefab `trunkBlock` will be `Core:Oaktrunk` by default.
+
+`canopyLayers` defines how the leaves will form on the tree. Each number corresponds to a different layer of the tree, starting from the base of the trunk. It defines how large the square canopy will be for that layer based on the number of blocks from the center.
+
+A value of 0 would mean that no leaves will grow for that layer, while a value of 2 would mean a 1x1 region of leaves will grow. a value of 2 would mean a 3x3 region of leaves would grow, centered on the trunk. 
+
+For instance, here is what a Peach Tree would look like based on the above prefab.
 
 ![](http://i.imgur.com/5hiraWw.png)
+
+As you can see, the first 3 layers have no fruit blocks, while the 4th layer has a canopy 3 blocks wide, followed by a layer 2 blocks wide and then a single block at the top of the tree. 
+
+And one last thing: instead of using `PlantProduceCreation` in the final prefab, what you should do for fruits is `TreeFruitCreation` instead, like so: 
+
+`Peach.prefab`:
+```javascript
+{
+    "parent": "engine:iconItem",
+    "DisplayName": {
+        "name": "Peach"
+    },
+    "Item": {
+        "icon": "SimpleFarming:Peach",
+        "stackId": "peach"
+    }
+}
+```
+
+And that's it! Ensure that all of the prefabs mentioned in the definition are present.
+
+A few things to take note of:
+- Trees will only grow if there is sufficient space for the trunk to appear. 
+- Destroying the part of the trunk that connects the tree to the ground will kill the tree, stopping any growth of fruit blocks and causing them to degenerate over time.
+
+Before creating your own tree, take a look at how the Peach Tree prefabs are written as well as test the Peach Tree in-game to gain a better understanding of how creating trees work.
 
 ## Produce Mechanisms
 

@@ -18,7 +18,7 @@ package org.terasology.simpleFarming.events;
 import org.terasology.entitySystem.event.Event;
 
 /**
- * An event that is triggered on every fruit block whenever a new tree is grown.
+ * An event triggered whenever a new tree is grown.
  */
-public class OnFruitCreated implements Event {
+public class OnNewTreeGrowth implements Event {
 }

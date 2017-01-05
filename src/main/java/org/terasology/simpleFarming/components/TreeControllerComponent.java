@@ -15,30 +15,27 @@
  */
 package org.terasology.simpleFarming.components;
 
+import com.google.common.collect.Maps;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.ForceBlockActive;
 
 import java.util.ArrayList;
+import java.util.Map;
 
-/**
- * A component defining an entity as being part of a fruit tree.
- */
 @ForceBlockActive
-public class PartOfTreeComponent implements Component {
+public class TreeControllerComponent implements Component {
     /**
-     * A list of the positions of the trunk blocks of the tree.
+     * A map defining the growth stages that the fruits borne by this tree will go through
+     * and the time they will remain at this stage.
      */
-    public ArrayList<Vector3i> trunkBlocks = new ArrayList<>();
+    public Map<String, TimeRange> fruitGrowthStages = Maps.newTreeMap();
 
     /**
-     * A list of the positions of the fruit blocks of the tree.
+     * A map linking the positions of the fruits and their current growth stage.
      */
-    public ArrayList<Vector3i> fruitBlocks = new ArrayList<>();
-
-    /**
-     * If a vital block of the tree is destroyed, all fruits will stop growing.
-     * Trunk are vital blocks.
-     */
-    public boolean isVital;
+    public Map<Vector3i, Block> fruitBlocks;
 }
+

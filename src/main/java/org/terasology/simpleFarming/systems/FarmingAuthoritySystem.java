@@ -42,18 +42,16 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
-import org.terasology.simpleFarming.components.PartOfTreeComponent;
 import org.terasology.simpleFarming.components.PlantDefinitionComponent;
 import org.terasology.simpleFarming.components.PlantProduceComponent;
 import org.terasology.simpleFarming.components.PlantProduceCreationComponent;
 import org.terasology.simpleFarming.components.TimeRange;
 import org.terasology.simpleFarming.components.TreeDefinitionComponent;
 import org.terasology.simpleFarming.components.UnGrowPlantOnHarvestComponent;
-import org.terasology.simpleFarming.events.OnFruitCreated;
+import org.terasology.simpleFarming.events.OnNewTreeGrowth;
 import org.terasology.simpleFarming.events.OnPlantGrowth;
 import org.terasology.simpleFarming.events.OnPlantHarvest;
 import org.terasology.simpleFarming.events.OnPlantUnGrowth;
-import org.terasology.simpleFarming.events.OnTreeGrow;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.BlockEntityRegistry;
@@ -74,7 +72,7 @@ import java.util.Map;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class FarmingAuthoritySystem extends BaseComponentSystem {
-    static final String GROWTH_ACTION = "PLANTGROWTH";
+    private static final String GROWTH_ACTION = "PLANTGROWTH";
     private static final Logger logger = LoggerFactory.getLogger(FarmingAuthoritySystem.class);
 
     @In
@@ -151,7 +149,6 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
                 plantEntity.addComponent(treeDefinitionComponent);
             }
 
-            TreeDefinitionComponent tdp = plantEntity.getComponent(TreeDefinitionComponent.class);
             schedulePlantGrowth(plantEntity, growthStage);
             inventoryManager.removeItem(seedItem.getOwner(), seedItem, seedItem, true, 1);
         }
@@ -246,7 +243,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         // If there's no next growth stage, return null, unless the plant grows into a tree.
         if (nextGrowthStage == null) {
             if (plantDefinitionComponent.growsIntoTree && entity.hasComponent(TreeDefinitionComponent.class)) {
-                entity.send(new OnTreeGrow());
+                entity.send(new OnNewTreeGrowth());
             }
             return;
         }
@@ -266,6 +263,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
 
         // Creates new entity.
         EntityRef newEntity = blockEntityRegistry.getBlockEntityAt(blockComponent.getPosition());
+
         // Check the new entity for PlantDefinitionComponent.
         if (newEntity.hasComponent(PlantDefinitionComponent.class)) {
             newEntity.saveComponent(plantDefinitionComponent);
@@ -389,14 +387,6 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         } else {
             entityRef.addComponent(plantProduceComponent);
         }
-    }
-
-
-    @ReceiveEvent
-    public void onFruitCreated(OnFruitCreated event, EntityRef fruitEntity, PlantDefinitionComponent plantDefinitionComponent) {
-        List<Map.Entry<String, TimeRange>> growthStages = getGrowthStages(plantDefinitionComponent);
-        TimeRange growthStage = growthStages.get(0).getValue();
-        schedulePlantGrowth(fruitEntity, growthStage);
     }
 
     @ReceiveEvent

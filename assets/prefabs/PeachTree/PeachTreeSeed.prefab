@@ -22,7 +22,6 @@
         }
     },
     "TreeDefinition": {
-        "fruitName": "Peach Fruit",
         "fruitGrowthStages": {
             "SimpleFarming:PeachFruit": {
                 "maxRandom": 5000,

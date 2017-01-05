@@ -1,4 +1,4 @@
 {
     "basedOn": "SimpleFarming:PeachFruit",
-    "tile": "SimpleFarming:MaturePeachFruit"
+    "tile": "SimpleFarming:PeachFruitMature"
 }

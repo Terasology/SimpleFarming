@@ -42,11 +42,6 @@ public class TreeDefinitionComponent implements Component {
     public ArrayList<Integer> canopyLayers = new ArrayList<>();
 
     /**
-     * The name of the fruit grown by the tree
-     */
-    public String fruitName;
-
-    /**
      * A list defining the growth stages that the fruits borne by the tree will go through
      */
     public Map<String, TimeRange> fruitGrowthStages = Maps.newTreeMap();

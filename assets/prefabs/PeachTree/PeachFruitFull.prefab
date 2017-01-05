@@ -1,6 +1,6 @@
 {
-    "PlantProduceCreation": {
-        "producePrefab": "SimpleFarming:Peach"
-    },
-    "UnGrowPlantOnHarvest": {}
+    "HarvestableTreeFruit": {
+        "fruitItem": "SimpleFarming:Peach",
+        "seedPrefab": "SimpleFarming:PeachTreeSeed"
+    }
 }
