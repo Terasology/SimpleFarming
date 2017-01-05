@@ -1,0 +1,21 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Melon Vine Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:MelonVineSeed",
+    "stackId": "Melon Vine Seed"
+  },
+  "VineDefinition": {
+      "plantName": "Melon Vine",
+      "sapling": "Core:Snow",
+      "trunk": "Core:Snow",
+      "produce": "Core:Snowball",
+      "nextGrowth": {
+          "maxRandom": 1000,
+          "fixed": 2000
+      },
+      "growthsTillRipe": 10
+  }
+}
