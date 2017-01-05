@@ -21,9 +21,9 @@ import org.terasology.entitySystem.entity.EntityRef;
 /**
  * Allows a fruit entity to be harvested
  */
-public class TreeFruitCreation implements Component {
+public class TreeFruitCreationComponent implements Component {
     /**
-     * The item of that the fruit produces when harvested.
+     * The item that the fruit produces when harvested.
      */
     public String fruitItem;
 }

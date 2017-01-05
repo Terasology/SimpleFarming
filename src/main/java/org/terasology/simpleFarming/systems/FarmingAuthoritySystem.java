@@ -466,7 +466,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
      *
      * @param p The definition of the plant.
      */
-    private List<Map.Entry<String, TimeRange>> getGrowthStages(PlantDefinitionComponent p) {
+    public List<Map.Entry<String, TimeRange>> getGrowthStages(PlantDefinitionComponent p) {
         List<Map.Entry<String, TimeRange>> output = Lists.newLinkedList();
         for (Map.Entry<String, TimeRange> item : p.growthStages.entrySet()) {
             output.add(item);

@@ -18,7 +18,7 @@ package org.terasology.simpleFarming.events;
 import org.terasology.entitySystem.event.Event;
 
 /**
- * An event that is trigerred when a plant is harvested.
+ * An event that is triggered when a plant is harvested.
  */
 public class OnPlantHarvest implements Event {
 }

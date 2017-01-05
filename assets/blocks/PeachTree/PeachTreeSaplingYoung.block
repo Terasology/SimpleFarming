@@ -1,4 +1,5 @@
 {
+    "displayName": "Young Peach Tree Sapling",
     "basedOn": "Core:plant",
     "waving": true
 }

@@ -167,13 +167,8 @@ And one last thing: instead of using `PlantProduceCreation` in the final prefab,
 `Peach.prefab`:
 ```javascript
 {
-    "parent": "engine:iconItem",
-    "DisplayName": {
-        "name": "Peach"
-    },
-    "Item": {
-        "icon": "SimpleFarming:Peach",
-        "stackId": "peach"
+    "TreeFruitCreation": {
+        "fruitItem": "SimpleFarming:Peach"
     }
 }
 ```

@@ -28,19 +28,20 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
-import org.terasology.logic.health.DestroyEvent;
+import org.terasology.logic.health.BeforeDestroyEvent;
 import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.protobuf.EntityData;
 import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.PlantDefinitionComponent;
 import org.terasology.simpleFarming.components.TimeRange;
 import org.terasology.simpleFarming.components.TreeControllerComponent;
 import org.terasology.simpleFarming.components.TreeDefinitionComponent;
-import org.terasology.simpleFarming.components.TreeFruitCreation;
+import org.terasology.simpleFarming.components.TreeFruitCreationComponent;
 import org.terasology.simpleFarming.events.OnFruitHarvest;
 import org.terasology.simpleFarming.events.OnNewTreeGrowth;
 import org.terasology.simpleFarming.events.OnTreeGrowth;
@@ -62,9 +63,16 @@ import java.util.Map;
 public class TreeAuthoritySystem extends BaseComponentSystem {
     private static final String TREE_GROWTH_ACTION = "TREEGROWTH";
     private static final String TREE_DEATH_ACTION = "TREEDEATH";
-    private static final long TREE_DEATH_MIN = 15000;
-    private static final long TREE_DEATH_MAX = 45000;
     private static final Logger logger = LoggerFactory.getLogger(TreeAuthoritySystem.class);
+
+    /**
+     * The minimum time taken after tree death for fruit blocks to disappear, in ms.
+     */
+    private static final long TREE_DEATH_MIN = 20000;
+    /**
+     * The maximum time taken after tree death for fruit blocks to disappear, in ms.
+     */
+    private static final long TREE_DEATH_MAX = 60000;
 
     @In
     WorldProvider worldProvider;
@@ -84,7 +92,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
     Random random = new FastRandom();
 
     /**
-     * Called whenever a new tree is generated from a seed.
+     * Called whenever a new tree is grown from a seed.
      *
      * @param event                    The event corresponding to the tree growing
      * @param entity                   The plant to be grown into a tree
@@ -93,7 +101,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
      * @param blockComponent           The component containing information about the plant block
      */
     @ReceiveEvent
-    public void onNewTreeGrow(OnNewTreeGrowth event, EntityRef entity, TreeDefinitionComponent treeDefinitionComponent, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
+    public void onNewTreeGrowth(OnNewTreeGrowth event, EntityRef entity, TreeDefinitionComponent treeDefinitionComponent, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
         Vector3i baseLocation = blockComponent.getPosition();
 
         TreeControllerComponent treeController = new TreeControllerComponent();
@@ -162,13 +170,19 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         treeController.fruitGrowthStages = treeDefinitionComponent.fruitGrowthStages;
 
         EntityRef controllerEntity = blockEntityRegistry.getBlockEntityAt(baseLocation);
+        controllerEntity.removeComponent(PlantDefinitionComponent.class);
+        controllerEntity.removeComponent(TreeDefinitionComponent.class);
         controllerEntity.addComponent(treeController);
         scheduleTreeGrowth(entity, initialTimeRange.getTimeRange());
-
-        entity.removeComponent(PlantDefinitionComponent.class);
-        entity.removeComponent(TreeDefinitionComponent.class);
     }
 
+    /**
+     * Increase the growth stage of all fruit blocks on this tree by 1.
+     *
+     * @param event          The event corresponding to the tree growth event
+     * @param entity         The entity corresponding to the tree controller
+     * @param treeController The component defining the entity as being a tree controller
+     */
     @ReceiveEvent
     public void onTreeGrowth(OnTreeGrowth event, EntityRef entity, TreeControllerComponent treeController) {
         Iterator<Map.Entry<Vector3i, Block>> fruitBlocksIt = treeController.fruitBlocks.entrySet().iterator();
@@ -216,12 +230,20 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Called whenever the player harvests a fruit from the tree.
+     *
+     * @param event              The event corresponding to the fruit block being activated by the player
+     * @param fruitEntity        The entity corresponding to the harvestable fruit block
+     * @param fruitItemComponent The component marking the fruit block as being harvestable
+     * @param blockComponent     The component containing information about the fruit block
+     */
     @ReceiveEvent
-    public void onGiveFruit(ActivateEvent event, EntityRef fruitEntity, TreeFruitCreation harvestableComponent, BlockComponent blockComponent) {
+    public void onGiveFruit(ActivateEvent event, EntityRef fruitEntity, TreeFruitCreationComponent fruitItemComponent, BlockComponent blockComponent) {
         EntityRef instigator = event.getInstigator();
 
         if (!event.isConsumed() && instigator.hasComponent(InventoryComponent.class)) {
-            EntityRef fruitItem = entityManager.create(harvestableComponent.fruitItem);
+            EntityRef fruitItem = entityManager.create(fruitItemComponent.fruitItem);
             if (fruitItem != EntityRef.NULL) {
                 inventoryManager.giveItem(instigator, instigator, fruitItem);
                 event.consume();
@@ -242,8 +264,15 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Called to update the fruit block after it has been harvested.
+     *
+     * @param event          The event corresponding to the fruit block being harvested
+     * @param entity         The entity corresponding to the controller block on the tree
+     * @param treeController The component marking the entity as being a tree controller
+     */
     @ReceiveEvent
-    public void onFruitHarvested(OnFruitHarvest event, EntityRef entity, TreeControllerComponent treeController) {
+    public void onFruitHarvest(OnFruitHarvest event, EntityRef entity, TreeControllerComponent treeController) {
         Vector3i fruitPos = event.getPosition();
         Block currentStageBlock = worldProvider.getBlock(fruitPos);
         if (currentStageBlock == null) {
@@ -266,8 +295,15 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Called whenever the controller block of the tree is destroyed.
+     *
+     * @param event               The event corresponding to the controller block being destroyed
+     * @param entity              The entity corresponding to the controller block of the tree
+     * @param controllerComponent The component marking the entity as being a tree controller
+     */
     @ReceiveEvent
-    public void onTreeDeath(DestroyEvent event, EntityRef entity, TreeControllerComponent controllerComponent) {
+    public void onTreeDeath(DoDestroyEvent event, EntityRef entity, TreeControllerComponent controllerComponent) {
         if (delayManager.hasDelayedAction(entity, TREE_GROWTH_ACTION)) {
             delayManager.cancelDelayedAction(entity, TREE_GROWTH_ACTION);
         }
@@ -278,7 +314,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    public void onFruitDeath(DelayedActionTriggeredEvent event, EntityRef entity) {
+    public void onFruitDestroy(DelayedActionTriggeredEvent event, EntityRef entity) {
         if (event.getActionId().equals(TREE_DEATH_ACTION)) {
             entity.send(new DoDestroyEvent(null, null, EngineDamageTypes.DIRECT.get()));
         }

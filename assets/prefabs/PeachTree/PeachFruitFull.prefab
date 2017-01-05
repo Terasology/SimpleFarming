@@ -1,6 +1,5 @@
 {
-    "HarvestableTreeFruit": {
-        "fruitItem": "SimpleFarming:Peach",
-        "seedPrefab": "SimpleFarming:PeachTreeSeed"
+    "TreeFruitCreation": {
+        "fruitItem": "SimpleFarming:Peach"
     }
 }

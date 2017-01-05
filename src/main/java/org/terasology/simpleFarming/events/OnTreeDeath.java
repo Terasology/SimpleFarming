@@ -17,5 +17,9 @@ package org.terasology.simpleFarming.events;
 
 import org.terasology.entitySystem.event.Event;
 
+/**
+ * An event triggered whenever the controller block of a tree is destroyed.
+ * This base of the trunk is the controller block by default.
+ */
 public class OnTreeDeath implements Event {
 }
