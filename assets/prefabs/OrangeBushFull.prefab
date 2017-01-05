@@ -1,9 +1,0 @@
-{
-  "PlantProduceCreation": {
-    "producePrefab": "SimpleFarming:Orange"
-  },
-  "UnGrowPlantOnHarvest": {},
-  "PlantDefinition": {
-    "seedPrefab": "OrangeSeed"
-  }
-}
