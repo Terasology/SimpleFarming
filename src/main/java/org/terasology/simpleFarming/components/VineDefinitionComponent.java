@@ -31,9 +31,6 @@ public class VineDefinitionComponent implements Component {
     /** The maximum number of blocks that can be part of the vine's trunk. */
     public int maxParts = 20;
 
-    /** The prefab name of the seed. */
-    public String seedPrefab;
-
     /** The URI of the block to be used as the sapling (the primitive stage that grows into a trunk block in 1 growth cycle. */
     public String sapling;
 
@@ -57,4 +54,24 @@ public class VineDefinitionComponent implements Component {
 
     /** The number of growth cycles left for the vine to become ripe. */
     public int growthsTillRipe;
+
+    /** 1 minus the probability of a fruit spawning in a growth cycle once ripe. */
+    public double probabilityThresholdForFruit = 0.7;
+
+    public VineDefinitionComponent() {
+    }
+
+    public VineDefinitionComponent(VineDefinitionComponent original) {
+        this.soilCategory = original.soilCategory;
+        this.maxParts = original.maxParts;
+        this.sapling = original.sapling;
+        this.trunk = original.trunk;
+        this.produce = original.produce;
+        this.plantName = original.plantName;
+        this.parts = original.parts;
+        this.isSapling = original.isSapling;
+        this.nextGrowth = original.nextGrowth;
+        this.growthsTillRipe = original.growthsTillRipe;
+        this.probabilityThresholdForFruit = original.probabilityThresholdForFruit;
+    }
 }

@@ -15,6 +15,7 @@
  */
 package org.terasology.simpleFarming.systems;
 
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -29,6 +30,7 @@ import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.math.Direction;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
@@ -41,27 +43,29 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class VineAuthoritySystem extends BaseComponentSystem {
     private static final String GROW_ACTION = "VINEGROWTH";
     private static final Logger logger = LoggerFactory.getLogger(VineAuthoritySystem.class);
+    private static final List<Direction> HORIZONTAL_DIRECTIONS = Lists.newArrayList(Direction.FORWARD, Direction.BACKWARD, Direction.LEFT, Direction.RIGHT);
 
     @In
-    WorldProvider worldProvider;
+    private WorldProvider worldProvider;
     @In
-    BlockManager blockManager;
+    private BlockManager blockManager;
     @In
-    InventoryManager inventoryManager;
+    private InventoryManager inventoryManager;
     @In
-    DelayManager delayManager;
+    private DelayManager delayManager;
     @In
-    EntityManager entityManager;
+    private EntityManager entityManager;
     @In
-    BlockEntityRegistry blockEntityRegistry;
+    private BlockEntityRegistry blockEntityRegistry;
     @In
-    PrefabManager prefabManager;
+    private PrefabManager prefabManager;
 
     /**
      * Defines what to do when a vine seed is planted.
@@ -82,8 +86,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
             return;
         }
 
-        Vector3i plantPosition = new Vector3i(event.getTargetLocation(), 0.5f);
-        plantPosition = surfaceSide.getAdjacentPos(plantPosition);
+        Vector3i plantPosition = surfaceSide.getAdjacentPos(new Vector3i(event.getTargetLocation()));
         Block currentPlantBlock = worldProvider.getBlock(plantPosition);
 
         BlockComponent soilBlockComponent = event.getTarget().getComponent(BlockComponent.class);
@@ -101,15 +104,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
                 return;
             }
 
-            VineDefinitionComponent newVineDefinitionComponent = new VineDefinitionComponent();
-            newVineDefinitionComponent.nextGrowth = vineDefinitionComponent.nextGrowth;
-            newVineDefinitionComponent.growthsTillRipe = vineDefinitionComponent.growthsTillRipe;
-            newVineDefinitionComponent.soilCategory = vineDefinitionComponent.soilCategory;
-            newVineDefinitionComponent.seedPrefab = seedItem.getParentPrefab().getName();
-            newVineDefinitionComponent.plantName = vineDefinitionComponent.plantName;
-            newVineDefinitionComponent.sapling = vineDefinitionComponent.sapling;
-            newVineDefinitionComponent.trunk = vineDefinitionComponent.trunk;
-            newVineDefinitionComponent.produce = vineDefinitionComponent.produce;
+            VineDefinitionComponent newVineDefinitionComponent = new VineDefinitionComponent(vineDefinitionComponent);
             newVineDefinitionComponent.isSapling = true;
 
             List<Vector3i> vineParts = new ArrayList<>();
@@ -173,14 +168,15 @@ public class VineAuthoritySystem extends BaseComponentSystem {
                 }
             }
 
-            Vector3i newPartPosition = getNewPartPosition(vineDefinitionComponent);
+            Vector3i newPartPosition = searchNewPartPosition(vineDefinitionComponent.parts, HORIZONTAL_DIRECTIONS, null);
 
             if (newPartPosition == null) {
+                scheduleVineGrowth(entity, vineDefinitionComponent);
                 return;
             }
 
             if (vineDefinitionComponent.growthsTillRipe <= 0) {
-                if (Math.random() > 0.7) {
+                if (Math.random() > vineDefinitionComponent.probabilityThresholdForFruit) {
                     Block fruitBlock = blockManager.getBlock(vineDefinitionComponent.produce);
                     worldProvider.setBlock(newPartPosition, fruitBlock);
                     scheduleVineGrowth(entity, vineDefinitionComponent);
@@ -205,60 +201,60 @@ public class VineAuthoritySystem extends BaseComponentSystem {
         scheduleVineGrowth(entity, vineDefinitionComponent);
     }
 
-    private Vector3i getNewPartPosition(VineDefinitionComponent vineDefinitionComponent) {
-        java.util.Random randomGenerator = new java.util.Random();
+    /**
+     * Searches for new plant part positions based on the current plant parts.
+     * New positions are searched relative from each part in all passed directions in random order.
+     * A valid position for a new plant part must meet the following requirements:
+     * <ul>
+     * <li> The position is (a) adjacent to one part or (b) adjacent & one block below and has air above it
+     * <li> The block at the new position is air
+     * <li> The blow below the new position is not air
+     * <li> The block below the new position has the required soil category for the part
+     * </ul>
+     * @param parts Position of the current plant parts/blocks
+     * @param searchDirections Directions to search for, relative to each part
+     * @param requiredSoilCategory The soil category, required for the ground below each part. Can be null to accept all kind of soils.
+     * @return The new position for a plant part on a valid position or null if no valid position was found.
+     */
+    private Vector3i searchNewPartPosition(List<Vector3i> parts, List<Direction> searchDirections, String requiredSoilCategory) {
 
-        List<Vector3i> partsCopy = new ArrayList<>(vineDefinitionComponent.parts);
+        List<Vector3i> partsCopy = new ArrayList<>(parts);
+        Collections.shuffle(partsCopy);
+        List<Direction> directionsCopy = new ArrayList<>(searchDirections);
+        Collections.shuffle(directionsCopy);
 
-        Vector3i rand;
-        List<Vector3i> possible;
-        while (partsCopy.size() > 0) {
-            possible = new ArrayList<>();
-            rand = partsCopy.get(randomGenerator.nextInt(partsCopy.size()));
-
-            if (worldProvider.getBlock((new Vector3i(rand)).add(1, 0, 0)) == blockManager.getBlock(BlockManager.AIR_ID)) {
-                if (worldProvider.getBlock((new Vector3i(rand)).add(1, -1, 0)) == blockManager.getBlock(BlockManager.AIR_ID)) {
-                    if (worldProvider.getBlock((new Vector3i(rand)).add(1, -2, 0)) != blockManager.getBlock(BlockManager.AIR_ID)) {
-                        possible.add((new Vector3i(rand)).add(1, -1, 0));
+        for (Vector3i part : partsCopy) {
+            for (Direction direction : directionsCopy) {
+                Vector3i possiblePosition = new Vector3i(part).add(direction.getVector3i());
+                //we are only interested in positions where the blocks are air
+                if (isAirBlock(possiblePosition)) {
+                    Vector3i oneDown = new Vector3i(possiblePosition).subY(1);
+                    if (!isAirBlock(oneDown)) {
+                        //one down is no air, so check the soil type next
+                        if (requiredSoilCategory == null || hasBlockSoilCategory(oneDown, requiredSoilCategory)) {
+                            //air at the position and valid soil type one down -> grow in this direction
+                            return possiblePosition;
+                        }
+                    } else {
+                        //one block down is air
+                        Vector3i twoDown = new Vector3i(possiblePosition).subY(2);
+                        if (!isAirBlock(twoDown) && (requiredSoilCategory == null || hasBlockSoilCategory(twoDown, requiredSoilCategory))) {
+                            //two down is no air and has the required soil category -> grow at the block one down
+                            //(crawling down shallow hills)
+                            return oneDown;
+                        }
                     }
-                } else {
-                    possible.add((new Vector3i(rand)).add(1, 0, 0));
                 }
-            }
-            if (worldProvider.getBlock((new Vector3i(rand)).sub(1, 0, 0)) == blockManager.getBlock(BlockManager.AIR_ID)) {
-                if (worldProvider.getBlock((new Vector3i(rand)).sub(1, 1, 0)) == blockManager.getBlock(BlockManager.AIR_ID)) {
-                    if (worldProvider.getBlock((new Vector3i(rand)).sub(1, 2, 0)) != blockManager.getBlock(BlockManager.AIR_ID)) {
-                        possible.add((new Vector3i(rand)).sub(1, 1, 0));
-                    }
-                } else {
-                    possible.add((new Vector3i(rand)).sub(1, 0, 0));
-                }
-            }
-            if (worldProvider.getBlock((new Vector3i(rand)).add(0, 0, 1)) == blockManager.getBlock(BlockManager.AIR_ID)) {
-                if (worldProvider.getBlock((new Vector3i(rand)).add(0, -1, 1)) == blockManager.getBlock(BlockManager.AIR_ID)) {
-                    if (worldProvider.getBlock((new Vector3i(rand)).add(0, -2, 1)) != blockManager.getBlock(BlockManager.AIR_ID)) {
-                        possible.add((new Vector3i(rand)).add(0, -1, 1));
-                    }
-                } else {
-                    possible.add((new Vector3i(rand)).add(0, 0, 1));
-                }
-            }
-            if (worldProvider.getBlock((new Vector3i(rand)).sub(0, 0, 1)) == blockManager.getBlock(BlockManager.AIR_ID)) {
-                if (worldProvider.getBlock((new Vector3i(rand)).sub(0, 1, 1)) == blockManager.getBlock(BlockManager.AIR_ID)) {
-                    if (worldProvider.getBlock((new Vector3i(rand)).sub(0, 2, 1)) != blockManager.getBlock(BlockManager.AIR_ID)) {
-                        possible.add((new Vector3i(rand)).sub(0, 1, 1));
-                    }
-                } else {
-                    possible.add((new Vector3i(rand)).sub(0, 0, 1));
-                }
-            }
-
-            if (possible.isEmpty()) {
-                partsCopy.remove(rand);
-            } else {
-                return possible.get(randomGenerator.nextInt(possible.size()));
             }
         }
         return null;
+    }
+
+    private boolean isAirBlock(Vector3i blockPosition) {
+        return worldProvider.getBlock(blockPosition) == blockManager.getBlock(BlockManager.AIR_ID);
+    }
+
+    private boolean hasBlockSoilCategory(Vector3i blockPosition, String soilCategory) {
+        return worldProvider.getBlock(blockPosition).getBlockFamily().hasCategory(soilCategory);
     }
 }
