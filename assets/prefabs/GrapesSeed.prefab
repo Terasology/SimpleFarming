@@ -18,10 +18,6 @@
         "maxRandom": 1000,
         "fixed": 20000
       },
-      "SimpleFarming:MatureGrapesBush": {
-        "maxRandom": 1000,
-        "fixed": 20000
-      },
       "SimpleFarming:GrapesBushFull": {
         "maxRandom": 1000,
         "fixed": 20000
