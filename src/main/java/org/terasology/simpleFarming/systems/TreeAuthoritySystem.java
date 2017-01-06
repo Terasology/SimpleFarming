@@ -28,14 +28,15 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
-import org.terasology.logic.health.BeforeDestroyEvent;
 import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.math.Region3i;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.protobuf.EntityData;
+import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.PlantDefinitionComponent;
 import org.terasology.simpleFarming.components.TimeRange;
@@ -52,6 +53,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.entity.CreateBlockDropsEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,28 +70,28 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
     /**
      * The minimum time taken after tree death for fruit blocks to disappear, in ms.
      */
-    private static final long TREE_DEATH_MIN = 20000;
+    private static final long FRUIT_DESTROY_MIN = 15000;
     /**
      * The maximum time taken after tree death for fruit blocks to disappear, in ms.
      */
-    private static final long TREE_DEATH_MAX = 60000;
+    private static final long FRUIT_DESTROY_MAX = 45000;
 
     @In
-    WorldProvider worldProvider;
+    private WorldProvider worldProvider;
     @In
-    BlockManager blockManager;
+    private BlockManager blockManager;
     @In
-    BlockEntityRegistry blockEntityRegistry;
+    private BlockEntityRegistry blockEntityRegistry;
     @In
-    DelayManager delayManager;
+    private DelayManager delayManager;
     @In
-    InventoryManager inventoryManager;
+    private InventoryManager inventoryManager;
     @In
-    EntityManager entityManager;
+    private EntityManager entityManager;
     @In
-    PrefabManager prefabManager;
+    private PrefabManager prefabManager;
 
-    Random random = new FastRandom();
+    private Random random = new FastRandom();
 
     /**
      * Called whenever a new tree is grown from a seed.
@@ -128,7 +130,8 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         Map<Vector3i, Block> fruitBlocks = new HashMap<>();
 
         for (int y = baseLocation.y(); y < baseLocation.y() + treeDefinitionComponent.trunkHeight; y++) {
-            trunkBlocks.put(new Vector3i(baseLocation.x(), y, baseLocation.z()), trunkBlock);
+            Vector3i trunkPos = new Vector3i(baseLocation.x(), y, baseLocation.z());
+            trunkBlocks.put(trunkPos, trunkBlock);
         }
         int currentLayer = baseLocation.y();
         for (Integer layerLength : canopyLayers) {
@@ -164,39 +167,39 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
             }
         }
 
+        EntityRef saplingEntity = blockEntityRegistry.getBlockEntityAt(baseLocation);
+        saplingEntity.destroy();
         worldProvider.setBlocks(fruitBlocks);
         worldProvider.setBlocks(trunkBlocks);
-        treeController.fruitBlocks = fruitBlocks;
+        treeController.trunkBlocks = new ArrayList<>(trunkBlocks.keySet());
+        treeController.fruitBlocks = new ArrayList<>(fruitBlocks.keySet());
         treeController.fruitGrowthStages = treeDefinitionComponent.fruitGrowthStages;
 
         EntityRef controllerEntity = blockEntityRegistry.getBlockEntityAt(baseLocation);
-        controllerEntity.removeComponent(PlantDefinitionComponent.class);
-        controllerEntity.removeComponent(TreeDefinitionComponent.class);
         controllerEntity.addComponent(treeController);
-        scheduleTreeGrowth(entity, initialTimeRange.getTimeRange());
+        scheduleTreeGrowth(controllerEntity, initialTimeRange.getTimeRange());
     }
 
     /**
      * Increase the growth stage of all fruit blocks on this tree by 1.
      *
-     * @param event          The event corresponding to the tree growth event
-     * @param entity         The entity corresponding to the tree controller
-     * @param treeController The component defining the entity as being a tree controller
+     * @param event            The event corresponding to the tree growth event
+     * @param controllerEntity The entity corresponding to the tree controller
+     * @param treeController   The component defining the entity as being a tree controller
      */
     @ReceiveEvent
-    public void onTreeGrowth(OnTreeGrowth event, EntityRef entity, TreeControllerComponent treeController) {
-        Iterator<Map.Entry<Vector3i, Block>> fruitBlocksIt = treeController.fruitBlocks.entrySet().iterator();
+    public void onTreeGrowth(OnTreeGrowth event, EntityRef controllerEntity, TreeControllerComponent treeController) {
+        Iterator<Vector3i> fruitBlocksIt = treeController.fruitBlocks.iterator();
         long timeToNextGrowth = 0;
 
         // increases growth stage of every fruit by 1
         while (fruitBlocksIt.hasNext()) {
-            Map.Entry<Vector3i, Block> fruitBlock = fruitBlocksIt.next();
-            Vector3i fruitPos = fruitBlock.getKey();
+            Vector3i fruitPos = fruitBlocksIt.next();
             Block blockAtFruitPos = worldProvider.getBlock(fruitPos);
-            Block currentStageBlock = fruitBlock.getValue();
-            Map.Entry<String, TimeRange> nextGrowthStage = findStageEntry(treeController, currentStageBlock, false);
+            Map.Entry<String, TimeRange> nextGrowthStage = findStageEntry(treeController, blockAtFruitPos, false);
 
-            if (blockAtFruitPos != currentStageBlock) {
+            // check for block being removed
+            if (!treeController.fruitGrowthStages.containsKey(blockAtFruitPos.toString())) {
                 fruitBlocksIt.remove();
                 continue;
             }
@@ -213,13 +216,12 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
             }
 
             worldProvider.setBlock(fruitPos, nextGrowthStageBlock);
-
-            treeController.fruitBlocks.replace(fruitPos, nextGrowthStageBlock);
-            entity.saveComponent(treeController);
             timeToNextGrowth = Math.max(timeToNextGrowth, nextGrowthStageRange.getTimeRange());
         }
+        controllerEntity.saveComponent(treeController);
+
         if (timeToNextGrowth > 0) {
-            scheduleTreeGrowth(entity, timeToNextGrowth);
+            scheduleTreeGrowth(controllerEntity, timeToNextGrowth);
         }
     }
 
@@ -233,17 +235,17 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
     /**
      * Called whenever the player harvests a fruit from the tree.
      *
-     * @param event              The event corresponding to the fruit block being activated by the player
-     * @param fruitEntity        The entity corresponding to the harvestable fruit block
-     * @param fruitItemComponent The component marking the fruit block as being harvestable
-     * @param blockComponent     The component containing information about the fruit block
+     * @param event             The event corresponding to the fruit block being activated by the player
+     * @param fruitEntity       The entity corresponding to the harvestable fruit block
+     * @param creationComponent The component marking the fruit block as being harvestable
+     * @param blockComponent    The component containing information about the fruit block
      */
     @ReceiveEvent
-    public void onGiveFruit(ActivateEvent event, EntityRef fruitEntity, TreeFruitCreationComponent fruitItemComponent, BlockComponent blockComponent) {
+    public void onGiveFruit(ActivateEvent event, EntityRef fruitEntity, TreeFruitCreationComponent creationComponent, BlockComponent blockComponent) {
         EntityRef instigator = event.getInstigator();
 
         if (!event.isConsumed() && instigator.hasComponent(InventoryComponent.class)) {
-            EntityRef fruitItem = entityManager.create(fruitItemComponent.fruitItem);
+            EntityRef fruitItem = entityManager.create(creationComponent.fruitPrefab);
             if (fruitItem != EntityRef.NULL) {
                 inventoryManager.giveItem(instigator, instigator, fruitItem);
                 event.consume();
@@ -252,7 +254,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
                 EntityRef controllerEntity = EntityRef.NULL;
                 for (EntityRef entity : entityManager.getEntitiesWith(TreeControllerComponent.class)) {
                     TreeControllerComponent controllerComponent = entity.getComponent(TreeControllerComponent.class);
-                    if (controllerComponent.fruitBlocks.containsKey(blockComponent.getPosition())) {
+                    if (controllerComponent.fruitBlocks.contains(blockComponent.getPosition())) {
                         controllerEntity = entity;
                         break;
                     }
@@ -289,8 +291,6 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 
         if (fruitPos != null && prevGrowthStageBlock != null) {
             worldProvider.setBlock(fruitPos, prevGrowthStageBlock);
-            treeController.fruitBlocks.replace(fruitPos, prevGrowthStageBlock);
-            entity.saveComponent(treeController);
             scheduleTreeGrowth(entity, prevGrowthStageRange.getTimeRange());
         }
     }
@@ -307,17 +307,34 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         if (delayManager.hasDelayedAction(entity, TREE_GROWTH_ACTION)) {
             delayManager.cancelDelayedAction(entity, TREE_GROWTH_ACTION);
         }
-        for (Map.Entry<Vector3i, Block> entry : controllerComponent.fruitBlocks.entrySet()) {
-            EntityRef fruitEntity = blockEntityRegistry.getBlockEntityAt(entry.getKey());
-            delayManager.addDelayedAction(fruitEntity, TREE_DEATH_ACTION, random.nextLong(TREE_DEATH_MIN, TREE_DEATH_MAX));
+        for (Vector3i trunkPos : controllerComponent.trunkBlocks) {
+            EntityRef trunkEntity = blockEntityRegistry.getEntityAt(trunkPos);
+            if (trunkEntity != EntityRef.NULL && !trunkEntity.hasComponent(TreeControllerComponent.class)) {
+                trunkEntity.send(new DoDestroyEvent(null, null, EngineDamageTypes.PHYSICAL.get()));
+            }
+        }
+        for (Vector3i fruitPos : controllerComponent.fruitBlocks) {
+            EntityRef fruitEntity = blockEntityRegistry.getBlockEntityAt(fruitPos);
+            if (fruitEntity != EntityRef.NULL) {
+                delayManager.addDelayedAction(fruitEntity, TREE_DEATH_ACTION, random.nextLong(FRUIT_DESTROY_MIN, FRUIT_DESTROY_MAX));
+            }
         }
     }
 
     @ReceiveEvent
-    public void onFruitDestroy(DelayedActionTriggeredEvent event, EntityRef entity) {
+    public void onTreeDeathFruitDestroy(DelayedActionTriggeredEvent event, EntityRef entity) {
         if (event.getActionId().equals(TREE_DEATH_ACTION)) {
-            entity.send(new DoDestroyEvent(null, null, EngineDamageTypes.DIRECT.get()));
+            entity.send(new DoDestroyEvent(null, null, EngineDamageTypes.PHYSICAL.get()));
         }
+    }
+
+    @ReceiveEvent
+    public void onFruitDestroy(CreateBlockDropsEvent event, EntityRef fruitEntity, TreeFruitCreationComponent creationComponent, BlockComponent blockComponent) {
+        event.consume();
+        EntityRef seedItem = entityManager.create(creationComponent.seedPrefab);
+        Vector3f position = blockComponent.getPosition().toVector3f().add(0, 0.5f, 0);
+        seedItem.send(new DropItemEvent(position));
+        seedItem.send(new ImpulseEvent(random.nextVector3f(30.0f)));
     }
 
     private Map.Entry<String, TimeRange> findStageEntry(TreeControllerComponent treeController, Block fruitBlock, boolean findPrevious) {

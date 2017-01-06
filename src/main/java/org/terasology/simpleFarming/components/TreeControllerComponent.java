@@ -16,10 +16,8 @@
 package org.terasology.simpleFarming.components;
 
 import com.google.common.collect.Maps;
-import org.terasology.engine.Time;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.world.block.Block;
 import org.terasology.world.block.ForceBlockActive;
 
 import java.util.ArrayList;
@@ -34,8 +32,13 @@ public class TreeControllerComponent implements Component {
     public Map<String, TimeRange> fruitGrowthStages = Maps.newTreeMap();
 
     /**
-     * A map linking the positions of the fruits and their current growth stage.
+     * A list of the positions of the fruits in this tree.
      */
-    public Map<Vector3i, Block> fruitBlocks;
+    public ArrayList<Vector3i> fruitBlocks;
+
+    /**
+     * A list of the positions of the trunk blocks of this tree.
+     */
+    public ArrayList<Vector3i> trunkBlocks;
 }
 

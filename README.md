@@ -162,13 +162,14 @@ For instance, here is what a Peach Tree would look like based on the above prefa
 
 As you can see, the first 3 layers have no fruit blocks, while the 4th layer has a canopy 3 blocks wide, followed by a layer 2 blocks wide and then a single block at the top of the tree. 
 
-And one last thing: instead of using `PlantProduceCreation` in the final prefab, what you should do for fruits is `TreeFruitCreation` instead, like so: 
+And one last thing: instead of using `PlantProduceCreation` in the final prefab, what you should do for fruits is `TreeFruitCreation` instead. You need to specify `fruitPrefab`, the item the player will receive when harvested, and `seedPrefab`, the seed of the tree that will drop when the fruit is destroyed: 
 
 `Peach.prefab`:
 ```javascript
 {
     "TreeFruitCreation": {
-        "fruitItem": "SimpleFarming:Peach"
+        "fruitPrefab": "SimpleFarming:Peach",
+        "seedPrefab": "SimpleFarming:PeachTreeSeed"
     }
 }
 ```
@@ -177,7 +178,7 @@ And that's it! Ensure that all of the prefabs mentioned in the definition are pr
 
 A few things to take note of:
 - Trees will only grow if there is sufficient space for the trunk to appear. 
-- Destroying the part of the trunk that connects the tree to the ground will kill the tree, stopping any growth of fruit blocks and causing them to degenerate over time.
+- Destroying the part of the trunk that connects the tree to the ground will kill the tree, destroying all trunk block and stopping the growth of all fruit blocks, causing them to degenerate over time.
 
 Before creating your own tree, take a look at how the Peach Tree prefabs are written as well as test the Peach Tree in-game to gain a better understanding of how creating trees work.
 

@@ -16,7 +16,6 @@
 package org.terasology.simpleFarming.components;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
 
 /**
  * Allows a fruit entity to be harvested
@@ -25,5 +24,10 @@ public class TreeFruitCreationComponent implements Component {
     /**
      * The item that the fruit produces when harvested.
      */
-    public String fruitItem;
+    public String fruitPrefab;
+
+    /**
+     * The seed item that the fruit produces when destroyed.
+     */
+    public String seedPrefab;
 }
