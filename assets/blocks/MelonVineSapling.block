@@ -1,5 +1,5 @@
 {
   "basedOn": "SimpleFarming:MatureBerryBush",
   "displayName": "Melon Vine Sapling",
-  "tile": "SimpleFarming:WatermelonBushFull"
+  "tile": "SimpleFarming:BerryBush"
 }
