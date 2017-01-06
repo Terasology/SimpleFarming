@@ -64,6 +64,7 @@ Fruit Prefab
 This prefab should be pretty intuitive. It creates the fruit that will be dropped when you harvest the plant that grows it.
 
 Ripe Stage of The Plant Prefab
+
 -----------
 *For a good example, see TestberryBushFull.prefab at assets/prefabs*
 
@@ -134,4 +135,4 @@ Credits for Images:
 * GrapesSeed: https://pixabay.com/en/dried-leaf-plant-natural-leaves-774823/ (Resized)
 * GrapesBush :https://pixabay.com/en/grape-fruit-fruit-tree-green-1511280/ (Resized)
 * GrapesBushFull :https://pixabay.com/en/grape-fruit-fruit-tree-green-1511280/ (Resized) (Edited by DhananjayGarg)
-
+* Cherry: https://pixabay.com/en/cherry-sweet-cherry-red-fruit-167341/
