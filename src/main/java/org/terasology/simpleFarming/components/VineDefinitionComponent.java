@@ -16,6 +16,7 @@
 package org.terasology.simpleFarming.components;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.math.geom.Vector3i;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,7 @@ public class VineDefinitionComponent implements Component {
     public String plantName;
 
     /** A list of all the parts of the trunk. */
-    public List<VinePartComponent> parts = new ArrayList<>();
+    public List<Vector3i> parts = new ArrayList<>();
 
     /** Whether the vine is currently in the sapling stage. */
     public boolean isSapling = true;
@@ -56,7 +57,4 @@ public class VineDefinitionComponent implements Component {
 
     /** The number of growth cycles left for the vine to become ripe. */
     public int growthsTillRipe;
-
-    /** Decides what direction the vine is slightly elongated in. True = X Direction, False = Z direction. */
-    public boolean orientation = Math.random() > 0.5;
 }

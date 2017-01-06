@@ -27,15 +27,12 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
-import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
-import org.terasology.simpleFarming.components.TimeRange;
 import org.terasology.simpleFarming.components.VineDefinitionComponent;
-import org.terasology.simpleFarming.components.VinePartComponent;
 import org.terasology.simpleFarming.events.OnVineGrowth;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
@@ -115,26 +112,20 @@ public class VineAuthoritySystem extends BaseComponentSystem {
             newVineDefinitionComponent.produce = vineDefinitionComponent.produce;
             newVineDefinitionComponent.isSapling = true;
 
-            List<VinePartComponent> vineParts = new ArrayList<>();
-            VinePartComponent rootComponent = new VinePartComponent();
-            rootComponent.parentComponent = newVineDefinitionComponent;
-            rootComponent.partPosition = plantPosition;
-            vineParts.add(rootComponent);
+            List<Vector3i> vineParts = new ArrayList<>();
+            vineParts.add(plantPosition);
             newVineDefinitionComponent.parts = vineParts;
 
             worldProvider.setBlock(plantPosition, saplingBlock);
             EntityRef vineEntity = blockEntityRegistry.getBlockEntityAt(plantPosition);
             vineEntity.addComponent(newVineDefinitionComponent);
-            vineEntity.addComponent(rootComponent);
             scheduleVineGrowth(vineEntity, newVineDefinitionComponent);
             inventoryManager.removeItem(seedItem.getOwner(), seedItem, seedItem, true, 1);
         }
     }
 
     private void scheduleVineGrowth(EntityRef vineEntity, VineDefinitionComponent vineDefinitionComponent) {
-        if (vineDefinitionComponent.parts.size() <= vineDefinitionComponent.maxParts) {
-            delayManager.addDelayedAction(vineEntity, GROW_ACTION, vineDefinitionComponent.nextGrowth.getTimeRange());
-        }
+        delayManager.addDelayedAction(vineEntity, GROW_ACTION, vineDefinitionComponent.nextGrowth.getTimeRange());
     }
 
     /**
@@ -167,6 +158,21 @@ public class VineAuthoritySystem extends BaseComponentSystem {
         }
 
         if (!vineDefinitionComponent.isSapling) {
+            // Prefer repairing vines if broken
+            List<Vector3i> copy = new ArrayList<>(vineDefinitionComponent.parts);
+            for (Vector3i position: copy) {
+                if (worldProvider.getBlock(position) != blockManager.getBlock(vineDefinitionComponent.trunk)) {
+                    if (worldProvider.getBlock(position) == blockManager.getBlock(BlockManager.AIR_ID)) {
+                        Block trunkBlock = blockManager.getBlock(vineDefinitionComponent.trunk);
+                        worldProvider.setBlock(position, trunkBlock);
+                        scheduleVineGrowth(entity, vineDefinitionComponent);
+                        return;
+                    } else {
+                        vineDefinitionComponent.parts.remove(position);
+                    }
+                }
+            }
+
             Vector3i newPartPosition = getNewPartPosition(vineDefinitionComponent);
 
             if (newPartPosition == null) {
@@ -181,63 +187,35 @@ public class VineAuthoritySystem extends BaseComponentSystem {
                     return;
                 }
             }
-
-            Block trunkBlock = blockManager.getBlock(vineDefinitionComponent.trunk);
-            worldProvider.setBlock(newPartPosition, trunkBlock);
-
-            VinePartComponent newPartComponent = new VinePartComponent();
-            newPartComponent.parentComponent = vineDefinitionComponent;
-            newPartComponent.partPosition = newPartPosition;
-
-            EntityRef newPartEntity = blockEntityRegistry.getBlockEntityAt(newPartPosition);
-            newPartEntity.addComponent(newPartComponent);
-            vineDefinitionComponent.parts.add(newPartComponent);
-            vineDefinitionComponent.growthsTillRipe = vineDefinitionComponent.growthsTillRipe - 1;
+            if (vineDefinitionComponent.parts.size() <= vineDefinitionComponent.maxParts) {
+                Block trunkBlock = blockManager.getBlock(vineDefinitionComponent.trunk);
+                worldProvider.setBlock(newPartPosition, trunkBlock);
+                vineDefinitionComponent.parts.add(newPartPosition);
+                vineDefinitionComponent.growthsTillRipe = vineDefinitionComponent.growthsTillRipe - 1;
+            }
         } else {
             Block trunkBlock = blockManager.getBlock(vineDefinitionComponent.trunk);
-            VinePartComponent part = vineDefinitionComponent.parts.get(0);
-            worldProvider.setBlock(part.partPosition, trunkBlock);
+            Vector3i pos = vineDefinitionComponent.parts.get(0);
+            worldProvider.setBlock(pos, trunkBlock);
             vineDefinitionComponent.isSapling = false;
-            EntityRef newPartEntity = blockEntityRegistry.getBlockEntityAt(part.partPosition);
+            EntityRef newPartEntity = blockEntityRegistry.getBlockEntityAt(pos);
             newPartEntity.addComponent(vineDefinitionComponent);
-            newPartEntity.addComponent(part);
         }
 
         scheduleVineGrowth(entity, vineDefinitionComponent);
     }
 
-    /**
-     * Removes a part from the parent vine entity when it is destroyed.
-     *
-     * @param event             The event corresponding to the destruction of the part
-     * @param entity            The vine part that was destroyed
-     * @param vinePartComponent The vine part component of the vine part
-     * @param blockComponent    The block component of the vine part
-     */
-    @ReceiveEvent
-    public void onDestroy(DoDestroyEvent event, EntityRef entity, VinePartComponent vinePartComponent, BlockComponent blockComponent) {
-        vinePartComponent.parentComponent.parts.remove(vinePartComponent);
-    }
-
     private Vector3i getNewPartPosition(VineDefinitionComponent vineDefinitionComponent) {
         java.util.Random randomGenerator = new java.util.Random();
 
-        List<Vector3i> partsCopy = new ArrayList<>();
-        for (VinePartComponent partComponent: vineDefinitionComponent.parts) {
-            partsCopy.add(partComponent.partPosition);
-        }
+        List<Vector3i> partsCopy = new ArrayList<>(vineDefinitionComponent.parts);
 
         Vector3i rand;
         List<Vector3i> possible;
-        while (true) {
-            if (partsCopy.size() == 0) {
-                return null;
-            }
-
+        while (partsCopy.size() > 0) {
             possible = new ArrayList<>();
             rand = partsCopy.get(randomGenerator.nextInt(partsCopy.size()));
 
-            // add multiple times either in x direction or z direction (based on orientation) so that the vine becomes elongated and not square-ish
             if (worldProvider.getBlock((new Vector3i(rand)).add(1, 0, 0)) == blockManager.getBlock(BlockManager.AIR_ID)) {
                 if (worldProvider.getBlock((new Vector3i(rand)).add(1, -1, 0)) == blockManager.getBlock(BlockManager.AIR_ID)) {
                     if (worldProvider.getBlock((new Vector3i(rand)).add(1, -2, 0)) != blockManager.getBlock(BlockManager.AIR_ID)) {
@@ -245,10 +223,6 @@ public class VineAuthoritySystem extends BaseComponentSystem {
                     }
                 } else {
                     possible.add((new Vector3i(rand)).add(1, 0, 0));
-                    if (vineDefinitionComponent.orientation) {
-                        possible.add((new Vector3i(rand)).add(1, 0, 0));
-                        possible.add((new Vector3i(rand)).add(1, 0, 0));
-                    }
                 }
             }
             if (worldProvider.getBlock((new Vector3i(rand)).sub(1, 0, 0)) == blockManager.getBlock(BlockManager.AIR_ID)) {
@@ -258,10 +232,6 @@ public class VineAuthoritySystem extends BaseComponentSystem {
                     }
                 } else {
                     possible.add((new Vector3i(rand)).sub(1, 0, 0));
-                    if (vineDefinitionComponent.orientation) {
-                        possible.add((new Vector3i(rand)).sub(1, 0, 0));
-                        possible.add((new Vector3i(rand)).sub(1, 0, 0));
-                    }
                 }
             }
             if (worldProvider.getBlock((new Vector3i(rand)).add(0, 0, 1)) == blockManager.getBlock(BlockManager.AIR_ID)) {
@@ -271,10 +241,6 @@ public class VineAuthoritySystem extends BaseComponentSystem {
                     }
                 } else {
                     possible.add((new Vector3i(rand)).add(0, 0, 1));
-                    if (!vineDefinitionComponent.orientation) {
-                        possible.add((new Vector3i(rand)).add(0, 0, 1));
-                        possible.add((new Vector3i(rand)).add(0, 0, 1));
-                    }
                 }
             }
             if (worldProvider.getBlock((new Vector3i(rand)).sub(0, 0, 1)) == blockManager.getBlock(BlockManager.AIR_ID)) {
@@ -284,10 +250,6 @@ public class VineAuthoritySystem extends BaseComponentSystem {
                     }
                 } else {
                     possible.add((new Vector3i(rand)).sub(0, 0, 1));
-                    if (!vineDefinitionComponent.orientation) {
-                        possible.add((new Vector3i(rand)).sub(0, 0, 1));
-                        possible.add((new Vector3i(rand)).sub(0, 0, 1));
-                    }
                 }
             }
 
@@ -297,5 +259,6 @@ public class VineAuthoritySystem extends BaseComponentSystem {
                 return possible.get(randomGenerator.nextInt(possible.size()));
             }
         }
+        return null;
     }
 }
