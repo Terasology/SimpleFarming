@@ -206,7 +206,8 @@ The thing that differentiates vine seed prefabs from other prefabs is the "VineD
 * `growthsTillRipe` : the number of growth cycles after which the vine becomes 'ripe' and starts yielding fruit.
 * `nextGrowth` : this is the TimeRange object used to calculate the time between two growth cycles, and is composite of two fields: the `fixed` field, which is the minimum time (in milliseconds) between two cycles, and `maxRandom`, which is the maximum variation in that time. See the [TimeRange class](https://github.com/Terasology/SimpleFarming/blob/master/src/main/java/org/terasology/simpleFarming/components/TimeRange.java) for details.
 
-For an example of a seed prefab, see the [MelonVineSeed prefab](https://github.com/Terasology/SimpleFarming/blob/master/assets/prefabs/MelonVineSeed.prefab). This prefab should be located in the `/assets/prefabs` directory, and an its texture must be located in the `/assets/textures` directory.
+* Cherry: https://www.pexels.com/photo/fruit-cherries-109274/
+* CherrySeed: https://www.pexels.com/photo/close-up-of-autumn-leaves-over-white-background-255073/For an example of a seed prefab, see the [MelonVineSeed prefab](https://github.com/Terasology/SimpleFarming/blob/master/assets/prefabs/MelonVineSeed.prefab). This prefab should be located in the `/assets/prefabs` directory, and an its texture must be located in the `/assets/textures` directory.
 
 ## Produce Mechanisms
 
@@ -258,3 +259,5 @@ Destroying a plant with produce, will also yield a produce.
 * Peach Tree Saplings, Fruits: iojw (Fruits modified from GreenLeaf)
 * Peach: https://pixabay.com/en/peach-fruit-nectarine-plant-nature-41169/
 * Peach Seed: https://pixabay.com/en/peach-nectarine-fruit-food-sweet-42902/
+* Cherry: https://www.pexels.com/photo/fruit-cherries-109274/
+* CherrySeed: https://www.pexels.com/photo/close-up-of-autumn-leaves-over-white-background-255073/
