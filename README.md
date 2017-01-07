@@ -182,6 +182,32 @@ A few things to take note of:
 
 Before creating your own tree, take a look at how the Peach Tree prefabs are written as well as test the Peach Tree in-game to gain a better understanding of how creating trees work.
 
+## Creating New Vines
+
+Vines are horizontally growing trees that produce fruits. Fruits produced by vines are generally big, and consume one whole block. 
+
+Vines consist of two basic parts: the trunk, which is the main vine and is made up of woody blocks, and the fruit which are separate blocks that grow around the trunk. Vines are grown by planting seeds, and are grown in cycles. When a seed is planted, a 'sapling' emerges, which turns into a trunk block during the first growth cycle. Every growth cycle after this, a new trunk block is added. If the vine is ripe, a fruit block may be added too.
+
+To add a new vine to the module, the following files must be made:
+
+* A seed prefab and texture.
+* 3 blocks: a 'Sapling' block, a 'Trunk' block, and a 'Produce' block.
+
+For instruction on how to add simple blocks, visit [this wiki article](https://github.com/Terasology/TutorialAssetSystem/wiki/Add-New-Block).
+
+### Vine Seed Prefab
+
+The thing that differentiates vine seed prefabs from other prefabs is the "VineDefinition" component. This component contains fields which are used to generate the vine when the seed is planted. The VineDefinition component of a valid vine seed prefab must contain the following fields:
+
+* `plantName` :  the name of the plant
+* `sapling` : the URI of the sapling block (e.g. "SimpleFarming:MelonVineSapling")
+* `trunk` : the URI of the trunk block (e.g. "SimpleFarming:MelonVineTrunk")
+* `produce` : the URI of the produce (fruit) block (e.g. "SimpleFarming:Melon")
+* `growthsTillRipe` : the number of growth cycles after which the vine becomes 'ripe' and starts yielding fruit.
+* `nextGrowth` : this is the TimeRange object used to calculate the time between two growth cycles, and is composite of two fields: the `fixed` field, which is the minimum time (in milliseconds) between two cycles, and `maxRandom`, which is the maximum variation in that time. See the [TimeRange class](https://github.com/Terasology/SimpleFarming/blob/master/src/main/java/org/terasology/simpleFarming/components/TimeRange.java) for details.
+
+For an example of a seed prefab, see the [MelonVineSeed prefab](https://github.com/Terasology/SimpleFarming/blob/master/assets/prefabs/MelonVineSeed.prefab). This prefab should be located in the `/assets/prefabs` directory, and an its texture must be located in the `/assets/textures` directory.
+
 ## Produce Mechanisms
 
 There's 2 kind of produce mechanism that you can specify using the SimpleFarming module.
