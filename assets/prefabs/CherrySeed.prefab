@@ -4,7 +4,7 @@
     "name": "Cherry Seed"
   },
   "Item": {
-    "icon": "SimpleFarming:SimpleFarming#cherryseed",
+    "icon": "SimpleFarming:SimpleFarming#CherrySeed",
     "stackId": "cherrySeed"
   },
   "PlantDefinition": {
