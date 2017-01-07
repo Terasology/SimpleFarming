@@ -2,6 +2,6 @@
   "hardness": 5,
   "mass": 100,
   "translucent": true,
-  "doubleSided": true
+  "doubleSided": true,
   "tile": "SimpleFarming:CherryBush"
 }
