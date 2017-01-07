@@ -13,8 +13,8 @@
       "trunk": "SimpleFarming:MelonVineTrunk",
       "produce": "SimpleFarming:Melon",
       "nextGrowth": {
-          "maxRandom": 1000,
-          "fixed": 2000
+          "maxRandom": 3000,
+          "fixed": 10000
       },
       "growthsTillRipe": 15
   }
