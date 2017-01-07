@@ -4,5 +4,5 @@
   "entity": {
     "prefab": "CherryBushFull"
   },
-  "tile": "SimpleFarming:CherryBush"
+  "tile": "SimpleFarming:CherryBushFull"
 }
