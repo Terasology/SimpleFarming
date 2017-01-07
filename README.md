@@ -258,3 +258,11 @@ Destroying a plant with produce, will also yield a produce.
 * Peach Tree Saplings, Fruits: iojw (Fruits modified from GreenLeaf)
 * Peach: https://pixabay.com/en/peach-fruit-nectarine-plant-nature-41169/
 * Peach Seed: https://pixabay.com/en/peach-nectarine-fruit-food-sweet-42902/
+
+* Melon: Mandar Juvekar (original)
+* Melon Vine Seed: Mandar Juvekar (original)
+* Melon Vine Trunk: Mandar Juvekar (original)
+* Pumpkin: Mandar Juvekar (original)
+* Pumpkin Vine Seed: Mandar Juvekar (original)
+* Pumpkin Vine Sapling: Mandar Juvekar (modified version of BerryBush)
+* Pumpkin Vine Trunk: Mandar Juvekar (original)
