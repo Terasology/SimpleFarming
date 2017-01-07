@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.terasology.simpleFarming.events;
 import org.terasology.entitySystem.event.Event;
 
 /**
- * An event that is triggered when a plant is harvested.
+ * An event triggered for the updating of all fruits in a tree.
  */
-public class OnPlantHarvest implements Event {
+public class OnTreeGrowth implements Event {
 }

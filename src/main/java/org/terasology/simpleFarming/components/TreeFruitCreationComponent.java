@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.simpleFarming.events;
+package org.terasology.simpleFarming.components;
 
-import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.Component;
 
 /**
- * An event that is triggered when a plant is harvested.
+ * Allows a fruit entity to be harvested
  */
-public class OnPlantHarvest implements Event {
+public class TreeFruitCreationComponent implements Component {
+    /**
+     * The item that the fruit produces when harvested.
+     */
+    public String fruitPrefab;
+
+    /**
+     * The seed item that the fruit produces when destroyed.
+     */
+    public String seedPrefab;
 }

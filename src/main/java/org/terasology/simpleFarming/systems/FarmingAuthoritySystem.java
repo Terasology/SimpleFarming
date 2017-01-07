@@ -1,12 +1,12 @@
 /**
  * Copyright 2015 MovingBlocks
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,7 +46,9 @@ import org.terasology.simpleFarming.components.PlantDefinitionComponent;
 import org.terasology.simpleFarming.components.PlantProduceComponent;
 import org.terasology.simpleFarming.components.PlantProduceCreationComponent;
 import org.terasology.simpleFarming.components.TimeRange;
+import org.terasology.simpleFarming.components.TreeDefinitionComponent;
 import org.terasology.simpleFarming.components.UnGrowPlantOnHarvestComponent;
+import org.terasology.simpleFarming.events.OnNewTreeGrowth;
 import org.terasology.simpleFarming.events.OnPlantGrowth;
 import org.terasology.simpleFarming.events.OnPlantHarvest;
 import org.terasology.simpleFarming.events.OnPlantUnGrowth;
@@ -93,7 +95,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     /**
      * Handles the seed drop on plant destroyed event.
-     * 
+     *
      * @param event                     The corresponding event.
      * @param seedItem                  Reference to the seed entity.
      * @param plantDefinitionComponent  The definition of the plant.
@@ -136,10 +138,17 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             newPlantDefinitionComponent.soilCategory = plantDefinitionComponent.soilCategory;
             newPlantDefinitionComponent.seedPrefab = seedItem.getParentPrefab().getName();
             newPlantDefinitionComponent.plantName = plantDefinitionComponent.plantName;
+            newPlantDefinitionComponent.growsIntoTree = plantDefinitionComponent.growsIntoTree;
 
             worldProvider.setBlock(plantPosition, plantBlock);
             EntityRef plantEntity = blockEntityRegistry.getBlockEntityAt(plantPosition);
             plantEntity.addComponent(newPlantDefinitionComponent);
+
+            TreeDefinitionComponent treeDefinitionComponent = seedItem.getComponent(TreeDefinitionComponent.class);
+            if (treeDefinitionComponent != null) {
+                plantEntity.addComponent(treeDefinitionComponent);
+            }
+
             schedulePlantGrowth(plantEntity, growthStage);
             inventoryManager.removeItem(seedItem.getOwner(), seedItem, seedItem, true, 1);
         }
@@ -160,8 +169,8 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     /**
      * Handles the seed drop on plant destroyed event.
-     * 
-     * @param event                     The event ccorresponding to the plant destroy.
+     *
+     * @param event                     The event corresponding to the plant destroy.
      * @param entity                    Reference to the plant entity.
      * @param plantDefinitionComponent  The definition of the plant.
      * @param blockComponent            The block component corresponding to the event
@@ -176,9 +185,9 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
 
     /**
      * Handles the growth schedule of plants
-     * 
-     * @param entity        Reference to the plant entity.
-     * @param timeRange     The time where the plant grow to the next stage
+     *
+     * @param entity    Reference to the plant entity.
+     * @param timeRange The time where the plant grow to the next stage
      */
     private void schedulePlantGrowth(EntityRef entity, TimeRange timeRange) {
         delayManager.addDelayedAction(entity, GROWTH_ACTION, timeRange.getTimeRange());
@@ -187,7 +196,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     /**
      * Handles plant growth based on the schedule time from delayed action
-     * 
+     *
      * @param event                     The delayed action event.
      * @param entity                    The entity which is going to grown
      * @param plantDefinitionComponent  The definition of the plant.
@@ -202,7 +211,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     /**
      * Handles plant growth event.
-     * 
+     *
      * @param event                     The event corresponding to the plant growth.
      * @param entity                    The entity which is going to grown
      * @param plantDefinitionComponent  The definition of the plant.
@@ -213,11 +222,10 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             delayManager.cancelDelayedAction(entity, GROWTH_ACTION);
         }
 
-        // growthStages.
         TimeRange nextGrowthStage = null;
         String nextGrowthStageBlockName = "";
 
-        // find the next growth stage
+        // Find the next growth stage
         List<Map.Entry<String, TimeRange>> growthStages = getGrowthStages(plantDefinitionComponent);
         Block currentBlock = blockComponent.getBlock();
 
@@ -232,8 +240,11 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             }
         }
 
-        // If there's no next growth stage, return null.
+        // If there's no next growth stage, return null, unless the plant grows into a tree.
         if (nextGrowthStage == null) {
+            if (plantDefinitionComponent.growsIntoTree && entity.hasComponent(TreeDefinitionComponent.class)) {
+                entity.send(new OnNewTreeGrowth());
+            }
             return;
         }
 
@@ -245,11 +256,14 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             return;
         }
 
+        TreeDefinitionComponent treeDefinitionComponent = entity.getComponent(TreeDefinitionComponent.class);
+
         // Grow the plant into the next growth stage.
         worldProvider.setBlock(blockComponent.getPosition(), newPlantBlock);
 
         // Creates new entity.
         EntityRef newEntity = blockEntityRegistry.getBlockEntityAt(blockComponent.getPosition());
+
         // Check the new entity for PlantDefinitionComponent.
         if (newEntity.hasComponent(PlantDefinitionComponent.class)) {
             newEntity.saveComponent(plantDefinitionComponent);
@@ -257,6 +271,14 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             newEntity.addComponent(plantDefinitionComponent);
         }
 
+        // Check for TreeDefinitionComponent
+        if (treeDefinitionComponent != null) {
+            if (newEntity.hasComponent(TreeDefinitionComponent.class)) {
+                newEntity.saveComponent(treeDefinitionComponent);
+            } else {
+                newEntity.addComponent(treeDefinitionComponent);
+            }
+        }
 
         schedulePlantGrowth(newEntity, nextGrowthStage);
     }
@@ -264,7 +286,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     /**
      * Handles plant ungrowth event.
-     * 
+     *
      * @param event                     The event corresponding to the plant ungrowth.
      * @param entity                    The entity which is going to ungrown.
      * @param plantDefinitionComponent  The definition of the plant.
@@ -352,7 +374,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     /**
      * Handles plant produce creation event.
-     * 
+     *
      * @param event                         The event corresponding to plant produce creation.
      * @param entity                        Reference to the plant entity.
      * @param plantProduceCreationComponent The plant produce creation component corresponding to the event.
@@ -370,7 +392,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     /**
      * Handles ungrowing of plan after harvest.
-     * 
+     *
      * @param event                         The event corresponding to plant produce creation.
      * @param EntityRef                     Reference to the plant entity.
      * @param unGrowPlantOnHarvestComponent The ungrow plant on harvest component corresponding to the event.
@@ -382,7 +404,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     /**
      * Handles copying plant definition from seed to block
-     * 
+     *
      * @param event                     The event corresponding to the plant.
      * @param EntityRef                 Reference to the plant entity.
      * @param plantDefinitionComponent  The definition of the plant.
@@ -404,8 +426,8 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     /**
      * Update the plant definition and display name.
      *
-     * @param entityRef                    Reference to the plant entity.
-     * @param plantDefinitionComponent     The definition of the plant.
+     * @param entityRef                Reference to the plant entity.
+     * @param plantDefinitionComponent The definition of the plant.
      */
     void updatePlantDefinitionAndDisplayName(EntityRef entityRef, PlantDefinitionComponent plantDefinitionComponent) {
         // Ensure that the important bits get copied from the seed prefab
@@ -442,7 +464,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     /**
      * Return the growth stages of this plant definition in list format.
      *
-     * @param p     The definition of the plant.
+     * @param p The definition of the plant.
      */
     public List<Map.Entry<String, TimeRange>> getGrowthStages(PlantDefinitionComponent p) {
         List<Map.Entry<String, TimeRange>> output = Lists.newLinkedList();
@@ -453,3 +475,4 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         return output;
     }
 }
+

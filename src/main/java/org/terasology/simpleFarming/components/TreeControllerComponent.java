@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,26 +17,28 @@ package org.terasology.simpleFarming.components;
 
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.ForceBlockActive;
+
+import java.util.ArrayList;
 import java.util.Map;
 
 @ForceBlockActive
-public class PlantDefinitionComponent implements Component {
+public class TreeControllerComponent implements Component {
     /**
-     * Map containing the growth stages of this plant. The string indicates the block URI, and the TimeRange indicates
-     * the range of time necessary to move into the next growth stage.
+     * A map defining the growth stages that the fruits borne by this tree will go through
+     * and the time they will remain at this stage.
      */
-    public Map<String, TimeRange> growthStages = Maps.newTreeMap();
+    public Map<String, TimeRange> fruitGrowthStages = Maps.newTreeMap();
 
-    /** The category of the soil */
-    public String soilCategory = "Soil";
+    /**
+     * A list of the positions of the fruits in this tree.
+     */
+    public ArrayList<Vector3i> fruitBlocks;
 
-    /** The item that this block turns into upon destruction */
-    public String seedPrefab;
-
-    /** Allows a static name for the plant that doesnt change with the block */
-    public String plantName;
-
-    /** Whether the plant will become a tree after it has passed its growth stages */
-    public boolean growsIntoTree;
+    /**
+     * A list of the positions of the trunk blocks of this tree.
+     */
+    public ArrayList<Vector3i> trunkBlocks;
 }
+

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,22 @@
 package org.terasology.simpleFarming.events;
 
 import org.terasology.entitySystem.event.Event;
+import org.terasology.math.geom.Vector3i;
 
 /**
- * An event that is triggered when a plant is harvested.
+ * An event triggered on the tree controller whenever a fruit is harvested.
  */
-public class OnPlantHarvest implements Event {
+public class OnFruitHarvest implements Event {
+    /**
+     * The position of the fruit being harvested.
+     */
+    private Vector3i fruitPos;
+
+    public OnFruitHarvest(Vector3i fruitPos) {
+        this.fruitPos = fruitPos;
+    }
+
+    public Vector3i getPosition() {
+        return fruitPos;
+    }
 }
