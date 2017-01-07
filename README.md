@@ -137,3 +137,5 @@ Credits for Images:
 * GrapesBushFull :https://pixabay.com/en/grape-fruit-fruit-tree-green-1511280/ (Resized) (Edited by DhananjayGarg)
 * Cherry: https://www.pexels.com/photo/fruit-cherries-109274/
 * CherrySeed: https://www.pexels.com/photo/close-up-of-autumn-leaves-over-white-background-255073/
+* CherryBushFull: https://www.pexels.com/photo/nature-red-shrub-trees-1895/
+* MatureCherryBush: https://www.pexels.com/photo/red-cherry-fruit-on-brown-tree-branch-63312/
