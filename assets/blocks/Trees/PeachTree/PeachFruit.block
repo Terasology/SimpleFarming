@@ -1,0 +1,7 @@
+{
+    "hardness": 2,
+    "translucent": true,
+    "mass": 100,
+    "doubleSided": true,
+    "tile": "SingleFarming:PeachFruit"
+}

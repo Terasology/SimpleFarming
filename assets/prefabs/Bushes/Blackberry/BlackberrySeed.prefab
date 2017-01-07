@@ -1,0 +1,31 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Blackberry Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:BlackberrySeed",
+    "stackId": "BlackberrySeed"
+  },
+  "PlantDefinition": {
+    "plantName": "Blackberry Bush",
+    "growthStages": {
+      "SimpleFarming:BlackberryBush:engine:halfblock": {
+        "maxRandom": 5000,
+        "fixed": 7000
+      },
+      "SimpleFarming:BlackberryBush": {
+        "maxRandom": 5000,
+        "fixed": 8000
+      },
+      "SimpleFarming:MatureBlackberryBush": {
+        "maxRandom": 6000,
+        "fixed": 8000
+      },
+      "SimpleFarming:BlackberryBushFull": {
+        "maxRandom": 6000,
+        "fixed": 9000
+      }
+    }
+  }
+}

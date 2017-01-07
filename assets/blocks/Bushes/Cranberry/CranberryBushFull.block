@@ -1,0 +1,8 @@
+{
+  "basedOn": "SimpleFarming:MatureBerryBush",
+  "displayName": "Fully-grown cranberry bush",
+  "entity": {
+    "prefab":"CranberryBushFull"
+  },
+  "tile":"SimpleFarming:CranberryBushFull"
+}

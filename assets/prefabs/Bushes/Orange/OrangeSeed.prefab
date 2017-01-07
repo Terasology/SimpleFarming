@@ -1,0 +1,31 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Orange seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:OrangeSeed",
+    "stackId": "OrangeSeed"
+  },
+  "PlantDefinition": {
+    "plantName": "Orange bush",
+    "growthStages": {
+      "SimpleFarming:OrangeBush:engine:halfblock": {
+        "maxRandom": 6000,
+        "fixed": 12000
+      },
+      "SimpleFarming:OrangeBush": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      },
+      "SimpleFarming:MatureOrangeBush": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      },
+      "SimpleFarming:OrangeBushFull": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      }
+    }
+  }
+}
