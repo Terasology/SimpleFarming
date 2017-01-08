@@ -364,7 +364,11 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
                 EntityRef produceItem = plantProduceComponent.produceItem;
                 plantProduceComponent.produceItem = EntityRef.NULL;
                 target.saveComponent(plantProduceComponent);
-                inventoryManager.giveItem(harvestingEntity, target, produceItem);
+                if (!inventoryManager.giveItem(harvestingEntity, target, produceItem) && target.hasComponent(BlockComponent.class)) {
+                    Vector3f position = target.getComponent(BlockComponent.class).getPosition().toVector3f().add(0, 0.5f, 0);
+                    produceItem.send(new DropItemEvent(position));
+                    produceItem.send(new ImpulseEvent(random.nextVector3f(15.0f)));
+                }
                 target.send(new OnPlantHarvest());
                 event.consume();
             }

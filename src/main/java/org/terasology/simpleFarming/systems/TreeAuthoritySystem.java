@@ -247,7 +247,16 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         if (!event.isConsumed() && instigator.hasComponent(InventoryComponent.class)) {
             EntityRef fruitItem = entityManager.create(creationComponent.fruitPrefab);
             if (fruitItem != EntityRef.NULL) {
-                inventoryManager.giveItem(instigator, instigator, fruitItem);
+                if (!inventoryManager.giveItem(instigator, instigator, fruitItem)) {
+                    Vector3f position = blockComponent.getPosition().toVector3f();
+                    if (worldProvider.getBlock(new Vector3f(position).add(0, -1f, 0)).isReplacementAllowed()) {
+                        position.add(0, -0.5f, 0);
+                    } else {
+                        position.add(0, 0.5f, 0);
+                    }
+                    fruitItem.send(new DropItemEvent(position));
+                    fruitItem.send(new ImpulseEvent(random.nextVector3f(15.0f)));
+                }
                 event.consume();
 
                 // find controller for this fruit
