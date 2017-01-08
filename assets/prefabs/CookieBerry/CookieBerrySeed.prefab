@@ -4,7 +4,7 @@
     "name": "Cookieberry seed"
   },
   "Item": {
-    "icon": "SimpleFarming:SimpleFarming#CookieSeed",
+    "icon": "SimpleFarming:CookieBerrySeed",
     "stackId": "cookieberryseed"
   },
   "PlantDefinition": {
