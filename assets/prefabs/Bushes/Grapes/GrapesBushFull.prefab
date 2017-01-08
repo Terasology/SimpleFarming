@@ -1,0 +1,9 @@
+{
+  "PlantProduceCreation": {
+    "producePrefab": "SimpleFarming:Grapes"
+  },
+  "UnGrowPlantOnHarvest": {},
+  "PlantDefinition": {
+    "seedPrefab": "GrapesSeed"
+  }
+}
