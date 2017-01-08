@@ -1,0 +1,8 @@
+{
+  "hardness": 3,
+  "mass": 100,
+  "displayName": "Cookieberry Bush",
+  "translucent": true,
+  "doubleSided": true,
+  "tile": "SimpleFarming:CookieBush"
+}
