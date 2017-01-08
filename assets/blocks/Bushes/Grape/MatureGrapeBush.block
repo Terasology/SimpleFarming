@@ -1,0 +1,5 @@
+{
+  "basedOn": "SimpleFarming:GrapeBush",
+  "displayName": "Mature Grape Bush",
+  "tile": "SimpleFarming:MatureGrapeBush"
+}

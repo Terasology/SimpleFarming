@@ -8,22 +8,22 @@
     "stackId": "GrapeSeed"
   },
   "PlantDefinition": {
-    "plantName": "Grape Vine",
+    "plantName": "Grape Bush",
     "growthStages": {
-      "SimpleFarming:GrapeVineSeedling": {
-        "maxRandom": 5000,
-        "fixed": 10000
+      "SimpleFarming:GrapeBush:engine:halfblock": {
+        "maxRandom": 3000,
+        "fixed": 5000
       },
-      "SimpleFarming:GrapeVineSprout": {
+      "SimpleFarming:GrapeBush": {
         "maxRandom": 5000,
-        "fixed": 10000
+        "fixed": 7000
       },
-      "SimpleFarming:GrapeVine": {
+      "SimpleFarming:MatureGrapeBush": {
         "maxRandom": 5000,
-        "fixed": 10000
+        "fixed": 7000
       },
-      "SimpleFarming:GrapeVineFull": {
-        "maxRandom": 5000,
+      "SimpleFarming:GrapeBushFull": {
+        "maxRandom": 7000,
         "fixed": 10000
       }
     }
