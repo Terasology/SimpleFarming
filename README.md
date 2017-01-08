@@ -264,3 +264,7 @@ Destroying a plant with produce, will also yield a produce.
 * Pumpkin Vine Seed: Mandar Juvekar (original)
 * Pumpkin Vine Sapling: Mandar Juvekar (modified version of BerryBush)
 * Pumpkin Vine Trunk: Mandar Juvekar (original)
+* Cherry: https://www.pexels.com/photo/fruit-cherries-109274/
+* CherrySeed: https://www.pexels.com/photo/close-up-of-autumn-leaves-over-white-background-255073/
+* CherryBushFull: https://www.pexels.com/photo/nature-red-shrub-trees-1895/
+* MatureCherryBush: https://www.pexels.com/photo/red-cherry-fruit-on-brown-tree-branch-63312/
