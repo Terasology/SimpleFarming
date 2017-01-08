@@ -3,5 +3,5 @@
   "mass": 100,
   "translucent": true,
   "doubleSided": true,
-  "tile": "SimpleFarming:GrapesBush"
+  "tile": "SimpleFarming:GrapeBush"
 }

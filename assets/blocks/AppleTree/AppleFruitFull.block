@@ -1,0 +1,8 @@
+{
+  "basedOn": "SimpleFarming:AppleFruit",
+  "displayName": "Fully-Grown Apple Fruit",
+  "entity": {
+    "prefab":"AppleFruitFull"
+  },
+  "tile":"SimpleFarming:AppleFruitFull"
+}
