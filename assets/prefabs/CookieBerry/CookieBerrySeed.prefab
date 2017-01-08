@@ -1,0 +1,31 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Cookieberry seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:SimpleFarming#CookieSeed",
+    "stackId": "cookieberryseed"
+  },
+  "PlantDefinition": {
+    "plantName": "Cookieberry Bush",
+    "growthStages": {
+      "SimpleFarming:CookieberryBush:engine:halfblock": {
+        "maxRandom": 5000,
+        "fixed": 10000
+      },
+      "SimpleFarming:CookieberryBush": {
+        "maxRandom": 7000,
+        "fixed": 14000
+      },
+      "SimpleFarming:MatureCookieBerryBush": {
+        "maxRandom": 7000,
+        "fixed": 14000
+      },
+      "SimpleFarming:CookieberryBushFull": {
+        "maxRandom": 7000,
+        "fixed": 14000
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "PlantProduceCreation": {
+    "producePrefab": "SimpleFarming:CookieBerry"
+  },
+  "UnGrowPlantOnHarvest": {},
+  "PlantDefinition": {
+    "seedPrefab": "CookieBerrySeed"
+  }
+}

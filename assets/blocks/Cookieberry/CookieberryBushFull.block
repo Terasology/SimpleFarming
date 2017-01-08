@@ -1,0 +1,8 @@
+{
+  "basedOn": "SimpleFarming:MatureCookieberryBush",
+  "displayName": "Cookieberry Bush",
+  "entity": {
+    "prefab": "CookieBerryBushFull"
+  },
+  "tile": "SimpleFarming:CookieBerryBushFull"
+}
