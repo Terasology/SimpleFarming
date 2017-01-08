@@ -24,11 +24,11 @@ Usually for each plant you want to make these three prefabs:
 2. **Ripe Stage Prefab** (e.g. TestberryBushFull.prefab)
 2. **Fruit prefab** (e.g. Testberry.prefab)  
 
-You will also need to create a .block file for each stage of the plant at assets/blocks, as well as the textures for each stage of the plant at assets/blockTiles.
+You will also need to create a .block file for each stage of the plant at `assets/blocks/<plant-type>/<plant-name>`, as well as the textures for each stage of the plant at `assets/blockTiles/<plant-type>/<plant-name>`.
 
 ### Seed Prefab
 
-*For a good example, see TestberrySeed.prefab at assets/prefabs*
+*For a good example, see TestberrySeed.prefab at `assets/prefabs/Bushes/Testberry`*
 
 `maxRandom` & `fixed` set the duration of a particular stage. The plant can grow to the next stage randomly during the range between maxRandom and fixed. If the value in `fixed` is reached, the plant immediately grows to the next growth stage. This will make the plants not grow to the next stage all at the exact time - some will get there faster than others!
 
@@ -59,19 +59,19 @@ You will also need to create a .block file for each stage of the plant at assets
 
 ### Ripe Stage Prefab
 
-*For a good example, see TestberryBushFull.prefab at assets/prefabs*
+*For a good example, see TestberryBushFull.prefab at `assets/prefabs/Bushes/Testberry`*
 
 This prefab manages the items that are are obtained when a particular plant is harvested. 
 
 ### Fruit Prefab
 
-*For a good example, see Testberry.prefab at assets/prefabs*
+*For a good example, see Testberry.prefab at `assets/prefabs/Bushes/Testberry`*
 
 This prefab should be pretty intuitive. It creates the fruit that will be dropped when you harvest the plant that grows it.
 
 ### Block Files
 
-*For a good example, see the .block files on assets/blocks*
+*For a good example, see the .block files on assets/blocks/Bushes/Testberry*
 
 The block files sets the characteristics for the plant block. 
 You can use `basedOn` to make that block have the characteristic of the block that it is based on. 
@@ -206,7 +206,7 @@ The thing that differentiates vine seed prefabs from other prefabs is the "VineD
 * `growthsTillRipe` : the number of growth cycles after which the vine becomes 'ripe' and starts yielding fruit.
 * `nextGrowth` : this is the TimeRange object used to calculate the time between two growth cycles, and is composite of two fields: the `fixed` field, which is the minimum time (in milliseconds) between two cycles, and `maxRandom`, which is the maximum variation in that time. See the [TimeRange class](https://github.com/Terasology/SimpleFarming/blob/master/src/main/java/org/terasology/simpleFarming/components/TimeRange.java) for details.
 
-For an example of a seed prefab, see the [MelonVineSeed prefab](https://github.com/Terasology/SimpleFarming/blob/master/assets/prefabs/MelonVineSeed.prefab). This prefab should be located in the `/assets/prefabs` directory, and an its texture must be located in the `/assets/textures` directory.
+For an example of a seed prefab, see the [MelonVineSeed prefab](https://github.com/Terasology/SimpleFarming/blob/master/assets/prefabs/MelonVineSeed.prefab). This prefab should be located in the `/assets/prefabs/Vines` directory, and an its texture must be located in the `/assets/textures/Vines` directory.
 
 ## Produce Mechanisms
 
@@ -254,11 +254,9 @@ Destroying a plant with produce, will also yield a produce.
 * GrapesSeed: https://pixabay.com/en/dried-leaf-plant-natural-leaves-774823/ (Resized)
 * GrapesBush :https://pixabay.com/en/grape-fruit-fruit-tree-green-1511280/ (Resized)
 * GrapesBushFull :https://pixabay.com/en/grape-fruit-fruit-tree-green-1511280/ (Resized) (Edited by DhananjayGarg)
-
 * Peach Tree Saplings, Fruits: iojw (Fruits modified from GreenLeaf)
 * Peach: https://pixabay.com/en/peach-fruit-nectarine-plant-nature-41169/
 * Peach Seed: https://pixabay.com/en/peach-nectarine-fruit-food-sweet-42902/
-
 * Melon: Mandar Juvekar (original)
 * Melon Vine Seed: Mandar Juvekar (original)
 * Melon Vine Trunk: Mandar Juvekar (original)
