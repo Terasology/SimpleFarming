@@ -268,3 +268,6 @@ Destroying a plant with produce, will also yield a produce.
 * CherrySeed: https://www.pexels.com/photo/close-up-of-autumn-leaves-over-white-background-255073/
 * CherryBushFull: https://www.pexels.com/photo/nature-red-shrub-trees-1895/
 * MatureCherryBush: https://www.pexels.com/photo/red-cherry-fruit-on-brown-tree-branch-63312/
+* Tomato: SufurElite (original)
+* Tomato Vine Seed: SufurElite based on Mandar Juvekar's original
+* Tomato Vine Stem: SufurElite based on Mandar Juvekar's original
