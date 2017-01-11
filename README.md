@@ -268,3 +268,7 @@ Destroying a plant with produce, will also yield a produce.
 * CherrySeed: https://www.pexels.com/photo/close-up-of-autumn-leaves-over-white-background-255073/
 * CherryBushFull: https://www.pexels.com/photo/nature-red-shrub-trees-1895/
 * MatureCherryBush: https://www.pexels.com/photo/red-cherry-fruit-on-brown-tree-branch-63312/
+* PassionFruit: mdj117 (original)
+* PassionFruit seed: mdj117 (original)
+* PassionFruit trunk: mdj117 (original)
+* PassionFruit Sapling: mdj117 (original)

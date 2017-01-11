@@ -1,0 +1,21 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "PassionFruit Vine Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:PassionfruitSeed",
+    "stackId": "Passionfruit Vine Seed"
+  },
+  "VineDefinition": {
+      "plantName": "PassionFruit Vine",
+      "sapling": "SimpleFarming:PassionFruitVineSapling",
+      "trunk": "SimpleFarming:PassionFruitVineTrunk",
+      "produce": "SimpleFarming:Passionfruit",
+      "nextGrowth": {
+          "maxRandom": 3000,
+          "fixed": 5000
+      },
+      "growthsTillRipe": 12
+  }
+}
