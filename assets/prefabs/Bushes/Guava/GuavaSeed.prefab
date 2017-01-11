@@ -1,0 +1,27 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Guava Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:Guavaseed",
+    "stackId": "GuavaSeed"
+  },
+  "PlantDefinition": {
+    "plantName": "Guava Bush",
+    "growthStages": {
+      "SimpleFarming:GuavaBush:engine:halfblock": {
+        "maxRandom": 1000,
+        "fixed": 20000
+      },
+      "SimpleFarming:GuavaBush": {
+        "maxRandom": 1000,
+        "fixed": 20000
+      },
+      "SimpleFarming:GuavaBushFull": {
+        "maxRandom": 1000,
+        "fixed": 20000
+      }
+    }
+  }
+}
