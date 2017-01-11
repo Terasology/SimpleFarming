@@ -280,3 +280,7 @@ Destroying a plant with produce, will also yield a produce.
 * SquashVineSapling : Made by Dhananjay Garg
 * SquashVineTrunk : Made by Dhananjay Garg
 * SquashVineSeed : Made by Dhananjay Garg
+* Guava: https://upload.wikimedia.org/wikipedia/commons/d/d4/A_aesthetic_guava_fruits.JPG (Resized)
+* GuavaSeed : https://pixabay.com/en/seeds-shells-yellow-foods-nuts-576562/ (Resized)
+* GuavaBush : https://pixabay.com/en/apple-branch-deciduous-fruit-1300027/ (Resized)
+* GuavaBushFull : https://pixabay.com/en/apple-branch-deciduous-fruit-1300027/ (Resized) (Edited by Jay)
