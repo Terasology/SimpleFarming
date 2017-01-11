@@ -1,0 +1,9 @@
+{
+  "PlantProduceCreation": {
+    "producePrefab": "SimpleFarming:Guava"
+  },
+  "UnGrowPlantOnHarvest": {},
+  "PlantDefinition": {
+    "seedPrefab": "GuavaSeed"
+  }
+}
