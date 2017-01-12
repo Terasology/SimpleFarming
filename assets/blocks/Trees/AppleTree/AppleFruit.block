@@ -3,5 +3,5 @@
     "translucent": true,
     "mass": 100,
     "doubleSided": true,
-    "tile": "SingleFarming:AppleFruit"
+    "tile": "SimpleFarming:AppleFruit"
 }
