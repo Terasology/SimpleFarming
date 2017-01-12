@@ -271,3 +271,7 @@ Destroying a plant with produce, will also yield a produce.
 * Tomato: SufurElite (original)
 * Tomato Vine Seed: SufurElite based on Mandar Juvekar's original
 * Tomato Vine Stem: SufurElite based on Mandar Juvekar's original
+* PassionFruit: mdj117 (original)
+* PassionFruit seed: mdj117 (original)
+* PassionFruit trunk: mdj117 (original)
+* PassionFruit Sapling: mdj117 (original)
