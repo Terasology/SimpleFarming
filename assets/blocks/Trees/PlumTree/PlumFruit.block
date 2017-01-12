@@ -1,0 +1,7 @@
+{
+    "hardness": 1,
+    "translucent": true,
+    "mass": 50,
+    "doubleSided": true,
+    "tile": "SimpleFarming:PlumFruit"
+}

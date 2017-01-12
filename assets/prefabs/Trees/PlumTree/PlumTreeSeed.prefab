@@ -1,0 +1,43 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Plum Tree Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:PlumTreeSeed",
+    "stackId": "PlumTreeSeed"
+  },
+  "PlantDefinition": {
+    "plantName": "Plum Tree",
+    "growsIntoTree": true,
+    "growthStages": {
+      "SimpleFarming:PlumTreeSaplingYoung": {
+        "maxRandom": 4000,
+        "fixed": 8000
+      },
+      "SimpleFarming:PlumTreeSaplingMature": {
+        "maxRandom": 3000,
+        "fixed": 7000
+      }
+    }
+  },
+  "TreeDefinition": {
+    "fruitGrowthStages": {
+      "SimpleFarming:PlumFruit": {
+        "maxRandom": 4000,
+        "fixed": 8000
+      },
+      "SimpleFarming:PlumFruitMature": {
+        "maxRandom": 2000,
+        "fixed": 5000
+      },
+      "SimpleFarming:PlumFruitFull": {
+        "maxRandom": 1000,
+        "fixed": 6000
+      }
+    },
+    "trunkHeight": 10,
+    "trunkBlock": "Core:BirchTrunk",
+    "canopyLayers": [0, 0, 0, 1, 2, 2, 3, 4, 5, 4, 3, 2, 1]
+  }
+}
