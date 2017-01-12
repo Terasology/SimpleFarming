@@ -10,7 +10,7 @@
   "VineDefinition": {
       "plantName": "Tomato Vine",
       "sapling": "SimpleFarming:TomatoVineSapling",
-      "trunk": "SimpleFarming:TomatoVineTrunk",
+      "trunk": "SimpleFarming:TomatoVineStem",
       "produce": "SimpleFarming:Tomato",
       "nextGrowth": {
           "maxRandom": 3000,
