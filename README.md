@@ -268,4 +268,10 @@ Destroying a plant with produce, will also yield a produce.
 * CherrySeed: https://www.pexels.com/photo/close-up-of-autumn-leaves-over-white-background-255073/
 * CherryBushFull: https://www.pexels.com/photo/nature-red-shrub-trees-1895/
 * MatureCherryBush: https://www.pexels.com/photo/red-cherry-fruit-on-brown-tree-branch-63312/
-* Guava: https://upload.wikimedia.org/wikipedia/commons/d/d4/A_aesthetic_guava_fruits.JPG
+* Guava: https://upload.wikimedia.org/wikipedia/commons/d/d4/A_aesthetic_guava_fruits.JPG (Resized)
+* GuavaSeed : https://pixabay.com/en/seeds-shells-yellow-foods-nuts-576562/ (Resized)
+* GuavaBush : https://pixabay.com/en/apple-branch-deciduous-fruit-1300027/ (Resized)
+* GuavaBushFull : https://pixabay.com/en/apple-branch-deciduous-fruit-1300027/ (Resized) (Edited by Jay)
+* MatureGuavaBush : https://pixabay.com/en/branch-deciduous-fruit-herbal-1300007/ (Resized)
+
+
