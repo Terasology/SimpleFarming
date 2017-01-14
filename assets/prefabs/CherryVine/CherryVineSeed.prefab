@@ -1,0 +1,21 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Cherry Vine Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:GrapeVineSeed",
+    "stackId": "Cherry Vine Seed"
+  },
+  "VineDefinition": {
+    "plantName": "Cherry Vine",
+    "sapling": "SimpleFarming:CherryVineSapling",
+    "trunk": "SimpleFarming:CherryVineTrunk",
+    "produce": "SimpleFarming:Cherry",
+    "nextGrowth": {
+      "maxRandom": 2000,
+      "fixed": 5000
+    },
+    "growthsTillRipe": 13
+  }
+}
