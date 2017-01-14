@@ -1,9 +1,0 @@
-{
-  "PlantProduceCreation": {
-    "producePrefab": "SimpleFarming:Cherry"
-  },
-  "UnGrowPlantOnHarvest": {},
-  "PlantDefinition": {
-    "seedPrefab": "CherrySeed"
-  }
-}
