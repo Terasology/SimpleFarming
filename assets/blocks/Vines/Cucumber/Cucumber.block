@@ -1,0 +1,9 @@
+{
+  "displayName": "Cucumber",
+  "categories" : ["cucumber"],
+  "hardness": 10,
+  "tiles": {
+    "sides": "SimpleFarming:Cucumber",
+    "topBottom": "SimpleFarming:CucumberSapling"
+  }
+}
