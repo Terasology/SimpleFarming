@@ -275,3 +275,4 @@ Destroying a plant with produce, will also yield a produce.
 * PassionFruit seed: mdj117 (original)
 * PassionFruit trunk: mdj117 (original)
 * PassionFruit Sapling: mdj117 (original)
+* Cucumber and all related: [András Ottó Földes](https://github.com/andriii25) (Trunk based on Melon Vine Trunk)
