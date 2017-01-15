@@ -5,7 +5,7 @@
   },
   "Item": {
     "icon": "SimpleFarming:SquashSeed",
-    "stackId": "SquashSeed"
+    "stackId": "squashSeed"
   },
   "PlantDefinition": {
     "plantName": "Squash Bush",
@@ -15,10 +15,6 @@
         "fixed": 10000
       },
       "SimpleFarming:SquashBush": {
-        "maxRandom": 5000,
-        "fixed": 10000
-      },
-      "SimpleFarming:MatureSquashBush": {
         "maxRandom": 5000,
         "fixed": 10000
       },
