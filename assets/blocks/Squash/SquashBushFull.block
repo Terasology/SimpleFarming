@@ -1,0 +1,8 @@
+{
+  "basedOn": "SimpleFarming:MatureSquashBush",
+  "displayName": "Squash Bush",
+  "entity": {
+    "prefab": "SquashBushFull"
+  },
+  "tile": "SimpleFarming:SquashBushFull"
+}
