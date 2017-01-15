@@ -5,6 +5,6 @@
   },
   "Item": {
     "icon": "SimpleFarming:Squash",
-    "stackId": "Squash"
+    "stackId": "squash"
   }
 }
