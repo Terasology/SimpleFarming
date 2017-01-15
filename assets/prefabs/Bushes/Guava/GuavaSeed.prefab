@@ -21,10 +21,6 @@
       "SimpleFarming:GuavaBushFull": {
         "maxRandom": 1000,
         "fixed": 20000
-      },
-      "SimpleFarming:MatureGuavaBush":{
-        "maxRandom": 1000,
-        "fixed": 20000
       }
     }
   }
