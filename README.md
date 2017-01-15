@@ -277,10 +277,6 @@ Destroying a plant with produce, will also yield a produce.
 * PassionFruit Sapling: mdj117 (original)
 * Cucumber and all related: [András Ottó Földes](https://github.com/andriii25) (Trunk based on Melon Vine Trunk)
 * Squash : Made by Dhananjay Garg
-* SquashBushFull : Made By Dhananjay Garg
 * SquashVineSapling : Made by Dhananjay Garg
 * SquashVineTrunk : Made by Dhananjay Garg
-* SquashSeed : Made by Dhananjay Garg
 * SquashVineSeed : Made by Dhananjay Garg
-
-
