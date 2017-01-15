@@ -4,7 +4,7 @@
     "name": "Guava Seed"
   },
   "Item": {
-    "icon": "SimpleFarming:Guavaseed",
+    "icon": "SimpleFarming:GuavaSeed",
     "stackId": "GuavaSeed"
   },
   "PlantDefinition": {
@@ -19,6 +19,10 @@
         "fixed": 20000
       },
       "SimpleFarming:GuavaBushFull": {
+        "maxRandom": 1000,
+        "fixed": 20000
+      },
+      "SimpleFarming:MatureGuavaBush":{
         "maxRandom": 1000,
         "fixed": 20000
       }
