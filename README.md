@@ -272,6 +272,5 @@ Destroying a plant with produce, will also yield a produce.
 * GuavaSeed : https://pixabay.com/en/seeds-shells-yellow-foods-nuts-576562/ (Resized)
 * GuavaBush : https://pixabay.com/en/apple-branch-deciduous-fruit-1300027/ (Resized)
 * GuavaBushFull : https://pixabay.com/en/apple-branch-deciduous-fruit-1300027/ (Resized) (Edited by Jay)
-* MatureGuavaBush : https://pixabay.com/en/branch-deciduous-fruit-herbal-1300007/ (Resized)
 
 
