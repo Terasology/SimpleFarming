@@ -44,7 +44,7 @@ public class GeneticsSystem extends BaseComponentSystem {
 
         //A=5, F=10, K=15
         GeneMutator geneMutator = new VocabularyGeneMutator("ABCDEFGHIJK");
-        BreedingAlgorithm breedingAlgorithm = new MonoploidBreedingAlgorithm(0, 0.4f, geneMutator);
+        BreedingAlgorithm breedingAlgorithm = new MonoploidBreedingAlgorithm(0, 0.05f, geneMutator);
 
         SeedBasedGenomeMap genomeMap = new SeedBasedGenomeMap(worldProvider.getSeed().hashCode());
         genomeMap.addSeedBasedProperty("filling", 0, genomeLength-1, 1, Integer.class,
