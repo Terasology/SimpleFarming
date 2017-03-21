@@ -15,13 +15,10 @@
  */
 package org.terasology.simpleFarming.systems;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.genome.component.GenomeComponent;
 import org.terasology.genome.events.OnBreed;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
@@ -36,8 +33,6 @@ import java.util.List;
 public class SeedMixerSystem extends BaseComponentSystem {
     @In
     private InventoryManager inventoryManager;
-
-    private static final Logger logger = LoggerFactory.getLogger(SeedMixerSystem.class);
 
     private InventoryComponent inventory;
 
@@ -62,7 +57,6 @@ public class SeedMixerSystem extends BaseComponentSystem {
             if (!secondSeed.equals(EntityRef.NULL)) {
                 EntityRef offspring1 = firstSeed.copy();
                 EntityRef offspring2 = firstSeed.copy();
-                logger.info("Sending events");
                 currentOffspringIndex = 0;
                 firstSeed.send(new OnBreed(firstSeed, secondSeed, offspring1));
                 firstSeed.send(new OnBreed(firstSeed, secondSeed, offspring2));
@@ -74,7 +68,6 @@ public class SeedMixerSystem extends BaseComponentSystem {
     public void onSeedsBred(OnBreed event, EntityRef entity, SeedComponent seedComponent) {
         if (inventory != null) {
             EntityRef offspring = event.getOffspring();
-            logger.info(offspring.getComponent(GenomeComponent.class).genes);
             inventory.itemSlots.set(currentOffspringIndex + 2, offspring);
             currentOffspringIndex += 1;
             if (currentOffspringIndex == 2) {

@@ -5,7 +5,6 @@
   },
   "Item": {
     "icon": "SimpleFarming:Blueberry",
-    "stackId": "blueberry",
     "consumedOnUse": true
   },
   "Food": {

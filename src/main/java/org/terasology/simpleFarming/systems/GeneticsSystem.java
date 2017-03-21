@@ -16,10 +16,6 @@
 package org.terasology.simpleFarming.systems;
 
 import com.google.common.base.Function;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.genome.GenomeDefinition;
@@ -28,9 +24,6 @@ import org.terasology.genome.breed.BreedingAlgorithm;
 import org.terasology.genome.breed.MonoploidBreedingAlgorithm;
 import org.terasology.genome.breed.mutator.GeneMutator;
 import org.terasology.genome.breed.mutator.VocabularyGeneMutator;
-import org.terasology.genome.component.GenomeComponent;
-import org.terasology.genome.events.OnBreed;
-import org.terasology.genome.system.SimpleGenomeManager;
 import org.terasology.genome.genomeMap.SeedBasedGenomeMap;
 import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
@@ -45,8 +38,6 @@ public class GeneticsSystem extends BaseComponentSystem {
     @In
     private GenomeRegistry genomeRegistry;
 
-    private static final Logger logger = LoggerFactory.getLogger(GeneticsSystem.class);
-
     @Override
     public void preBegin() {
         int genomeLength = 1;
@@ -56,7 +47,7 @@ public class GeneticsSystem extends BaseComponentSystem {
         BreedingAlgorithm breedingAlgorithm = new MonoploidBreedingAlgorithm(0, 0.4f, geneMutator);
 
         SeedBasedGenomeMap genomeMap = new SeedBasedGenomeMap(worldProvider.getSeed().hashCode());
-        genomeMap.addSeedBasedProperty("filling", 1, genomeLength, 1, Integer.class,
+        genomeMap.addSeedBasedProperty("filling", 0, genomeLength-1, 1, Integer.class,
                 new Function<String, Integer>() {
                     @Nullable
                     @Override

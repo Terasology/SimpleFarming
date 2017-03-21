@@ -96,6 +96,8 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     @In
     private GenomeRegistry genomeRegistry;
 
+    GenomeComponent newGenomeComponent = new GenomeComponent();
+
     Random random = new FastRandom();
 
     @ReceiveEvent
@@ -150,7 +152,6 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             EntityRef plantEntity = blockEntityRegistry.getBlockEntityAt(plantPosition);
             plantEntity.addComponent(newPlantDefinitionComponent);
             plantEntity.addOrSaveComponent(genomeComponent);
-            logger.info("On seed plant" + genomeComponent.genes);
 
             TreeDefinitionComponent treeDefinitionComponent = seedItem.getComponent(TreeDefinitionComponent.class);
             if (treeDefinitionComponent != null) {
@@ -187,7 +188,6 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         event.consume();
         EntityRef seedItem = entityManager.create(plantDefinitionComponent.seedPrefab);
         seedItem.addComponent(genomeComponent);
-        logger.info("On plant destroyed" + genomeComponent.genes);
         Vector3f position = blockComponent.getPosition().toVector3f().add(0, 0.5f, 0);
         seedItem.send(new DropItemEvent(position));
         seedItem.send(new ImpulseEvent(random.nextVector3f(30.0f)));
@@ -232,6 +232,10 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             delayManager.cancelDelayedAction(entity, GROWTH_ACTION);
         }
 
+        GenomeComponent newGenomeComponent = new GenomeComponent();
+        newGenomeComponent.genomeId = genomeComponent.genomeId;
+        newGenomeComponent.genes = genomeComponent.genes;
+
         TimeRange nextGrowthStage = null;
         String nextGrowthStageBlockName = "";
 
@@ -268,6 +272,8 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
 
         TreeDefinitionComponent treeDefinitionComponent = entity.getComponent(TreeDefinitionComponent.class);
 
+        entity.destroy();
+
         // Grow the plant into the next growth stage.
         worldProvider.setBlock(blockComponent.getPosition(), newPlantBlock);
 
@@ -278,9 +284,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         newEntity.addOrSaveComponent(plantDefinitionComponent);
 
         // Check the new entity for GenomeComponent.
-        newEntity.addOrSaveComponent(genomeComponent);
-        logger.info(entity.toFullDescription());
-        logger.info("On plant growth - " + genomeComponent.genes);
+        newEntity.addOrSaveComponent(newGenomeComponent);
 
         // Check for TreeDefinitionComponent
         if (treeDefinitionComponent != null) {
@@ -357,7 +361,6 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
      * @param entity    The entity which is going to be harvested
      */
     public void onHarvest(ActivateEvent event, EntityRef entity, GenomeComponent genomeComponent) {
-        logger.info("on harvest");
         EntityRef target = event.getTarget();
         EntityRef instigator = event.getInstigator();
         EntityRef harvestingEntity = entity;
@@ -372,7 +375,6 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
                 FoodComponent foodComponent = new FoodComponent();
                 GenomeDefinition genomeDefinition = genomeRegistry.getGenomeDefinition(genomeComponent.genomeId);
                 foodComponent.filling = genomeDefinition.getGenomeMap().getProperty("filling", genomeComponent.genes, Integer.class);
-                logger.info(String.valueOf(foodComponent.filling));
                 produceItem.addComponent(foodComponent);
                 plantProduceComponent.produceItem = EntityRef.NULL;
                 target.saveComponent(plantProduceComponent);
@@ -396,11 +398,9 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
      * @param plantProduceCreationComponent The plant produce creation component corresponding to the event.
      */
     public void onPlantProduceCreation(OnAddedComponent event, EntityRef entityRef, PlantProduceCreationComponent plantProduceCreationComponent) {
-        logger.info("on plant produce creation");
         EntityRef newItem = entityManager.create(plantProduceCreationComponent.producePrefab);
         PlantProduceComponent plantProduceComponent = new PlantProduceComponent(newItem);
         entityRef.addOrSaveComponent(plantProduceComponent);
-        logger.info(entityRef.getComponent(GenomeComponent.class).genes);
     }
 
     @ReceiveEvent
