@@ -4,8 +4,12 @@
     "name": "Blueberry Seed"
   },
   "Item": {
-    "icon": "SimpleFarming:SimpleFarming#berryseed",
-    "stackId": "blueberrySeed"
+    "icon": "SimpleFarming:SimpleFarming#berryseed"
+  },
+  "Seed": {},
+  "Genome": {
+    "genomeId": "blueberry",
+    "genes": "F"
   },
   "PlantDefinition": {
     "plantName": "Blueberry Bush",

@@ -5,6 +5,11 @@
   },
   "Item": {
     "icon": "SimpleFarming:Blueberry",
-    "stackId": "blueberry"
-  }
+    "stackId": "blueberry",
+    "consumedOnUse": true
+  },
+  "Food": {
+    "filling": 10
+  },
+  "Genome": {}
 }

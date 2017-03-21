@@ -29,6 +29,10 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.genome.GenomeDefinition;
+import org.terasology.genome.GenomeRegistry;
+import org.terasology.genome.component.GenomeComponent;
+import org.terasology.hunger.component.FoodComponent;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.delay.DelayManager;
@@ -89,19 +93,21 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
     BlockEntityRegistry blockEntityRegistry;
     @In
     PrefabManager prefabManager;
+    @In
+    private GenomeRegistry genomeRegistry;
 
     Random random = new FastRandom();
 
     @ReceiveEvent
     /**
-     * Handles the seed drop on plant destroyed event.
+     * Handles the seed planting event.
      *
      * @param event                     The corresponding event.
      * @param seedItem                  Reference to the seed entity.
      * @param plantDefinitionComponent  The definition of the plant.
      * @param itemComponent             The item component corresponding to the event
      */
-    public void onPlantSeed(ActivateEvent event, EntityRef seedItem, PlantDefinitionComponent plantDefinitionComponent, ItemComponent itemComponent) {
+    public void onPlantSeed(ActivateEvent event, EntityRef seedItem, PlantDefinitionComponent plantDefinitionComponent, GenomeComponent genomeComponent, ItemComponent itemComponent) {
         if (!event.getTarget().exists() || event.getTargetLocation() == null) {
             return;
         }
@@ -143,6 +149,8 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             worldProvider.setBlock(plantPosition, plantBlock);
             EntityRef plantEntity = blockEntityRegistry.getBlockEntityAt(plantPosition);
             plantEntity.addComponent(newPlantDefinitionComponent);
+            plantEntity.addOrSaveComponent(genomeComponent);
+            logger.info("On seed plant" + genomeComponent.genes);
 
             TreeDefinitionComponent treeDefinitionComponent = seedItem.getComponent(TreeDefinitionComponent.class);
             if (treeDefinitionComponent != null) {
@@ -175,9 +183,11 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
      * @param plantDefinitionComponent  The definition of the plant.
      * @param blockComponent            The block component corresponding to the event
      */
-    public void onPlantDestroyed(CreateBlockDropsEvent event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
+    public void onPlantDestroyed(CreateBlockDropsEvent event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, GenomeComponent genomeComponent, BlockComponent blockComponent) {
         event.consume();
         EntityRef seedItem = entityManager.create(plantDefinitionComponent.seedPrefab);
+        seedItem.addComponent(genomeComponent);
+        logger.info("On plant destroyed" + genomeComponent.genes);
         Vector3f position = blockComponent.getPosition().toVector3f().add(0, 0.5f, 0);
         seedItem.send(new DropItemEvent(position));
         seedItem.send(new ImpulseEvent(random.nextVector3f(30.0f)));
@@ -213,11 +223,11 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
      * Handles plant growth event.
      *
      * @param event                     The event corresponding to the plant growth.
-     * @param entity                    The entity which is going to grown
+     * @param entity                    The entity which is going to grow
      * @param plantDefinitionComponent  The definition of the plant.
      * @param blockComponent            The block component corresponding to the event
      */
-    public void onPlantGrowth(OnPlantGrowth event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
+    public void onPlantGrowth(OnPlantGrowth event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, GenomeComponent genomeComponent, BlockComponent blockComponent) {
         if (delayManager.hasDelayedAction(entity, GROWTH_ACTION)) {
             delayManager.cancelDelayedAction(entity, GROWTH_ACTION);
         }
@@ -265,19 +275,16 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         EntityRef newEntity = blockEntityRegistry.getBlockEntityAt(blockComponent.getPosition());
 
         // Check the new entity for PlantDefinitionComponent.
-        if (newEntity.hasComponent(PlantDefinitionComponent.class)) {
-            newEntity.saveComponent(plantDefinitionComponent);
-        } else {
-            newEntity.addComponent(plantDefinitionComponent);
-        }
+        newEntity.addOrSaveComponent(plantDefinitionComponent);
+
+        // Check the new entity for GenomeComponent.
+        newEntity.addOrSaveComponent(genomeComponent);
+        logger.info(entity.toFullDescription());
+        logger.info("On plant growth - " + genomeComponent.genes);
 
         // Check for TreeDefinitionComponent
         if (treeDefinitionComponent != null) {
-            if (newEntity.hasComponent(TreeDefinitionComponent.class)) {
-                newEntity.saveComponent(treeDefinitionComponent);
-            } else {
-                newEntity.addComponent(treeDefinitionComponent);
-            }
+            newEntity.addOrSaveComponent(treeDefinitionComponent);
         }
 
         schedulePlantGrowth(newEntity, nextGrowthStage);
@@ -292,7 +299,7 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
      * @param plantDefinitionComponent  The definition of the plant.
      * @param blockComponent            The block component corresponding to the event.
      */
-    public void onPlantUnGrowth(OnPlantUnGrowth event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
+    public void onPlantUnGrowth(OnPlantUnGrowth event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, GenomeComponent genomeComponent, BlockComponent blockComponent) {
         List<Map.Entry<String, TimeRange>> growthStages = getGrowthStages(plantDefinitionComponent);
 
         if (growthStages.size() == 0) {
@@ -332,11 +339,10 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         // Creates a new entity
         EntityRef newEntity = blockEntityRegistry.getBlockEntityAt(blockComponent.getPosition());
         // Check the new entity for PlantDefinitionComponent.
-        if (newEntity.hasComponent(PlantDefinitionComponent.class)) {
-            newEntity.saveComponent(plantDefinitionComponent);
-        } else {
-            newEntity.addComponent(plantDefinitionComponent);
-        }
+        newEntity.addOrSaveComponent(plantDefinitionComponent);
+
+        // Check the new entity for GenomeComponent.
+        newEntity.addOrSaveComponent(genomeComponent);
 
         // Schedules a plant growth.
         schedulePlantGrowth(newEntity, previousGrowthStage);
@@ -350,7 +356,8 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
      * @param event     The event corresponding to the plant harvest
      * @param entity    The entity which is going to be harvested
      */
-    public void onHarvest(ActivateEvent event, EntityRef entity) {
+    public void onHarvest(ActivateEvent event, EntityRef entity, GenomeComponent genomeComponent) {
+        logger.info("on harvest");
         EntityRef target = event.getTarget();
         EntityRef instigator = event.getInstigator();
         EntityRef harvestingEntity = entity;
@@ -362,6 +369,11 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             PlantProduceComponent plantProduceComponent = target.getComponent(PlantProduceComponent.class);
             if (plantProduceComponent != null) {
                 EntityRef produceItem = plantProduceComponent.produceItem;
+                FoodComponent foodComponent = new FoodComponent();
+                GenomeDefinition genomeDefinition = genomeRegistry.getGenomeDefinition(genomeComponent.genomeId);
+                foodComponent.filling = genomeDefinition.getGenomeMap().getProperty("filling", genomeComponent.genes, Integer.class);
+                logger.info(String.valueOf(foodComponent.filling));
+                produceItem.addComponent(foodComponent);
                 plantProduceComponent.produceItem = EntityRef.NULL;
                 target.saveComponent(plantProduceComponent);
                 if (!inventoryManager.giveItem(harvestingEntity, target, produceItem) && target.hasComponent(BlockComponent.class)) {
@@ -384,13 +396,11 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
      * @param plantProduceCreationComponent The plant produce creation component corresponding to the event.
      */
     public void onPlantProduceCreation(OnAddedComponent event, EntityRef entityRef, PlantProduceCreationComponent plantProduceCreationComponent) {
+        logger.info("on plant produce creation");
         EntityRef newItem = entityManager.create(plantProduceCreationComponent.producePrefab);
         PlantProduceComponent plantProduceComponent = new PlantProduceComponent(newItem);
-        if (entityRef.hasComponent(PlantProduceComponent.class)) {
-            entityRef.saveComponent(plantProduceComponent);
-        } else {
-            entityRef.addComponent(plantProduceComponent);
-        }
+        entityRef.addOrSaveComponent(plantProduceComponent);
+        logger.info(entityRef.getComponent(GenomeComponent.class).genes);
     }
 
     @ReceiveEvent

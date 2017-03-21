@@ -3,6 +3,7 @@
     "producePrefab": "SimpleFarming:Blueberry"
   },
   "UnGrowPlantOnHarvest": {},
+  "Genome": {},
   "PlantDefinition": {
     "seedPrefab": "BlueberrySeed"
   }

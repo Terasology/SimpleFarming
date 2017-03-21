@@ -9,6 +9,14 @@
          {
              "id" : "Core",
              "minVersion" : "1.0.0"
+         },
+         {
+             "id" : "Genome",
+             "minVersion" : "0.1.1"
+         },
+         {
+             "id" : "Hunger",
+             "minVersion" : "1.0.0"
          }
      ],
     "isServerSideOnly" : false

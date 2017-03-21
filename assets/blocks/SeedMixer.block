@@ -1,0 +1,15 @@
+{
+    "attachmentAllowed": false,
+    "rotation": "horizontal",
+    "tiles" : {
+        "sides"     : "core:ChestSides",
+        "front"     : "core:ChestFront",
+        "topBottom" : "core:ChestTopBottom"
+    },
+    "entity": {
+        "prefab": "SimpleFarming:SeedMixer"
+    },
+    "inventory": {
+        "stackable": true
+    }
+}
