@@ -1,5 +1,5 @@
 {
-    "type": "containerScreen",
+    "type": "SeedMixerWindow",
     "skin": "inventoryDefault",
     "contents": {
         "type": "relativeLayout",
@@ -19,9 +19,46 @@
                 }
             },
             {
-                "type": "InventoryGrid",
-                "id": "container",
-                "maxHorizontalCells": 4,
+                "type": "relativeLayout",
+                "contents": [
+                    {
+                        "type": "InventoryGrid",
+                        "id": "S1",
+                        "maxHorizontalCells": 1,
+                        "layoutInfo": {
+                            "use-content-width": true,
+                            "use-content-height": true
+
+                        }
+                    },
+                    {
+                        "type": "InventoryGrid",
+                        "id": "S2",
+                        "maxHorizontalCells": 1,
+                        "layoutInfo": {
+                            "use-content-width": true,
+                            "use-content-height": true
+                        }
+                    },
+                    {
+                        "type": "InventoryGrid",
+                        "id": "O1",
+                        "maxHorizontalCells": 1,
+                        "layoutInfo": {
+                            "use-content-width": true,
+                            "use-content-height": true
+                        }
+                    },
+                    {
+                        "type": "InventoryGrid",
+                        "id": "O2",
+                        "maxHorizontalCells": 1,
+                        "layoutInfo": {
+                            "use-content-width": true,
+                            "use-content-height": true
+                        }
+                    }
+                ],
                 "layoutInfo": {
                     "use-content-width": true,
                     "use-content-height": true,
@@ -30,9 +67,10 @@
                         "widget": "inventory",
                         "offset": 16
                     },
-                    "position-horizontal-center": {}
+                    "position-horizontal-center": {},
+                    "position-vertical-center": {}
                 }
-            },
+            }
         ]
     }
 }
