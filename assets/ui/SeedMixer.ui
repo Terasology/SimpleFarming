@@ -1,76 +1,89 @@
 {
-    "type": "SeedMixerWindow",
-    "skin": "inventoryDefault",
-    "contents": {
-        "type": "relativeLayout",
-        "contents": [
-            {
-                "type": "InventoryGrid",
-                "id": "inventory",
-                "maxHorizontalCells": 10,
-                "layoutInfo": {
-                    "use-content-width": true,
-                    "use-content-height": true,
-                    "position-bottom": {
-                        "target": "BOTTOM",
-                        "offset": 128
-                    },
-                    "position-horizontal-center": {}
-                }
-            },
-            {
-                "type": "relativeLayout",
-                "contents": [
-                    {
-                        "type": "InventoryGrid",
-                        "id": "S1",
-                        "maxHorizontalCells": 1,
-                        "layoutInfo": {
-                            "use-content-width": true,
-                            "use-content-height": true
-
-                        }
-                    },
-                    {
-                        "type": "InventoryGrid",
-                        "id": "S2",
-                        "maxHorizontalCells": 1,
-                        "layoutInfo": {
-                            "use-content-width": true,
-                            "use-content-height": true
-                        }
-                    },
-                    {
-                        "type": "InventoryGrid",
-                        "id": "O1",
-                        "maxHorizontalCells": 1,
-                        "layoutInfo": {
-                            "use-content-width": true,
-                            "use-content-height": true
-                        }
-                    },
-                    {
-                        "type": "InventoryGrid",
-                        "id": "O2",
-                        "maxHorizontalCells": 1,
-                        "layoutInfo": {
-                            "use-content-width": true,
-                            "use-content-height": true
+  "type": "SeedMixerWindow",
+  "skin": "inventoryDefault",
+  "contents": {
+    "type": "relativeLayout",
+    "contents": [
+        {
+            "type": "InventoryGrid",
+            "id": "inventory",
+            "maxHorizontalCells" : 10,
+            "layoutInfo": {
+                "use-content-width": true,
+                "use-content-height": true,
+                "position-bottom": {
+                    "target": "BOTTOM",
+                    "offset": 128
+                },
+                "position-horizontal-center": {}
+            }
+        },
+        {
+            "type": "flowLayout",
+            "id": "mixerInventory",
+            "contents": [
+                {
+                    "type": "InventoryCell",
+                    "id": "S1",
+                    "targetSlot": 0
+                },
+                {
+                    "type": "UIImage",
+                    "image": "SimpleFarming:plus",
+                    "layoutInfo": {
+                        "width": 48,
+                        "height": 48,
+                        "position-vertical-center": {}
+                    }
+                },
+                {
+                    "type": "InventoryCell",
+                    "id": "S2",
+                    "targetSlot": 1
+                },
+                {
+                    "type": "UIImage",
+                    "image": "SimpleFarming:equals",
+                    "layoutInfo": {
+                        "width": 48,
+                        "height": 48,
+                        "position-vertical-center": {}
+                    }
+                },
+                {
+                    "type": "InventoryCell",
+                    "id": "O1",
+                    "targetSlot": 2
+                },
+                {
+                    "type": "UIImage",
+                    "image": "SimpleFarming:plus",
+                    "layoutInfo": {
+                        "width": 48,
+                        "height": 48,
+                        "position-bottom": {
+                            "target": "BOTTOM",
+                            "widget": "mixerInventory"
                         }
                     }
-                ],
-                "layoutInfo": {
-                    "use-content-width": true,
-                    "use-content-height": true,
-                    "position-bottom": {
-                        "target": "TOP",
-                        "widget": "inventory",
-                        "offset": 16
-                    },
-                    "position-horizontal-center": {},
-                    "position-vertical-center": {}
+                },
+                {
+                    "type": "InventoryCell",
+                    "id": "O2",
+                    "targetSlot": 3
+                }
+            ],
+            "layoutInfo": {
+                "use-content-width": true,
+                "use-content-height": true,
+                "position-horizontal-center": {},
+                "position-bottom": {
+                    "target": "TOP",
+                    "widget": "inventory",
+                    "offset": 16
                 }
             }
-        ]
-    }
+        }
+    ]
+  }
 }

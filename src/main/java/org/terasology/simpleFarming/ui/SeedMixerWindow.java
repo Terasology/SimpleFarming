@@ -16,7 +16,13 @@
 package org.terasology.simpleFarming.ui;
 
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.players.LocalPlayer;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.BaseInteractionScreen;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.layers.ingame.inventory.InventoryCell;
 import org.terasology.rendering.nui.layers.ingame.inventory.InventoryGrid;
 
 /**
@@ -26,10 +32,10 @@ public class SeedMixerWindow extends BaseInteractionScreen {
 
     private InventoryGrid playerInventory;
 
-    private InventoryGrid seed1;
-    private InventoryGrid seed2;
-    private InventoryGrid offspring1;
-    private InventoryGrid offspring2;
+    private InventoryCell seed1;
+    private InventoryCell seed2;
+    private InventoryCell offspring1;
+    private InventoryCell offspring2;
 
     private EntityRef player = EntityRef.NULL;
 
@@ -37,14 +43,54 @@ public class SeedMixerWindow extends BaseInteractionScreen {
     public void initialise() {
         player = EntityRef.NULL;
 
-        seed1 = find("S1", InventoryGrid.class);
-        seed2 = find("S1", InventoryGrid.class);
-        offspring1 = find("O1", InventoryGrid.class);
-        offspring2 = find("O2", InventoryGrid.class);
+        seed1 = find("S1", InventoryCell.class);
+        seed2 = find("S1", InventoryCell.class);
+        offspring1 = find("O1", InventoryCell.class);
+        offspring2 = find("O2", InventoryCell.class);
+
+    }
+
+    public void reInit() {
+        playerInventory = find("inventory", InventoryGrid.class);
+        playerInventory.bindTargetEntity(new ReadOnlyBinding<EntityRef>() {
+            @Override
+            public EntityRef get() {
+                return CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
+            }
+        });
+        playerInventory.setCellOffset(10);
+        playerInventory.setMaxCellCount(40);
+
+        player = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
+    }
+
+    @Override
+    public void onOpened() {
+        EntityRef characterEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
+        CharacterComponent characterComponent = characterEntity.getComponent(CharacterComponent.class);
+
+        // In case the player has not been created yet, exit out early to prevent an error.
+        if (characterComponent == null) {
+            return;
+        }
+
+        // If the reference to the player entity hasn't been set yet, or it refers to a NULL entity, call the reInit()
+        // method to set it. The getId() check is necessary for certain network entities whose ID is 0, but are
+        // erroneously marked as existent.
+        if (!player.exists() || (player.exists() && (player == EntityRef.NULL || player.getId() == 0 || player == null))) {
+            reInit();
+        }
+
+        // As long as there's an interaction target, open this window.
+        if (getInteractionTarget() != EntityRef.NULL) {
+            initializeWithInteractionTarget(getInteractionTarget());
+            super.onOpened();
+        }
     }
 
     @Override
     protected void initializeWithInteractionTarget(EntityRef interactionTarget) {
+        reInit();
     }
 
 }
