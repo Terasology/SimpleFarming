@@ -1,5 +1,5 @@
 {
-  "type": "SeedMixerWindow",
+  "type": "SeedMixerScreen",
   "skin": "inventoryDefault",
   "contents": {
     "type": "relativeLayout",
