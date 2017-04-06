@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.BaseInteractionScreen;
@@ -42,6 +43,8 @@ public class SeedMixerScreen extends BaseInteractionScreen {
 
     @Override
     protected void initializeWithInteractionTarget(EntityRef interactionTarget) {
+        logger.info(interactionTarget.toFullDescription());
+        logger.info(String.valueOf(interactionTarget.hasComponent(InventoryComponent.class)));
         seed1.bindTargetInventory(new Binding<EntityRef>() {
             @Override
             public EntityRef get() {
@@ -97,7 +100,7 @@ public class SeedMixerScreen extends BaseInteractionScreen {
                 return player;
             }
         });
-        playerInventory.setCellOffset(10);
+        playerInventory.setMaxCellCount(40);
     }
 
     @Override
@@ -105,7 +108,7 @@ public class SeedMixerScreen extends BaseInteractionScreen {
         player = EntityRef.NULL;
 
         seed1 = find("S1", InventoryCell.class);
-        seed2 = find("S1", InventoryCell.class);
+        seed2 = find("S2", InventoryCell.class);
         offspring1 = find("O1", InventoryCell.class);
         offspring2 = find("O2", InventoryCell.class);
     }

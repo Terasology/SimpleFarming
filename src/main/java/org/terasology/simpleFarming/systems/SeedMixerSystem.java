@@ -82,12 +82,12 @@ public class SeedMixerSystem extends BaseComponentSystem {
         }
     }
 
-    @Command(shortDescription = "Prints genome of held seed.")
-    public String seedGenomeCheck(@Sender EntityRef client) {
+    @Command(shortDescription = "Prints genome of held item if possible.")
+    public String heldGenomeCheck(@Sender EntityRef client) {
         EntityRef character = client.getComponent(ClientComponent.class).character;
         if (character.hasComponent(CharacterHeldItemComponent.class)) {
             EntityRef selectedItem = character.getComponent(CharacterHeldItemComponent.class).selectedItem;
-            if (selectedItem.hasComponent(SeedComponent.class) && selectedItem.hasComponent(GenomeComponent.class)) {
+            if (selectedItem.hasComponent(GenomeComponent.class)) {
                 return selectedItem.getComponent(GenomeComponent.class).genes;
             } else {
                 return "Command not valid for current conditions.";
