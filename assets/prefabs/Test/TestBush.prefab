@@ -1,0 +1,21 @@
+{
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:TestBushMature:engine:halfblock": {
+        "minTime": 500,
+        "maxTime": 1000
+      },
+      "SimpleFarming:TestBushMature": {
+        "minTime": 500,
+        "maxTime": 1000
+      },
+      "SimpleFarming:TestBushFruiting": {
+        "minTime": 500,
+        "maxTime": 1000
+      }
+    },
+    "seed": "SimpleFarming:TestSeed",
+    "produce": "SimpleFarming:Apple",
+    "sustainable": true
+  }
+}
