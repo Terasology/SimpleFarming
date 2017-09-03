@@ -1,0 +1,21 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Squash Vine Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:SquashVineSeed",
+    "stackId": "Squash Vine Seed"
+  },
+  "VineDefinition": {
+    "plantName": "Squash Vine",
+    "sapling": "SimpleFarming:SquashVineSapling",
+    "trunk": "SimpleFarming:SquashVineTrunk",
+    "produce": "SimpleFarming:Squash",
+    "nextGrowth": {
+      "maxRandom": 2000,
+      "fixed": 5000
+    },
+    "growthsTillRipe": 13
+  }
+}

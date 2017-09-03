@@ -1,10 +1,27 @@
 {
-  "parent": "engine:iconItem",
-  "DisplayName": {
-    "name": "Apple"
-  },
-  "Item": {
-    "icon": "SimpleFarming:Apple",
-    "stackId": "Apple"
-  }
+    "parent": "engine:iconItem",
+    "Item": {
+        "icon": "SimpleFarming:Apple",
+        "stackId": "SimpleFarming:Apple",
+        "consumedOnUse": true
+    },
+    "DisplayName": {
+        "name": "Red Apple"
+    },
+    "CraftingStationIngredient": {
+        "type": "Apple"
+    },
+    "Food": {
+        "filling": 1.5
+    },
+    "Drink": {
+        "filling": 1
+    },
+    "ItemHelp": {
+        "category": "Edible Flora",
+        "paragraphText": [
+             "A bright red juicy fruit. A staple in many households",
+             "Restores 1.5 food and 1 water."
+        ]
+    }
 }

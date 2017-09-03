@@ -1,0 +1,5 @@
+{
+  "basedOn": "Core:Plant",
+  "tile": "SimpleFarming:GrownPotato",
+  "waving": true
+}
