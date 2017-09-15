@@ -62,19 +62,21 @@ public class VineAuthoritySystem extends BaseComponentSystem {
 
     private EntityRef sendingEntity;
 
-    private FastRandom random;
+    private FastRandom random = new FastRandom();
     private Block airBlock;
     private Vector3i[] spawnPos = new Vector3i[4];
     /**
      * Links position to entities as a method of getting the correct entity for that position.
      * This is as block.setEntity() sets for all instances of that block.
      */
-    private Map<Vector3f, VineNode> blockEntities = new HashMap<>();
+    private Map<Vector3f, VineNode> nodeMap = new HashMap<>();
 
+    /**
+     * Called when the system is being set up. Used to create instances of various things.
+     */
     @Override
     public void postBegin() {
         super.postBegin();
-        random = new FastRandom();
         airBlock = blockManager.getBlock(BlockManager.AIR_ID);
         spawnPos[0] = new Vector3i(-1, 0, 0);
         spawnPos[1] = new Vector3i(1, 0, 0);
@@ -98,7 +100,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
         vineComponent.rootNode = new VineNode(event.getPosition());
         vineComponent.rootNode.root = true;
         vine.saveComponent(vineComponent);
-        blockEntities.put(event.getPosition().toVector3f(), vineComponent.rootNode);
+        nodeMap.put(event.getPosition().toVector3f(), vineComponent.rootNode);
         resetDelay(vine, vineComponent.minGrowTime, vineComponent.maxGrowTime);
     }
 
@@ -163,6 +165,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
             EntityRef budEntity = entityManager.create(vineComponent.bud);
             BushDefinitionComponent bushComponent = budEntity.getComponent(BushDefinitionComponent.class);
             bushComponent.parentPosition = parent.position;
+            budEntity.saveComponent(bushComponent);
             budEntity.send(new OnSeedPlanted(pos));
             parent.bud = pos;
             return true;
@@ -184,7 +187,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
             parent.child = new VineNode(pos);
             parent.child.parent = parent;
             worldProvider.setBlock(pos, vineComponent.stem);
-            blockEntities.put(pos.toVector3f(), parent.child);
+            nodeMap.put(pos.toVector3f(), parent.child);
             return true;
         } else {
             return false;
@@ -217,13 +220,14 @@ public class VineAuthoritySystem extends BaseComponentSystem {
 
     /**
      * Called when a bud is destroyed
-     * @param event
-     * @param entity
+     *
+     * @param event  The remove event
+     * @param entity A dummy entity
      */
     @ReceiveEvent
     public void onBudRemove(DoRemoveBud event, EntityRef entity) {
-        if (blockEntities.containsKey(event.location.toVector3f())) {
-            VineNode node = blockEntities.get(event.location.toVector3f());
+        if (nodeMap.containsKey(event.location.toVector3f())) {
+            VineNode node = nodeMap.get(event.location.toVector3f());
             node.bud = null;
         }
     }
@@ -236,8 +240,8 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      */
     @ReceiveEvent
     public void onVineDestroyed(CreateBlockDropsEvent event, EntityRef entity, LocationComponent location) {
-        if (blockEntities.containsKey(location.getWorldPosition())) {
-            VineNode node = blockEntities.get(location.getWorldPosition());
+        if (nodeMap.containsKey(location.getWorldPosition())) {
+            VineNode node = nodeMap.get(location.getWorldPosition());
             recurseKill(node);
             if (!node.root) {
                 node.parent.child = null;

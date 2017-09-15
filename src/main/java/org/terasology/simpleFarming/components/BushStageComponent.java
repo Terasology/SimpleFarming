@@ -16,15 +16,9 @@
 package org.terasology.simpleFarming.components;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.ForceBlockActive;
+import org.terasology.entitySystem.entity.EntityRef;
 
-public class VineDefinitionComponent implements Component {
-    public Block stem;
-    public Prefab bud;
-    public int growFails;
-    public VineNode rootNode;
-    public int minGrowTime;
-    public int maxGrowTime;
+public class BushStageComponent implements Component {
+    EntityRef parent;
+
 }

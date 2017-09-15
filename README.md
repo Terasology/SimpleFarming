@@ -1,224 +1,27 @@
 # Simple Farming
 
-**Simple Farming** is a module that adds the capability to grow plants in Terasology using seeds. After the plant is ripe, you can harvest the 'fruit' that is grown by that particular plant.
+**Simple Farming** is a module that adds the ability to grow & harvest edible plants.
+The module currently supports both bushes and vines, which allow for different plant types.
+Trees are currently not added and bushes are used in their place.
 
-## Farming
+## Quick Guide
 
-1. Plant the seed in a ground.
-2. Wait for the plant to grow.
-3. Wait for the produce to ripen.
-4. Harvest the produce - you can do this by **pressing E** while facing the plant.
-5. Destroy the expired plant OR go back to step 3.
+Once you have a seed for the item, right click a free patch of ground to plant it.
+The plant will grow and eventually bear produce. Once this happens you can harvest the produce by interacting with it (default key of E)
+The plant will then either be removed or revert back and begin to grow more produce.
 
-## Items
+If you break the plant before the fruit is ready no seeds will drop, so ensure you only break the plant when it is finished.
 
- - Un-Growth Can - Make the plant go 1 growth stage back.
- - Growth Can - Make the plant go 1 growth stage forward.
+## Modding Quick Guide
 
-## Creating New Plants
+The full details of the included prefabs & components is on the wiki.
 
-You can start making new plants by creating a new prefab file at assets/prefabs.
+Each plant will have two or three prefabs. One for the plant itself and one or two for the seed & the produce. The seed & the produce can be the same item, in the case of the Carrot.
+The seed prefab must have a SeedDefinition which contains the name of the plant prefab.
+The plant prefab will be a BushDefinition or a VineDefinition depending on the type of plant.
+The bush definition will contain a list of blocks & times for each stage as well as an the produce to create on harvest.
+A vine definition will contain a block to use as a stem and a prefab to use as a bud. This bud prefab will be a bush.
 
-Usually for each plant you want to make these three prefabs:  
-1. **Seed Prefab** (e.g. TestberrySeed.prefab)  
-2. **Ripe Stage Prefab** (e.g. TestberryBushFull.prefab)
-2. **Fruit prefab** (e.g. Testberry.prefab)  
-
-You will also need to create a .block file for each stage of the plant at `assets/blocks/<plant-type>/<plant-name>`, as well as the textures for each stage of the plant at `assets/blockTiles/<plant-type>/<plant-name>`.
-
-### Seed Prefab
-
-*For a good example, see TestberrySeed.prefab at `assets/prefabs/Bushes/Testberry`*
-
-`maxRandom` & `fixed` set the duration of a particular stage. The plant can grow to the next stage randomly during the range between maxRandom and fixed. If the value in `fixed` is reached, the plant immediately grows to the next growth stage. This will make the plants not grow to the next stage all at the exact time - some will get there faster than others!
-
-`engine:halfblock` can be used to create a half-size block. This can be useful if you are trying to characterize the plant being "small" in size during that particular growth stage. (For instance, in the first stage of TestBerry Plant, the plant is a half-block of berry bush block).
-
-![A comparison between a half-block and a full-block](http://i.imgur.com/URLFbzo.png)
-
-```json
-    "growthStages": {
-        "SimpleFarming:BerryBush:engine:halfblock": {
-        "maxRandom": 5000,
-        "fixed": 10000
-    },
-    "SimpleFarming:BerryBush": {
-        "maxRandom": 5000,
-        "fixed": 10000
-    },
-    "SimpleFarming:MatureBerryBush": {
-        "maxRandom": 5000,
-        "fixed": 10000
-    },
-    "SimpleFarming:TestberryBushFull": {
-        "maxRandom": 5000,
-        "fixed": 10000
-    }
-}
-```
-
-### Ripe Stage Prefab
-
-*For a good example, see TestberryBushFull.prefab at `assets/prefabs/Bushes/Testberry`*
-
-This prefab manages the items that are are obtained when a particular plant is harvested. 
-
-### Fruit Prefab
-
-*For a good example, see Testberry.prefab at `assets/prefabs/Bushes/Testberry`*
-
-This prefab should be pretty intuitive. It creates the fruit that will be dropped when you harvest the plant that grows it.
-
-### Block Files
-
-*For a good example, see the .block files on assets/blocks/Bushes/Testberry*
-
-The block files sets the characteristics for the plant block. 
-You can use `basedOn` to make that block have the characteristic of the block that it is based on. 
-
-`tile` should show where the texture for that particular block is located.
-
-One thing that you need to pay attention when you want to create a stage that can be harvested is adding this code to the .block file. (Ex: TestberryBushFull.block)
-
-```json
-"entity": {
-    "prefab": "<Ripe stage of the plant prefab>"
-}
-```
-
-This code will allow the game to know that this particular block is associated with a prefab that indicated that this stage is where the fruit is ripe and is ready to be harvested.
-
-## Creating New Trees
-
-Just like smaller plants, trees need to contain seed prefabs as well. 
-
-To indicate that a plant will become a tree, you will need set 
-`"growsIntoTree" : true` inside the seed prefab. 
-
-`PeachTreeSeed.prefab`:
-```javascript
-"PlantDefinition": {
-        "plantName": "Peach Tree",
-        "growsIntoTree": true,
-        "growthStages": {
-            "SimpleFarming:PeachTreeSaplingYoung": {
-                "maxRandom": 5000,
-                "fixed": 5000
-            },
-            "SimpleFarming:PeachTreeSaplingMature": {
-                "maxRandom": 5000,
-                "fixed": 5000
-            }
-        }
-    }
-```
-
-`growthStages` defines the changes that the tree will undergo as a sapling before turning into a fully-grown tree. 
-
-![](http://i.imgur.com/Rf6sN1R.png)
-
-After the tree has gone through the growth stages specified under `PlantDefinition`, it will grow into a tree!
-
-![](http://i.imgur.com/rSZlcTO.png)
-
-The properties of the tree formed have to be specified under `TreeDefinition` in the seed prefab. 
-
-`PeachTreeSeed.prefab`:
-```javascript
-"TreeDefinition": {
-    "fruitGrowthStages": {
-        "SimpleFarming:PeachFruit": {
-            "maxRandom": 5000,
-            "fixed": 5000
-        },
-        "SimpleFarming:PeachFruitMature": {
-            "maxRandom": 5000,
-            "fixed": 5000
-        },
-        "SimpleFarming:PeachFruitFull": {
-            "maxRandom": 6000,
-            "fixed": 10000
-        }
-    },
-    "trunkHeight": 5,
-    "trunkBlock": "Core:PineTrunk", 
-    "canopyLayers": [0, 0, 0, 3, 2, 1]
-}
-```
-
-`fruitGrowthStages` is similar to `plantGrowthStages`, except that it now defines the changes that will occur to the leaf blocks of the tree over time. Ideally, the first stage should be an empty leaf block, while the last stage would contain the block showing the fruit to be harvested.
-
-`trunkHeight`, as the name suggests, defines how tall the trunk of the tree will be, starting from the base of the tree. 
-
-`trunkBlock` determines what block makes up the trunk of the tree. If not defined in the prefab `trunkBlock` will be `Core:Oaktrunk` by default.
-
-`canopyLayers` defines how the leaves will form on the tree. Each number corresponds to a different layer of the tree, starting from the base of the trunk. It defines how large the square canopy will be for that layer based on the number of blocks from the center.
-
-A value of 0 would mean that no leaves will grow for that layer, while a value of 2 would mean a 1x1 region of leaves will grow. a value of 2 would mean a 3x3 region of leaves would grow, centered on the trunk. 
-
-For instance, here is what a Peach Tree would look like based on the above prefab.
-
-![](http://i.imgur.com/5hiraWw.png)
-
-As you can see, the first 3 layers have no fruit blocks, while the 4th layer has a canopy 3 blocks wide, followed by a layer 2 blocks wide and then a single block at the top of the tree. 
-
-And one last thing: instead of using `PlantProduceCreation` in the final prefab, what you should do for fruits is `TreeFruitCreation` instead. You need to specify `fruitPrefab`, the item the player will receive when harvested, and `seedPrefab`, the seed of the tree that will drop when the fruit is destroyed: 
-
-`Peach.prefab`:
-```javascript
-{
-    "TreeFruitCreation": {
-        "fruitPrefab": "SimpleFarming:Peach",
-        "seedPrefab": "SimpleFarming:PeachTreeSeed"
-    }
-}
-```
-
-And that's it! Ensure that all of the prefabs mentioned in the definition are present.
-
-A few things to take note of:
-- Trees will only grow if there is sufficient space for the trunk to appear. 
-- Destroying the part of the trunk that connects the tree to the ground will kill the tree, destroying all trunk block and stopping the growth of all fruit blocks, causing them to degenerate over time.
-
-Before creating your own tree, take a look at how the Peach Tree prefabs are written as well as test the Peach Tree in-game to gain a better understanding of how creating trees work.
-
-## Creating New Vines
-
-Vines are horizontally growing trees that produce fruits. Fruits produced by vines are generally big, and consume one whole block. 
-
-Vines consist of two basic parts: the trunk, which is the main vine and is made up of woody blocks, and the fruit which are separate blocks that grow around the trunk. Vines are grown by planting seeds, and are grown in cycles. When a seed is planted, a 'sapling' emerges, which turns into a trunk block during the first growth cycle. Every growth cycle after this, a new trunk block is added. If the vine is ripe, a fruit block may be added too.
-
-To add a new vine to the module, the following files must be made:
-
-* A seed prefab and texture.
-* 3 blocks: a 'Sapling' block, a 'Trunk' block, and a 'Produce' block.
-
-For instruction on how to add simple blocks, visit [this wiki article](https://github.com/Terasology/TutorialAssetSystem/wiki/Add-New-Block).
-
-### Vine Seed Prefab
-
-The thing that differentiates vine seed prefabs from other prefabs is the "VineDefinition" component. This component contains fields which are used to generate the vine when the seed is planted. The VineDefinition component of a valid vine seed prefab must contain the following fields:
-
-* `plantName` :  the name of the plant
-* `sapling` : the URI of the sapling block (e.g. "SimpleFarming:MelonVineSapling")
-* `trunk` : the URI of the trunk block (e.g. "SimpleFarming:MelonVineTrunk")
-* `produce` : the URI of the produce (fruit) block (e.g. "SimpleFarming:Melon")
-* `growthsTillRipe` : the number of growth cycles after which the vine becomes 'ripe' and starts yielding fruit.
-* `nextGrowth` : this is the TimeRange object used to calculate the time between two growth cycles, and is composite of two fields: the `fixed` field, which is the minimum time (in milliseconds) between two cycles, and `maxRandom`, which is the maximum variation in that time. See the [TimeRange class](https://github.com/Terasology/SimpleFarming/blob/master/src/main/java/org/terasology/simpleFarming/components/TimeRange.java) for details.
-
-For an example of a seed prefab, see the [MelonVineSeed prefab](https://github.com/Terasology/SimpleFarming/blob/master/assets/prefabs/MelonVineSeed.prefab). This prefab should be located in the `/assets/prefabs/Vines` directory, and an its texture must be located in the `/assets/textures/Vines` directory.
-
-## Produce Mechanisms
-
-There's 2 kind of produce mechanism that you can specify using the SimpleFarming module.
- 1. Periodic
- 2. Once
-
-A **Periodic** produce will grow again after it's harvest. On the other hand, a **Once** produce will only be a one-time harvest and after you harvest it, you need to plant it again from the seed.
-
-To make a plant have a **periodic** produce mechanism, you need to add `"UnGrowPlantOnHarvest": {},` in ripe stage of the plant prefab file, and vice versa.
-
-Destroying a plant with produce, will also yield a produce.
 
 ## Credits for Images:
 

@@ -18,6 +18,9 @@ package org.terasology.simpleFarming.systems;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.entity.internal.BaseEntityRef;
+import org.terasology.entitySystem.entity.internal.PojoEntityRef;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.GrowthStage;
 import org.terasology.simpleFarming.events.DoDestroyPlant;
@@ -35,7 +38,6 @@ import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.events.DropItemEvent;
-import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
@@ -45,7 +47,6 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.entity.CreateBlockDropsEvent;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -66,11 +67,6 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     @In
     private DelayManager delayManager;
 
-    /**
-     * Links position to entities as a method of getting the correct entity for that position.
-     * This is as block.setEntity() sets for all instances of that block.
-     */
-    private Map<Vector3f, EntityRef> blockEntities = new HashMap<>();
     private FastRandom random = new FastRandom();
 
     /**
@@ -83,34 +79,51 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onBushPlanted(OnSeedPlanted event, EntityRef bush, BushDefinitionComponent bushComponent) {
         bushComponent.position = event.getPosition();
-        bushComponent.stages = buildGrowthStages(bushComponent.growthStages);
-        bushComponent.currentStage = doBushGrowth(bushComponent, 1);
-        blockEntities.put(bushComponent.position.toVector3f(), bush);
+        bushComponent.currentStage = -1;
+        doBushGrowth(bushComponent, 1);
         resetDelay(bush, bushComponent.stages[0].minTime, bushComponent.stages[0].maxTime);
     }
 
     @ReceiveEvent
+    public void onBushComponent(OnActivatedComponent event, EntityRef bush, BushDefinitionComponent bushComponent) {
+        bushComponent.stages = buildGrowthStages(bushComponent.growthStages);
+        bush.saveComponent(bushComponent);
+    }
+
+    /**
+     * Called when a bush is destroyed.
+     * Handles the case of the bush actually being a vine bud.
+     *
+     * @param event  The destroy event
+     * @param entity The bush entity or a dummy entity if a bud.
+     */
+    @ReceiveEvent
     public void onBushDestroyed(DoDestroyPlant event, EntityRef entity) {
-        int numSeeds = random.nextInt(1, 3);
-        BushDefinitionComponent bushComponent = entity.getComponent(BushDefinitionComponent.class);
-        if (event.location != null) {
-            numSeeds = 1;
-            EntityRef bushEntity = blockEntities.get(event.location.toVector3f());
-            bushComponent = bushEntity.getComponent(BushDefinitionComponent.class);
-            worldProvider.setBlock(event.location, blockManager.getBlock(BlockManager.AIR_ID));
+        BushDefinitionComponent bushComponent;
+        int numSeeds = 1;
+        if (entity.hasComponent(BushDefinitionComponent.class)) {
+            /* It is a bush being destroyed */
+            bushComponent = entity.getComponent(BushDefinitionComponent.class);
+            if (bushComponent.currentStage == bushComponent.stages.length - 1) {
+                numSeeds = random.nextInt(1, 3);
+            }
         } else {
-            if (bushComponent.parentPosition != null) {
-                entity.send(new DoRemoveBud(bushComponent.parentPosition));
-            }
+            /* It is a bud being destroyed */
+            EntityRef newBush = blockEntityRegistry.getBlockEntityAt(event.location);
+            bushComponent = newBush.getComponent(BushDefinitionComponent.class);
+            entity.send(new DoRemoveBud(bushComponent.parentPosition));
+            worldProvider.setBlock(event.location, blockManager.getBlock(BlockManager.AIR_ID));
         }
-        if (bushComponent.currentStage == bushComponent.stages.length - 1) {
-            for (int i = 0; i < numSeeds; i++) {
-                EntityRef seedItem = entityManager.create(bushComponent.seed);
-                Vector3f position = bushComponent.position.toVector3f().add(0, 0.5f, 0);
-                seedItem.send(new DropItemEvent(position));
-                seedItem.send(new ImpulseEvent(random.nextVector3f(30.0f)));
-            }
+
+        /* Drop some seeds */
+        for (int i = 0; i < numSeeds; i++) {
+            EntityRef seedItem = entityManager.create(bushComponent.seed);
+            Vector3f position = bushComponent.position.toVector3f().add(0, 0.5f, 0);
+            seedItem.send(new DropItemEvent(position));
+            seedItem.send(new ImpulseEvent(random.nextVector3f(30.0f)));
         }
+
+
     }
 
     /**
@@ -123,12 +136,11 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onBushGrowth(DelayedActionTriggeredEvent event, EntityRef bush, BushDefinitionComponent bushComponent) {
         if (bushComponent.currentStage < bushComponent.stages.length - 1) {
-            bushComponent.currentStage = doBushGrowth(bushComponent, 1);
+            doBushGrowth(bushComponent, 1);
         }
         resetDelay(bush,
                 bushComponent.stages[bushComponent.currentStage].minTime,
                 bushComponent.stages[bushComponent.currentStage].maxTime);
-
     }
 
     /**
@@ -143,19 +155,19 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         EntityRef harvester = entity.equals(target) ? event.getInstigator() : entity;
         if (!event.isConsumed() && target.exists() && harvester.exists()
                 && harvester.hasComponent(InventoryComponent.class)
-                && blockEntities.containsKey(event.getTargetLocation())) {
+                && target.hasComponent(BushDefinitionComponent.class)) {
 
-            target = blockEntities.get(event.getTargetLocation());
             BushDefinitionComponent bushComponent = target.getComponent(BushDefinitionComponent.class);
             if (bushComponent.currentStage == bushComponent.stages.length - 1) {
                 EntityRef produce = entityManager.create(bushComponent.produce);
+
                 boolean giveSuccess = inventoryManager.giveItem(harvester, target, produce);
                 if (!giveSuccess) {
                     Vector3f position = event.getTargetLocation().add(0, 0.5f, 0);
                     produce.send(new DropItemEvent(position));
                     produce.send(new ImpulseEvent(random.nextVector3f(15.0f)));
                 }
-                bushComponent.currentStage = doBushGrowth(bushComponent, -1);
+                doBushGrowth(bushComponent, -1);
                 event.consume();
             }
         }
@@ -168,12 +180,9 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param entity Reference to the plant entity.
      */
     @ReceiveEvent
-    public void onBushDestroyed(CreateBlockDropsEvent event, EntityRef entity, LocationComponent location) {
-        if (blockEntities.containsKey(location.getWorldPosition())) {
-            EntityRef bushEntity = blockEntities.get(location.getWorldPosition());
-            bushEntity.send(new DoDestroyPlant());
-            event.consume();
-        }
+    public void onBushDestroyed(CreateBlockDropsEvent event, EntityRef entity, BushDefinitionComponent bushComponent) {
+        entity.send(new DoDestroyPlant());
+        event.consume();
     }
 
     /**
@@ -181,12 +190,12 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      *
      * @param bushComponent The definition of the bush to grow
      * @param direction     The direction to grow in. positive indicates forward & negative indicated backwards
-     * @return The current stage number of the bush
      */
-    private int doBushGrowth(BushDefinitionComponent bushComponent, int direction) {
-        int i = bushComponent.currentStage + direction;
-        worldProvider.setBlock(bushComponent.position, bushComponent.stages[i].block);
-        return i;
+    private void doBushGrowth(BushDefinitionComponent bushComponent, int direction) {
+        bushComponent.currentStage += direction;
+        worldProvider.setBlock(bushComponent.position, bushComponent.stages[bushComponent.currentStage].block);
+        EntityRef newBush = blockEntityRegistry.getBlockEntityAt(bushComponent.position);
+        newBush.addOrSaveComponent(bushComponent);
     }
 
     /**
@@ -203,6 +212,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
             String block = keys.next();
             stages[i] = new GrowthStage((GrowthStage) values[i]);
             stages[i].block = blockManager.getBlock(block);
+            stages[i].block.setKeepActive(true);
         }
         return stages;
     }

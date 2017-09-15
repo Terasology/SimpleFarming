@@ -19,8 +19,8 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
 
 public class SeedDefinitionComponent implements Component {
-    public Prefab vinePrefab;
-    public Prefab bushPrefab;
-    public Prefab treePrefab;
+    public String vinePrefab;
+    public String bushPrefab;
+    public String treePrefab;
 
 }
