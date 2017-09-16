@@ -18,8 +18,6 @@ package org.terasology.simpleFarming.systems;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.entity.internal.BaseEntityRef;
-import org.terasology.entitySystem.entity.internal.PojoEntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.GrowthStage;
@@ -80,8 +78,9 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     public void onBushPlanted(OnSeedPlanted event, EntityRef bush, BushDefinitionComponent bushComponent) {
         bushComponent.position = event.getPosition();
         bushComponent.currentStage = -1;
-        doBushGrowth(bushComponent, 1);
-        resetDelay(bush, bushComponent.stages[0].minTime, bushComponent.stages[0].maxTime);
+
+        EntityRef newBush = doBushGrowth(bushComponent, 1);
+        resetDelay(newBush, bushComponent.stages[0].minTime, bushComponent.stages[0].maxTime);
     }
 
     @ReceiveEvent
@@ -135,16 +134,18 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      */
     @ReceiveEvent
     public void onBushGrowth(DelayedActionTriggeredEvent event, EntityRef bush, BushDefinitionComponent bushComponent) {
+        EntityRef newBush = null;
         if (bushComponent.currentStage < bushComponent.stages.length - 1) {
-            doBushGrowth(bushComponent, 1);
+            newBush = doBushGrowth(bushComponent, 1);
         }
-        resetDelay(bush,
+        resetDelay(newBush == null ? bush : newBush,
                 bushComponent.stages[bushComponent.currentStage].minTime,
                 bushComponent.stages[bushComponent.currentStage].maxTime);
     }
 
     /**
-     * Called when an attempt to harvest the bush is made
+     * Called when an attempt to harvest the bush is made.
+     * If the bush is
      *
      * @param event  The activation event
      * @param entity The entity doing the harvesting
@@ -153,14 +154,14 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     public void onHarvest(ActivateEvent event, EntityRef entity) {
         EntityRef target = event.getTarget();
         EntityRef harvester = entity.equals(target) ? event.getInstigator() : entity;
+        /* Ensure the target is a plant and the entities are valid */
         if (!event.isConsumed() && target.exists() && harvester.exists()
-                && harvester.hasComponent(InventoryComponent.class)
                 && target.hasComponent(BushDefinitionComponent.class)) {
-
             BushDefinitionComponent bushComponent = target.getComponent(BushDefinitionComponent.class);
+
+            /* Produce is only given in the final stage */
             if (bushComponent.currentStage == bushComponent.stages.length - 1) {
                 EntityRef produce = entityManager.create(bushComponent.produce);
-
                 boolean giveSuccess = inventoryManager.giveItem(harvester, target, produce);
                 if (!giveSuccess) {
                     Vector3f position = event.getTargetLocation().add(0, 0.5f, 0);
@@ -191,12 +192,14 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param bushComponent The definition of the bush to grow
      * @param direction     The direction to grow in. positive indicates forward & negative indicated backwards
      */
-    private void doBushGrowth(BushDefinitionComponent bushComponent, int direction) {
+    private EntityRef doBushGrowth(BushDefinitionComponent bushComponent, int direction) {
         bushComponent.currentStage += direction;
         worldProvider.setBlock(bushComponent.position, bushComponent.stages[bushComponent.currentStage].block);
         EntityRef newBush = blockEntityRegistry.getBlockEntityAt(bushComponent.position);
         newBush.addOrSaveComponent(bushComponent);
+        return newBush;
     }
+
 
     /**
      * Builds the list of growth stages from the prefab data
