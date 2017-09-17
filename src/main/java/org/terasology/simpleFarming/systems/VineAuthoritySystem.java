@@ -165,10 +165,10 @@ public class VineAuthoritySystem extends BaseComponentSystem {
             bushComponent.parent = parent;
             budEntity.saveComponent(bushComponent);
 
-            nodeComponent.bud = pos;
-            parent.saveComponent(nodeComponent);
-
             budEntity.send(new OnSeedPlanted(pos));
+
+            nodeComponent.bud = budEntity;
+            parent.saveComponent(nodeComponent);
             return true;
         }
         return false;
@@ -243,7 +243,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onVineDestroyed(CreateBlockDropsEvent event, EntityRef entity, VineNodeComponent nodeComponent) {
         recurseKill(entity);
-        if (entity.hasComponent(VineDefinitionComponent.class)) {
+        if (nodeComponent.parent == null) {
             nodeComponent.height = -1;
         } else {
             VineNodeComponent parentNodeComponent = nodeComponent.parent.getComponent(VineNodeComponent.class);
@@ -264,7 +264,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
             recurseKill(nodeComponent.child);
         }
         if (nodeComponent.bud != null) {
-            node.send(new DoDestroyPlant(nodeComponent.bud));
+            nodeComponent.bud.send(new DoDestroyPlant(true));
         }
         node.destroy();
     }

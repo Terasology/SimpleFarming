@@ -22,7 +22,7 @@ import org.terasology.math.geom.Vector3i;
 public class VineNodeComponent implements Component {
     public Vector3i position;
     public EntityRef child;
-    public Vector3i bud;
+    public EntityRef bud;
     public EntityRef parent;
     public int height;
 

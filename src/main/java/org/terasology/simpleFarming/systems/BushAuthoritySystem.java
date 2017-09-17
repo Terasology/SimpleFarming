@@ -81,6 +81,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
 
         EntityRef newBush = doBushGrowth(bushComponent, 1);
         resetDelay(newBush, bushComponent.stages[0].minTime, bushComponent.stages[0].maxTime);
+        bush.saveComponent(bushComponent);
     }
 
     @ReceiveEvent
@@ -97,21 +98,20 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param entity The bush entity or a dummy entity if a bud.
      */
     @ReceiveEvent
-    public void onBushDestroyed(DoDestroyPlant event, EntityRef entity) {
-        BushDefinitionComponent bushComponent;
+    public void onBushDestroyed(DoDestroyPlant event, EntityRef entity, BushDefinitionComponent bushComponent) {
         int numSeeds = 1;
-        if (entity.hasComponent(BushDefinitionComponent.class)) {
+        logger.info("Bush Called");
+        if (bushComponent.parent == null) {
             /* It is a bush being destroyed */
-            bushComponent = entity.getComponent(BushDefinitionComponent.class);
             if (bushComponent.currentStage == bushComponent.stages.length - 1) {
                 numSeeds = random.nextInt(1, 3);
             }
         } else {
             /* It is a bud being destroyed */
-            EntityRef newBush = blockEntityRegistry.getBlockEntityAt(event.location);
-            bushComponent = newBush.getComponent(BushDefinitionComponent.class);
-            bushComponent.parent.send(new DoRemoveBud());
-            worldProvider.setBlock(event.location, blockManager.getBlock(BlockManager.AIR_ID));
+            if (!event.isParentDead) {
+                bushComponent.parent.send(new DoRemoveBud());
+            }
+            worldProvider.setBlock(bushComponent.position, blockManager.getBlock(BlockManager.AIR_ID));
         }
 
         /* Drop some seeds */

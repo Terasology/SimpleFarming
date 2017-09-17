@@ -19,11 +19,13 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.math.geom.Vector3i;
 
 public class DoDestroyPlant implements Event {
-    public Vector3i location;
+    public boolean isParentDead;
+
     public DoDestroyPlant() {
 
     }
-    public DoDestroyPlant(Vector3i pos) {
-        location = pos;
+
+    public DoDestroyPlant(boolean isParentDead) {
+        this.isParentDead = isParentDead;
     }
 }
