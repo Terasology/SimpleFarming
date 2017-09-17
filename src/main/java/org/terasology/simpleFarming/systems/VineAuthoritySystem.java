@@ -108,7 +108,6 @@ public class VineAuthoritySystem extends BaseComponentSystem {
         if (nodeComponent.height != -1) {
             if (nodeComponent.height < 20) {
                 recurseGrow(vine, vineComponent);
-                logger.info("~_~");
             }
             resetDelay(vine, vineComponent.minGrowTime, vineComponent.maxGrowTime);
         }
@@ -142,7 +141,6 @@ public class VineAuthoritySystem extends BaseComponentSystem {
             nodeComponent.height = recurseGrow(nodeComponent.child, vineComponent) + 1;
         } else {
             if (addChild(node, vineComponent)) {
-                logger.info(nodeComponent.child.toFullDescription());
                 nodeComponent.height = 1;
             }
         }
@@ -185,7 +183,6 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     private boolean addChild(EntityRef parent, VineDefinitionComponent vineComponent) {
         VineNodeComponent nodeComponent = parent.getComponent(VineNodeComponent.class);
         Vector3i pos = getGrowthPosition(nodeComponent, false);
-        logger.info("Boink!");
         if (pos != null) {
             vineComponent.stem.setKeepActive(true);
             worldProvider.setBlock(pos, vineComponent.stem);

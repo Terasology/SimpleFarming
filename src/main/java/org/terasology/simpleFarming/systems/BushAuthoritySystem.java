@@ -100,7 +100,6 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onBushDestroyed(DoDestroyPlant event, EntityRef entity, BushDefinitionComponent bushComponent) {
         int numSeeds = 1;
-        logger.info("Bush Called");
         if (bushComponent.parent == null) {
             /* It is a bush being destroyed */
             if (bushComponent.currentStage == bushComponent.stages.length - 1) {
@@ -168,7 +167,12 @@ public class BushAuthoritySystem extends BaseComponentSystem {
                     produce.send(new DropItemEvent(position));
                     produce.send(new ImpulseEvent(random.nextVector3f(15.0f)));
                 }
-                doBushGrowth(bushComponent, -1);
+                if (bushComponent.sustainable) {
+                    doBushGrowth(bushComponent, -1);
+                } else {
+                    entity.send(new DoDestroyPlant());
+                    worldProvider.setBlock(bushComponent.position, blockManager.getBlock(BlockManager.AIR_ID));
+                }
                 event.consume();
             }
         }
