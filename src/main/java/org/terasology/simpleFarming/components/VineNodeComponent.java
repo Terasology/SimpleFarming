@@ -15,17 +15,26 @@
  */
 package org.terasology.simpleFarming.components;
 
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3i;
 
-public class VineNode {
+public class VineNodeComponent implements Component {
     public Vector3i position;
-    public VineNode child;
-    public int height;
-    public VineNode parent;
+    public EntityRef child;
     public Vector3i bud;
-    public boolean root;
+    public EntityRef parent;
+    public int height;
 
-    public VineNode(Vector3i position) {
+    public VineNodeComponent() {
+    }
+
+    public VineNodeComponent(Vector3i position) {
+        this.position = position;
+    }
+
+    public VineNodeComponent(EntityRef parent, Vector3i position) {
+        this.parent = parent;
         this.position = position;
     }
 }

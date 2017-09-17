@@ -110,7 +110,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
             /* It is a bud being destroyed */
             EntityRef newBush = blockEntityRegistry.getBlockEntityAt(event.location);
             bushComponent = newBush.getComponent(BushDefinitionComponent.class);
-            entity.send(new DoRemoveBud(bushComponent.parentPosition));
+            bushComponent.parent.send(new DoRemoveBud());
             worldProvider.setBlock(event.location, blockManager.getBlock(BlockManager.AIR_ID));
         }
 
@@ -228,7 +228,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param max    THe maximum duration
      */
     private void resetDelay(EntityRef entity, int min, int max) {
-        delayManager.addDelayedAction(entity, "EdibleFlora:" + entity.getId(), generateRandom(min, max));
+        delayManager.addDelayedAction(entity, "SimpleFarming:" + entity.getId(), generateRandom(min, max));
     }
 
     /**

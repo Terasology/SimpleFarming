@@ -19,9 +19,4 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.math.geom.Vector3i;
 
 public class DoRemoveBud implements Event {
-    public Vector3i location;
-
-    public DoRemoveBud(Vector3i pos) {
-        location = pos;
-    }
 }

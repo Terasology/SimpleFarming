@@ -18,7 +18,7 @@ package org.terasology.simpleFarming.systems;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
-import org.terasology.simpleFarming.components.VineNode;
+import org.terasology.simpleFarming.components.VineNodeComponent;
 import org.terasology.simpleFarming.events.DoDestroyPlant;
 import org.terasology.simpleFarming.events.DoRemoveBud;
 import org.terasology.simpleFarming.events.OnSeedPlanted;
@@ -32,17 +32,14 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
+import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.entity.CreateBlockDropsEvent;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 @RegisterSystem(RegisterMode.AUTHORITY)
@@ -56,20 +53,15 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     @In
     private BlockManager blockManager;
     @In
+    private BlockEntityRegistry blockEntityRegistry;
+    @In
     private DelayManager delayManager;
     @In
     private EntityManager entityManager;
 
-    private EntityRef sendingEntity;
-
     private FastRandom random = new FastRandom();
     private Block airBlock;
     private Vector3i[] spawnPos = new Vector3i[4];
-    /**
-     * Links position to entities as a method of getting the correct entity for that position.
-     * This is as block.setEntity() sets for all instances of that block.
-     */
-    private Map<Vector3f, VineNode> nodeMap = new HashMap<>();
 
     /**
      * Called when the system is being set up. Used to create instances of various things.
@@ -89,18 +81,18 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * Called when a new vine is to be planted.
      * Handles placing the block, setting up the first node and delegates the periodic growth call
      *
-     * @param event         The event containing the position
-     * @param vine          The vine entity
-     * @param vineComponent The vine's definition
+     * @param event            The event containing the position
+     * @param definitionEntity The vine entity
+     * @param vineComponent    The vine's definition
      */
+
     @ReceiveEvent
-    public void onVinePlanted(OnSeedPlanted event, EntityRef vine, VineDefinitionComponent vineComponent) {
-        sendingEntity = vine;
+    public void onVinePlanted(OnSeedPlanted event, EntityRef definitionEntity, VineDefinitionComponent vineComponent) {
+        vineComponent.stem.setKeepActive(true);
         worldProvider.setBlock(event.getPosition(), vineComponent.stem);
-        vineComponent.rootNode = new VineNode(event.getPosition());
-        vineComponent.rootNode.root = true;
-        vine.saveComponent(vineComponent);
-        nodeMap.put(event.getPosition().toVector3f(), vineComponent.rootNode);
+        EntityRef vine = blockEntityRegistry.getExistingEntityAt(event.getPosition());
+        vine.addOrSaveComponent(vineComponent);
+        vine.addComponent(new VineNodeComponent(event.getPosition()));
         resetDelay(vine, vineComponent.minGrowTime, vineComponent.maxGrowTime);
     }
 
@@ -109,13 +101,14 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      *
      * @param event         The event called periodically
      * @param vine          The vine entity
-     * @param vineComponent The vine's definition
+     * @param nodeComponent The vine's definition
      */
     @ReceiveEvent
-    public void onVineGrowth(DelayedActionTriggeredEvent event, EntityRef vine, VineDefinitionComponent vineComponent) {
-        if (vineComponent.rootNode.height != -1) {
-            if (vineComponent.rootNode.height < 20) {
-                recurseGrow(vineComponent.rootNode, vineComponent);
+    public void onVineGrowth(DelayedActionTriggeredEvent event, EntityRef vine, VineNodeComponent nodeComponent, VineDefinitionComponent vineComponent) {
+        if (nodeComponent.height != -1) {
+            if (nodeComponent.height < 20) {
+                recurseGrow(vine, vineComponent);
+                logger.info("~_~");
             }
             resetDelay(vine, vineComponent.minGrowTime, vineComponent.maxGrowTime);
         }
@@ -135,22 +128,26 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * @param vineComponent The vine's definition
      * @return True if we were able to grow something. Else false
      */
-    private int recurseGrow(VineNode node, VineDefinitionComponent vineComponent) {
-        if (node.bud != null && node.child != null) {
-            node.height = recurseGrow(node.child, vineComponent) + 1;
-        } else if (node.child != null) {
+    private int recurseGrow(EntityRef node, VineDefinitionComponent vineComponent) {
+        VineNodeComponent nodeComponent = node.getComponent(VineNodeComponent.class);
+        if (nodeComponent.bud != null && nodeComponent.child != null) {
+            nodeComponent.height = recurseGrow(nodeComponent.child, vineComponent) + 1;
+
+        } else if (nodeComponent.child != null) {
             if (random.nextDouble() < budChance) {
                 if (addBud(node, vineComponent)) {
-                    return node.height;
+                    return nodeComponent.height;
                 }
             }
-            node.height = recurseGrow(node.child, vineComponent) + 1;
+            nodeComponent.height = recurseGrow(nodeComponent.child, vineComponent) + 1;
         } else {
             if (addChild(node, vineComponent)) {
-                node.height = 1;
+                logger.info(nodeComponent.child.toFullDescription());
+                nodeComponent.height = 1;
             }
         }
-        return node.height;
+        node.addOrSaveComponent(nodeComponent);
+        return nodeComponent.height;
     }
 
     /**
@@ -159,15 +156,19 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * @param parent The node to add the bud off
      * @return True if we could add a bud, false otherwise
      */
-    private boolean addBud(VineNode parent, VineDefinitionComponent vineComponent) {
-        Vector3i pos = getGrowthPosition(parent, true);
+    private boolean addBud(EntityRef parent, VineDefinitionComponent vineComponent) {
+        VineNodeComponent nodeComponent = parent.getComponent(VineNodeComponent.class);
+        Vector3i pos = getGrowthPosition(nodeComponent, true);
         if (pos != null) {
             EntityRef budEntity = entityManager.create(vineComponent.bud);
             BushDefinitionComponent bushComponent = budEntity.getComponent(BushDefinitionComponent.class);
-            bushComponent.parentPosition = parent.position;
+            bushComponent.parent = parent;
             budEntity.saveComponent(bushComponent);
+
+            nodeComponent.bud = pos;
+            parent.saveComponent(nodeComponent);
+
             budEntity.send(new OnSeedPlanted(pos));
-            parent.bud = pos;
             return true;
         }
         return false;
@@ -181,13 +182,16 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * @param vineComponent The definition of the vine
      * @return True if the child was added, false otherwise.
      */
-    private boolean addChild(VineNode parent, VineDefinitionComponent vineComponent) {
-        Vector3i pos = getGrowthPosition(parent, false);
+    private boolean addChild(EntityRef parent, VineDefinitionComponent vineComponent) {
+        VineNodeComponent nodeComponent = parent.getComponent(VineNodeComponent.class);
+        Vector3i pos = getGrowthPosition(nodeComponent, false);
+        logger.info("Boink!");
         if (pos != null) {
-            parent.child = new VineNode(pos);
-            parent.child.parent = parent;
+            vineComponent.stem.setKeepActive(true);
             worldProvider.setBlock(pos, vineComponent.stem);
-            nodeMap.put(pos.toVector3f(), parent.child);
+            nodeComponent.child = blockEntityRegistry.getExistingEntityAt(pos);
+            nodeComponent.child.addComponent(new VineNodeComponent(parent, pos));
+            parent.addOrSaveComponent(nodeComponent);
             return true;
         } else {
             return false;
@@ -201,7 +205,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * @param isBud  If the node is to be a bud.
      * @return A position to grow in or null if none found.
      */
-    private Vector3i getGrowthPosition(VineNode parent, boolean isBud) {
+    private Vector3i getGrowthPosition(VineNodeComponent parent, boolean isBud) {
         int i = 0;
         Vector3i nextPos;
         shuffleArray(spawnPos);
@@ -225,11 +229,9 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * @param entity A dummy entity
      */
     @ReceiveEvent
-    public void onBudRemove(DoRemoveBud event, EntityRef entity) {
-        if (nodeMap.containsKey(event.location.toVector3f())) {
-            VineNode node = nodeMap.get(event.location.toVector3f());
-            node.bud = null;
-        }
+    public void onBudRemove(DoRemoveBud event, EntityRef entity, VineNodeComponent nodeComponent) {
+        nodeComponent.bud = null;
+        entity.saveComponent(nodeComponent);
     }
 
     /**
@@ -239,37 +241,41 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * @param entity Reference to the plant entity.
      */
     @ReceiveEvent
-    public void onVineDestroyed(CreateBlockDropsEvent event, EntityRef entity, LocationComponent location) {
-        if (nodeMap.containsKey(location.getWorldPosition())) {
-            VineNode node = nodeMap.get(location.getWorldPosition());
-            recurseKill(node);
-            if (!node.root) {
-                node.parent.child = null;
-                rebuildHeight(node.parent, 0);
-            } else {
-                node.height = -1;
-            }
-            event.consume();
+    public void onVineDestroyed(CreateBlockDropsEvent event, EntityRef entity, VineNodeComponent nodeComponent) {
+        recurseKill(entity);
+        if (entity.hasComponent(VineDefinitionComponent.class)) {
+            nodeComponent.height = -1;
+        } else {
+            VineNodeComponent parentNodeComponent = nodeComponent.parent.getComponent(VineNodeComponent.class);
+            parentNodeComponent.child.destroy();
+            parentNodeComponent.child = null;
+            nodeComponent.parent.saveComponent(parentNodeComponent);
+            rebuildHeight(nodeComponent.parent, 0);
         }
+        event.consume();
     }
 
 
-    private void recurseKill(VineNode node) {
-        worldProvider.setBlock(node.position, airBlock);
-        if (node.child != null) {
-            recurseKill(node.child);
-            node.child = null;
+
+    private void recurseKill(EntityRef node) {
+        VineNodeComponent nodeComponent =  node.getComponent(VineNodeComponent.class);
+        worldProvider.setBlock(nodeComponent.position, airBlock);
+        if (nodeComponent.child != null) {
+            recurseKill(nodeComponent.child);
         }
-        if (node.bud != null) {
-            sendingEntity.send(new DoDestroyPlant(node.bud));
+        if (nodeComponent.bud != null) {
+            node.send(new DoDestroyPlant(nodeComponent.bud));
         }
+        node.destroy();
     }
 
-    private void rebuildHeight(VineNode node, int height) {
-        node.height = height;
-        if (!node.root) {
-            rebuildHeight(node.parent, height + 1);
+    private void rebuildHeight(EntityRef node, int height) {
+        VineNodeComponent nodeComponent =  node.getComponent(VineNodeComponent.class);
+        nodeComponent.height = height;
+        if (nodeComponent.parent != null) {
+            rebuildHeight(nodeComponent.parent, height + 1);
         }
+        node.saveComponent(nodeComponent);
     }
 
 
@@ -325,7 +331,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * @param max    THe maximum duration
      */
     private void resetDelay(EntityRef entity, int min, int max) {
-        delayManager.addDelayedAction(entity, "EdibleFlora:" + entity.getId(), generateRandom(min, max));
+        delayManager.addDelayedAction(entity, "SimpleFarming:" + entity.getId(), generateRandom(min, max));
     }
 
 

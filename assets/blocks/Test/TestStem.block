@@ -1,4 +1,5 @@
 {
   "displayName": "BushBlock",
-  "tile": "SimpleFarming:TestVine"
+  "tile": "SimpleFarming:TestVine",
+  "keepActive": true
 }

@@ -2,5 +2,6 @@
   "hardness": 3,
   "mass": 100,
   "translucent": true,
-  "doubleSided": true
+  "doubleSided": true,
+  "keepActive": true
 }

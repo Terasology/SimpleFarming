@@ -23,8 +23,6 @@ import org.terasology.world.block.ForceBlockActive;
 public class VineDefinitionComponent implements Component {
     public Block stem;
     public Prefab bud;
-    public int growFails;
-    public VineNode rootNode;
     public int minGrowTime;
     public int maxGrowTime;
 }
