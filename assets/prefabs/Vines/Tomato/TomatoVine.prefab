@@ -1,0 +1,8 @@
+{
+  "VineDefinition": {
+    "stem":"SimpleFarming:TomatoStem",
+    "bud":"SimpleFarming:TomatoBud",
+    "minGrowTime": 4000,
+    "maxGrowTime": 7000
+  }
+}

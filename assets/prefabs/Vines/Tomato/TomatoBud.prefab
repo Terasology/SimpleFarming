@@ -1,0 +1,25 @@
+{
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:BabyTomato": {
+        "minTime": 1000,
+        "maxTime": 5000
+      },
+      "SimpleFarming:YoungTomato": {
+        "minTime": 2000,
+        "maxTime": 2500
+      },
+      "SimpleFarming:MatureTomato": {
+        "minTime": 5000,
+        "maxTime": 12000
+      },
+      "SimpleFarming:FruitingTomato": {
+        "minTime": 5000,
+        "maxTime": 12000
+      }
+    },
+    "seed": "SimpleFarming:TomatoSeed",
+    "produce": "SimpleFarming:Tomato",
+    "sustainable": true
+  }
+}

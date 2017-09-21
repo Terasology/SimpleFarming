@@ -1,0 +1,13 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Tomato Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:TomatoSeed",
+    "stackId": "Tomato Seed"
+  },
+  "SeedDefinition": {
+    "vinePrefab": "SimpleFarming:TomatoVine"
+  }
+}

@@ -160,12 +160,18 @@ public class BushAuthoritySystem extends BaseComponentSystem {
 
             /* Produce is only given in the final stage */
             if (bushComponent.currentStage == bushComponent.stages.length - 1) {
-                EntityRef produce = entityManager.create(bushComponent.produce);
-                boolean giveSuccess = inventoryManager.giveItem(harvester, target, produce);
-                if (!giveSuccess) {
-                    Vector3f position = event.getTargetLocation().add(0, 0.5f, 0);
-                    produce.send(new DropItemEvent(position));
-                    produce.send(new ImpulseEvent(random.nextVector3f(15.0f)));
+                EntityRef produce;
+                /* Handle a dodgy produce */
+                try {
+                    produce = entityManager.create(bushComponent.produce);
+                    boolean giveSuccess = inventoryManager.giveItem(harvester, target, produce);
+                    if (!giveSuccess) {
+                        Vector3f position = event.getTargetLocation().add(0, 0.5f, 0);
+                        produce.send(new DropItemEvent(position));
+                        produce.send(new ImpulseEvent(random.nextVector3f(15.0f)));
+                    }
+                } catch (NullPointerException e) {
+                    logger.error("Unable to create produce: " + bushComponent.produce);
                 }
                 if (bushComponent.sustainable) {
                     doBushGrowth(bushComponent, -1);
@@ -218,7 +224,12 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         for (int i = 0; i < values.length; i++) {
             String block = keys.next();
             stages[i] = new GrowthStage((GrowthStage) values[i]);
-            stages[i].block = blockManager.getBlock(block);
+            try {
+                stages[i].block = blockManager.getBlock(block);
+            } catch (NullPointerException e) {
+                logger.error("Unable to get block: " + block);
+                throw e;
+            }
             stages[i].block.setKeepActive(true);
         }
         return stages;
@@ -231,6 +242,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param min    The minimum duration
      * @param max    THe maximum duration
      */
+
     private void resetDelay(EntityRef entity, int min, int max) {
         delayManager.addDelayedAction(entity, "SimpleFarming:" + entity.getId(), generateRandom(min, max));
     }
