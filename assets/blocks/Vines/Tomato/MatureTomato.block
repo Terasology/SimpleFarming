@@ -1,5 +1,0 @@
-{
-  "basedOn": "Core:Plant",
-  "tile": "SimpleFarming:MatureTomato",
-  "waving": true
-}
