@@ -1,9 +1,0 @@
-{
-  "PlantProduceCreation": {
-    "producePrefab": "SimpleFarming:Raspberry"
-  },
-  "UnGrowPlantOnHarvest": {},
-  "PlantDefinition": {
-    "seedPrefab": "RaspberrySeed"
-  }
-}

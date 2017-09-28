@@ -1,0 +1,13 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Blueberry"
+  },
+  "Item": {
+    "icon": "SimpleFarming:Blueberry",
+    "stackId": "SimpleFarming:Blueberry"
+  },
+  "SeedDefinition": {
+    "bushPrefab": "SimpleFarming:BlueberryBush"
+  }
+}

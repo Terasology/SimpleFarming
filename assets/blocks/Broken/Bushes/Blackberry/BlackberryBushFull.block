@@ -1,8 +1,0 @@
-{
-  "basedOn": "SimpleFarming:MatureBlackberryBush",
-  "displayName": "Blackberry Bush",
-  "entity": {
-    "prefab": "BlackberryBushFull"
-  },
-  "tile": "SimpleFarming:BlackberryBushFull"
-}

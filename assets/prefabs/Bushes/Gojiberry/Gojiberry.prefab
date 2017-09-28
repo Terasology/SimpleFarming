@@ -1,0 +1,13 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Gojiberry"
+  },
+  "Item": {
+    "icon": "SimpleFarming:Gojiberry",
+    "stackId": "Gojiberry"
+  },
+  "SeedDefinition":{
+	"bushPrefab":"GojiberryBush"
+  }
+}

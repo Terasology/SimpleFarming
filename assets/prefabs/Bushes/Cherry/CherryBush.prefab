@@ -1,0 +1,23 @@
+{
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:YoungCherryBush:engine:halfblock": {
+        "minTime": 5000,
+        "maxTime": 10000
+      },
+      "SimpleFarming:YoungCherryBush": {
+        "minTime": 6000,
+        "maxTime": 12000
+      },
+      "SimpleFarming:MatureCherryBush": {
+        "minTime": 6000,
+        "maxTime": 12000
+      },
+      "SimpleFarming:FruitingCherryBush": {
+        "minTime": 6000,
+        "maxTime": 12000
+      }
+    },
+	"produce":"SimpleFarming:Cherry"
+  }
+}

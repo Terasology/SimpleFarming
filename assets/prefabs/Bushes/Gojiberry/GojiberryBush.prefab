@@ -1,0 +1,24 @@
+{
+  "BushDefinition": {
+    "plantName": "Gojiberry Bush",
+    "growthStages": {
+      "SimpleFarming:YoungGojiberryBush:engine:halfblock": {
+        "minTime": 5000,
+        "maxTime": 10000
+      },
+      "SimpleFarming:YoungGojiberryBush": {
+        "minTime": 7000,
+        "maxTime": 10000
+      },
+      "SimpleFarming:MatureGojiberryBush": {
+        "minTime": 5000,
+        "maxTime": 10000
+      },
+      "SimpleFarming:FruitingGojiberryBush": {
+        "minTime": 6000,
+        "maxTime": 10000
+      }
+    },
+	"produce":"SimpleFarming:Gojiberry"
+  }
+}

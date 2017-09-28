@@ -55,8 +55,13 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
         super.postBegin();
         airBlock = blockManager.getBlock(BlockManager.AIR_ID);
     }
+
     @ReceiveEvent
     public void onSeedPlant(ActivateEvent event, EntityRef seed, SeedDefinitionComponent seedComponent) {
+        /* The item is being used but not planted */
+        if (event.getTargetLocation() == null) {
+            return;
+        }
         Vector3i position = new Vector3i(event.getTargetLocation());
         position.add(Vector3i.up());
         if (Side.inDirection(event.getHitNormal()) == Side.TOP && checkPosition(position)) {

@@ -1,0 +1,6 @@
+{
+  "displayName": "Mature Cranberry flower",
+  "basedOn": "Core:plant",
+  "tile":"SimpleFarming:MatureCranberryFlower",
+  "waving": true
+}

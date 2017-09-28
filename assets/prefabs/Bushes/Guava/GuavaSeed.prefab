@@ -1,0 +1,13 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Guava Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:GuavaSeed",
+    "stackId": "GuavaSeed"
+  },
+  "SeedDefinition": {
+	"bushPrefab":"SimpleFarming:GuavaBush"
+  }
+}

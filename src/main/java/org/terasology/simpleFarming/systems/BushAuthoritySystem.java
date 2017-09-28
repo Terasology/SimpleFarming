@@ -19,6 +19,7 @@ package org.terasology.simpleFarming.systems;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.GrowthStage;
 import org.terasology.simpleFarming.events.DoDestroyPlant;
@@ -115,7 +116,8 @@ public class BushAuthoritySystem extends BaseComponentSystem {
 
         /* Drop some seeds */
         for (int i = 0; i < numSeeds; i++) {
-            EntityRef seedItem = entityManager.create(bushComponent.seed);
+            Prefab seed = bushComponent.seed == null ? bushComponent.produce : bushComponent.seed;
+            EntityRef seedItem = entityManager.create(seed);
             Vector3f position = bushComponent.position.toVector3f().add(0, 0.5f, 0);
             seedItem.send(new DropItemEvent(position));
             seedItem.send(new ImpulseEvent(random.nextVector3f(30.0f)));

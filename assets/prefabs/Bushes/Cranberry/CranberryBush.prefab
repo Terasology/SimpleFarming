@@ -1,0 +1,32 @@
+{
+  "BushDefinition": {
+    "plantName": "Cranberry bush",
+    "growthStages": {
+      "SimpleFarming:YoungCranberryFlower": {
+        "minTime": 3000,
+        "maxTime": 6000
+      },
+      "SimpleFarming:MatureCranberryFlower": {
+        "minTime": 3000,
+        "maxTime": 6000
+      },
+      "SimpleFarming:YoungCranberryBush:engine:halfblock": {
+        "minTime": 6000,
+        "maxTime": 12000
+      },
+      "SimpleFarming:YoungCranberryBush": {
+        "minTime": 5000,
+        "maxTime": 10000
+      },
+      "SimpleFarming:MatureCranberryBush": {
+        "minTime": 5000,
+        "maxTime": 10000
+      },
+      "SimpleFarming:FruitingCranberryBush": {
+        "minTime": 5000,
+        "maxTime": 10000
+      }
+    },
+	"produce":"SimpleFarming:Cranberry"
+  }
+}

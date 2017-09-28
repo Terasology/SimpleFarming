@@ -29,7 +29,7 @@ public class BushDefinitionComponent implements Component {
     public Map<String, GrowthStage> growthStages = Maps.newTreeMap();
     public GrowthStage[] stages;
     public Vector3i position;
-    public boolean sustainable;
+    public boolean sustainable = true;
     public EntityRef parent;
     public Prefab seed;
     public Prefab produce;
