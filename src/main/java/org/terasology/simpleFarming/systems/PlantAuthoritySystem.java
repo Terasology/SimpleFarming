@@ -59,7 +59,7 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onSeedPlant(ActivateEvent event, EntityRef seed, SeedDefinitionComponent seedComponent) {
         /* The item is being used but not planted */
-        if (event.getTargetLocation() == null) {
+        if (event.getTargetLocation() == null || event.isConsumed()) {
             return;
         }
         Vector3i position = new Vector3i(event.getTargetLocation());
@@ -78,6 +78,7 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
             }
             plantEntity.send(new OnSeedPlanted(position));
             inventoryManager.removeItem(seed.getOwner(), seed, seed, true, 1);
+            event.consume();
         }
     }
 
