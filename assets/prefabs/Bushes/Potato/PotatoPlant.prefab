@@ -1,0 +1,24 @@
+{
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:YoungPotato": {
+        "minTime": 6000,
+        "maxTime": 12000
+      },
+      "SimpleFarming:MaturePotato": {
+        "minTime": 7000,
+        "maxTime": 14000
+      },
+      "SimpleFarming:FloweringPotato": {
+        "maxRandom": 8000,
+        "fixed": 16000
+      },
+      "SimpleFarming:GrownPotato": {
+        "maxRandom": 8000,
+        "fixed": 16000
+      }
+    },
+    "produce": "SimpleFarming:Potato",
+    "sustainable": false
+  }
+}

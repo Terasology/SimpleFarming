@@ -1,0 +1,24 @@
+{
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:YoungBlackberryBush:engine:halfblock": {
+        "minTime": 5000,
+        "maxTime": 7000
+      },
+      "SimpleFarming:YoungBlackberryBush": {
+        "minTime": 5000,
+        "maxTime": 8000
+      },
+      "SimpleFarming:MatureBlackberryBush": {
+        "minTime": 6000,
+        "maxTime": 8000
+      },
+      "SimpleFarming:FruitingBlackberryBush": {
+        "minTime": 6000,
+        "maxTime": 9000
+      }
+    },
+    "produce": "SimpleFarming:Blackberry",
+    "sustainable": true
+	}
+}

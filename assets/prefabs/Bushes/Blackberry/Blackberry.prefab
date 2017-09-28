@@ -1,0 +1,30 @@
+{
+  "parent": "engine:iconItem",
+  "Item": {
+    "icon": "SimpleFarming:Blackberry",
+    "stackId": "SimpleFarming:Blackberry",
+    "consumedOnUse": true
+  },
+  "DisplayName": {
+    "name": "Blackberry"
+  },
+  "CraftingStationIngredient": {
+    "type": "Blackberry"
+  },
+  "Food": {
+    "filling": 0.3
+  },
+  "Drink": {
+    "filling": 0.2
+  },
+  "ItemHelp": {
+    "category": "Edible Flora",
+    "paragraphText": [
+      "A berry made up multiple bunched seeds. One of the more popular berries",
+      "Restores 0.3 food and 0.2 water."
+    ]
+  },
+  "SeedDefinition": {
+    "bushPrefab": "SimpleFarming:BlackberryBush"
+  }
+}

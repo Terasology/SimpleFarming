@@ -1,6 +1,0 @@
-{
-  "TreeFruitCreation": {
-    "fruitPrefab": "SimpleFarming:Apple",
-    "seedPrefab": "SimpleFarming:AppleTreeSeed"
-  }
-}

@@ -1,0 +1,13 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Orange Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:OrangeSeed",
+    "stackId": "OrangeSeed"
+  },
+  "SeedDefinition":{
+    "bushPrefab":"SimpleFarming:OrangeBush"
+  }
+}
