@@ -1,0 +1,8 @@
+{
+  "VineDefinition": {
+    "stem":"SimpleFarming:GrapeVineStem",
+    "bud":"SimpleFarming:GrapeBud",
+    "minGrowTime": 4000,
+    "maxGrowTime": 7000
+  }
+}

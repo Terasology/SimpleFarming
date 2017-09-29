@@ -1,0 +1,13 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Pumpkin Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:PumpkinSeed",
+    "stackId": "Pumpkin Seed"
+  },
+  "SeedDefinition": {
+    "vinePrefab": "SimpleFarming:PumpkinVine"
+  }
+}

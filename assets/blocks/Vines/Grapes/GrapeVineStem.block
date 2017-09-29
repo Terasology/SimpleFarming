@@ -1,0 +1,4 @@
+{
+  "basedOn":"SimpleFarming:BaseBush",
+  "tile": "SimpleFarming:GrapeVineStem"
+}

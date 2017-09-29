@@ -1,0 +1,13 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Melon Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:MelonSeed",
+    "stackId": "Melon Seed"
+  },
+  "SeedDefinition": {
+    "vinePrefab": "SimpleFarming:MelonVine"
+  }
+}

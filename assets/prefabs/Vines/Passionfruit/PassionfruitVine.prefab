@@ -1,0 +1,8 @@
+{
+  "VineDefinition": {
+    "stem":"SimpleFarming:PassionfruitVineStem",
+    "bud":"SimpleFarming:PassionfruitBud",
+    "minGrowTime": 4000,
+    "maxGrowTime": 7000
+  }
+}

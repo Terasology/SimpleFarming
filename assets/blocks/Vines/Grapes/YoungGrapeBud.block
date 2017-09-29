@@ -1,0 +1,5 @@
+{
+  "basedOn": "Core:plant",
+  "tile": "SimpleFarming:YoungGrapeBud",
+  "waving": true
+}

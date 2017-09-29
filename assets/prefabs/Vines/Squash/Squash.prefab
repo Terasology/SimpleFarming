@@ -1,0 +1,11 @@
+{
+  "parent": "engine:iconItem",
+  "Item": {
+    "icon": "SimpleFarming:Squash",
+    "stackId": "SimpleFarming:Squash",
+    "consumedOnUse": true
+  },
+  "DisplayName": {
+    "name": "Squash"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Cucumber Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:CucumberSeed",
+    "stackId": "Cucumber Seed"
+  },
+  "SeedDefinition": {
+    "vinePrefab": "SimpleFarming:CucumberVine"
+  }
+}

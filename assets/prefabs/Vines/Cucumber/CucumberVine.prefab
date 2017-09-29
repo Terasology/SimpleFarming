@@ -1,0 +1,8 @@
+{
+  "VineDefinition": {
+    "stem":"SimpleFarming:CucumberVineStem",
+    "bud":"SimpleFarming:CucumberBud",
+    "minGrowTime": 4000,
+    "maxGrowTime": 7000
+  }
+}

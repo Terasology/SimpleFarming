@@ -1,0 +1,13 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Passionfruit Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:PassionfruitSeed",
+    "stackId": "Passionfruit Seed"
+  },
+  "SeedDefinition": {
+    "vinePrefab": "SimpleFarming:PassionfruitVine"
+  }
+}

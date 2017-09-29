@@ -1,0 +1,20 @@
+{
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:YoungCucumberBud:engine:halfblock": {
+        "minTime": 1000,
+        "maxTime": 5000
+      },
+      "SimpleFarming:YoungCucumberBud": {
+        "minTime": 2000,
+        "maxTime": 2500
+      },
+      "SimpleFarming:FruitingCucumberBud": {
+        "minTime": 5000,
+        "maxTime": 12000
+      }
+    },
+    "seed": "SimpleFarming:CucumberSeed",
+    "produce": "SimpleFarming:Cucumber"
+  }
+}

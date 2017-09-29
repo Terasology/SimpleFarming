@@ -1,0 +1,8 @@
+{
+  "VineDefinition": {
+    "stem":"SimpleFarming:PumpkinVineStem",
+    "bud":"SimpleFarming:PumpkinBud",
+    "minGrowTime": 4000,
+    "maxGrowTime": 7000
+  }
+}

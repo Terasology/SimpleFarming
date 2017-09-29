@@ -1,0 +1,16 @@
+{
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:MelonBud:engine:halfblock": {
+        "minTime": 2000,
+        "maxTime": 2500
+      },
+      "SimpleFarming:MelonBud": {
+        "minTime": 5000,
+        "maxTime": 12000
+      }
+    },
+    "seed": "SimpleFarming:MelonSeed",
+    "produce": "SimpleFarming:Melon"
+  }
+}

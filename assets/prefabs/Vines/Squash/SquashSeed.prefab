@@ -1,0 +1,13 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Squash Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:SquashSeed",
+    "stackId": "Squash Seed"
+  },
+  "SeedDefinition": {
+    "vinePrefab": "SimpleFarming:SquashVine"
+  }
+}
