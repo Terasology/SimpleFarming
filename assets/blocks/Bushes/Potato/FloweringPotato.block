@@ -1,5 +1,6 @@
 {
   "basedOn": "Core:Plant",
+  "displayName": "Flowering Potato",
   "tile": "SimpleFarming:FloweringPotato",
   "waving": true
 }

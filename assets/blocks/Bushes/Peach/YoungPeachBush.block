@@ -1,4 +1,5 @@
 {
-    "basedOn": "SimpleFarming:BaseBush",
-    "tile":"SimpleFarming:YoungPeachBush"
+  "basedOn": "SimpleFarming:BaseBush",
+  "displayName": "Young Peach Bush",
+  "tile":"SimpleFarming:YoungPeachBush"
 }

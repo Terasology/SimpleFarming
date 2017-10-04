@@ -1,5 +1,6 @@
 {
   "basedOn": "Core:Plant",
+  "displayName": "Fruiting Tomato",
   "tile": "SimpleFarming:FruitingTomato",
   "waving": true
 }

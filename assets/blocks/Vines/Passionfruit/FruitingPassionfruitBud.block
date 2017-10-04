@@ -1,4 +1,5 @@
 {
-    "basedOn": "SimpleFarming:BaseBush",
-    "tile": "SimpleFarming:FruitingPassionfruitBud"
+  "basedOn": "SimpleFarming:BaseBush",
+  "displayName": "Fruiting Passionfruit Bud",
+  "tile": "SimpleFarming:FruitingPassionfruitBud"
 }

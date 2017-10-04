@@ -1,5 +1,6 @@
 {
   "basedOn": "Core:Plant",
+  "displayName": "Mature Potato",
   "tile": "SimpleFarming:MaturePotato",
   "waving": true
 }
