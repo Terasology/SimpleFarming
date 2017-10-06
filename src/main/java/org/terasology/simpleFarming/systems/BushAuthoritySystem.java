@@ -49,10 +49,10 @@ import org.terasology.world.block.entity.CreateBlockDropsEvent;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BushAuthoritySystem extends BaseComponentSystem {
-    private static final Logger logger = LoggerFactory.getLogger(BushAuthoritySystem.class);
     private static final float DROP_IMPULSE_AMOUNT = 22.0f;
     @In
     private WorldProvider worldProvider;
@@ -157,7 +157,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onBushGrowth(DelayedActionTriggeredEvent event, EntityRef bush, BushDefinitionComponent bushComponent) {
         EntityRef newBush = null;
-        if (isInLastStage(bushComponent)) {
+        if (!isInLastStage(bushComponent)) {
             newBush = doBushGrowth(bushComponent, 1);
         }
         resetDelay(newBush == null ? bush : newBush,
@@ -177,13 +177,15 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         EntityRef target = event.getTarget();
         EntityRef harvester = entity.equals(target) ? event.getInstigator() : entity;
         if (!event.isConsumed() && areValidHarvestEntities(target, harvester)) {
-            BushDefinitionComponent bushComponent = target.getComponent(BushDefinitionComponent.class);
 
+            BushDefinitionComponent bushComponent = target.getComponent(BushDefinitionComponent.class);
             /* Produce is only given in the final stage */
             if (isInLastStage(bushComponent)) {
                 dropProduce(bushComponent.produce, event.getTargetLocation(), harvester, target);
                 if (bushComponent.sustainable) {
-                    doBushGrowth(bushComponent, -1);
+                    resetDelay(doBushGrowth(bushComponent, -1),
+                    bushComponent.stages[bushComponent.currentStage].minTime,
+                            bushComponent.stages[bushComponent.currentStage].maxTime);
                 } else {
                     entity.send(new DoDestroyPlant());
                     worldProvider.setBlock(bushComponent.position, blockManager.getBlock(BlockManager.AIR_ID));
@@ -220,6 +222,14 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Creates the produce and gives it to the harvester or drops it
+     *
+     * @param produce   The produce to create
+     * @param position  The position to drop at
+     * @param harvester The entity to give the item to
+     * @param target    The entity to take the item from
+     */
     private void dropProduce(Prefab produce, Vector3f position, EntityRef harvester, EntityRef target) {
         EntityRef produceItem = entityManager.create(produce);
         boolean giveSuccess = inventoryManager.giveItem(harvester, target, produceItem);
@@ -251,19 +261,14 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @return The array of growth stages
      */
     private GrowthStage[] buildGrowthStages(Map<String, GrowthStage> growthStages) {
-        Object[] values = growthStages.values().toArray();
-        Iterator<String> keys = growthStages.keySet().iterator();
-        GrowthStage[] stages = new GrowthStage[values.length];
-        for (int i = 0; i < values.length; i++) {
-            String block = keys.next();
-            stages[i] = new GrowthStage((GrowthStage) values[i]);
-            try {
-                stages[i].block = blockManager.getBlock(block);
-            } catch (NullPointerException e) {
-                logger.error("Unable to get block: " + block);
-                throw e;
-            }
+        Set<Map.Entry<String, GrowthStage>> entrySet = growthStages.entrySet();
+        GrowthStage[] stages = new GrowthStage[entrySet.size()];
+        int i = 0;
+        for (Map.Entry<String, GrowthStage> entry : entrySet) {
+            stages[i] = new GrowthStage(entry.getValue());
+            stages[i].block = blockManager.getBlock(entry.getKey());
             stages[i].block.setKeepActive(true);
+            i++;
         }
         return stages;
     }
