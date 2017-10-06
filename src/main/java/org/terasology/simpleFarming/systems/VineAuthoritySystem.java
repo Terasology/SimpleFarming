@@ -15,8 +15,6 @@
  */
 package org.terasology.simpleFarming.systems;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.VineNodeComponent;
 import org.terasology.simpleFarming.events.DoDestroyPlant;
@@ -208,7 +206,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
             nextPos.add(parent.position);
             i++;
         }
-        while ((!validatePosition(nextPos) || (countNeighbours(nextPos) > MAX_NEIGHBOURS && !isBud)) && i < spawnPos.length);
+        while ((!isValidPosition(nextPos) || (countNeighbours(nextPos) > MAX_NEIGHBOURS && !isBud)) && i < spawnPos.length);
 
         return i == spawnPos.length ? null : nextPos;
     }
@@ -286,7 +284,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * @param position The position to check for
      * @return True if a vine can grow there. False otherwise
      */
-    private boolean validatePosition(Vector3i position) {
+    private boolean isValidPosition(Vector3i position) {
         if (position == null) {
             return false;
         }
@@ -294,8 +292,8 @@ public class VineAuthoritySystem extends BaseComponentSystem {
         if (targetBlock != airBlock) {
             return false;
         }
-        targetBlock = worldProvider.getBlock(new Vector3i(position.x(), position.y() - 1, position.z()));
-        if (targetBlock.isPenetrable()) {
+        Block belowBlock = worldProvider.getBlock(position.addY(-1));
+        if (belowBlock.isPenetrable()) {
             return false;
         }
         return true;

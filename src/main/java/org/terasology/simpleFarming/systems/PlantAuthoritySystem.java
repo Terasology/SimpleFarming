@@ -64,7 +64,7 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
         }
         Vector3i position = new Vector3i(event.getTargetLocation());
         position.add(Vector3i.up());
-        if (Side.inDirection(event.getHitNormal()) == Side.TOP && checkPosition(position)) {
+        if (Side.inDirection(event.getHitNormal()) == Side.TOP && isValidPosition(position)) {
             EntityRef plantEntity;
             if (seedComponent.vinePrefab != null) {
                 plantEntity = entityManager.create(seedComponent.vinePrefab);
@@ -82,7 +82,7 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
         }
     }
 
-    private boolean checkPosition(Vector3i position) {
+    public boolean isValidPosition(Vector3i position) {
         if (position == null) {
             return false;
         }
@@ -90,8 +90,8 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
         if (targetBlock != airBlock) {
             return false;
         }
-        targetBlock = worldProvider.getBlock(new Vector3i(position.x(), position.y() - 1, position.z()));
-        if (targetBlock.isPenetrable()) {
+        Block belowBlock = worldProvider.getBlock(position.addY(-1));
+        if (belowBlock.isPenetrable()) {
             return false;
         }
         return true;
