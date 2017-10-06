@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.GrowthStage;
 import org.terasology.simpleFarming.events.DoDestroyPlant;
@@ -85,44 +86,61 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         bush.saveComponent(bushComponent);
     }
 
+    /**
+     * Called when a bushComponent is added to an entity.
+     * Converts the stages to an array
+     *
+     * @param event         The addition event
+     * @param bush          The bush entity
+     * @param bushComponent THe bush component being added
+     */
     @ReceiveEvent
-    public void onBushComponent(OnActivatedComponent event, EntityRef bush, BushDefinitionComponent bushComponent) {
+    public void onBushComponentAdded(OnActivatedComponent event, EntityRef bush, BushDefinitionComponent bushComponent) {
         bushComponent.stages = buildGrowthStages(bushComponent.growthStages);
         bush.saveComponent(bushComponent);
     }
 
     /**
-     * Called when a bush is destroyed.
-     * Handles the case of the bush actually being a vine bud.
-     *
-     * @param event  The destroy event
-     * @param entity The bush entity or a dummy entity if a bud.
+     * Called when a bush or bud is destroyed.
+     * Delegates to the correct handler function in either case
+     * @param event The destroy plant event
+     * @param entity The entity sending
+     * @param bushComponent The bush component on the plant
      */
     @ReceiveEvent
-    public void onBushDestroyed(DoDestroyPlant event, EntityRef entity, BushDefinitionComponent bushComponent) {
-        int numSeeds = 1;
+    public void onPlantDestroyed(DoDestroyPlant event, EntityRef entity, BushDefinitionComponent bushComponent) {
         if (bushComponent.parent == null) {
-            /* It is a bush being destroyed */
-            if (bushComponent.currentStage == bushComponent.stages.length - 1) {
-                numSeeds = random.nextInt(1, 3);
-            }
+            onBushDestroyed(bushComponent);
         } else {
-            /* It is a bud being destroyed */
-            if (!event.isParentDead) {
-                bushComponent.parent.send(new DoRemoveBud());
-            }
-            worldProvider.setBlock(bushComponent.position, blockManager.getBlock(BlockManager.AIR_ID));
+            onBudDestroyed(bushComponent, event.isParentDead);
         }
+    }
 
-        /* Drop some seeds */
-        for (int i = 0; i < numSeeds; i++) {
-            Prefab seed = bushComponent.seed == null ? bushComponent.produce : bushComponent.seed;
-            EntityRef seedItem = entityManager.create(seed);
-            Vector3f position = bushComponent.position.toVector3f().add(0, 0.5f, 0);
-            seedItem.send(new DropItemEvent(position));
-            seedItem.send(new ImpulseEvent(random.nextVector3f(30.0f)));
+    /**
+     * Handles dropping the correct seeds when a bush is destoyed
+     * @param bushComponent The bush component of the entity
+     */
+    private void onBushDestroyed(BushDefinitionComponent bushComponent) {
+        if (bushComponent.currentStage == bushComponent.stages.length - 1) {
+            dropSeeds(random.nextInt(1, 3),
+                    bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
+                    bushComponent.position.toVector3f());
         }
+    }
 
+    /**
+     * Handles dropping the correct seeds & notifying the vine when a bud is destroyed
+     * @param bushComponent The component of the bud
+     * @param isParentDead Whether the parent vine still exists
+     */
+    private void onBudDestroyed(BushDefinitionComponent bushComponent, boolean isParentDead) {
+        if (!isParentDead) {
+            bushComponent.parent.send(new DoRemoveBud());
+        }
+        worldProvider.setBlock(bushComponent.position, blockManager.getBlock(BlockManager.AIR_ID));
+        dropSeeds(1,
+                bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
+                bushComponent.position.toVector3f());
 
     }
 
@@ -196,6 +214,20 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     public void onBushDestroyed(CreateBlockDropsEvent event, EntityRef entity, BushDefinitionComponent bushComponent) {
         entity.send(new DoDestroyPlant());
         event.consume();
+    }
+
+    /**
+     * Drops a number of seeds at the position
+     * @param numSeeds The amount of seeds to drop
+     * @param seed The prefab of the entity to drop
+     * @param position The position to drop above.
+     */
+    private void dropSeeds(int numSeeds, Prefab seed, Vector3f position) {
+        for (int i = 0; i < numSeeds; i++) {
+            EntityRef seedItem = entityManager.create(seed);
+            seedItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
+            seedItem.send(new ImpulseEvent(random.nextVector3f(30.0f)));
+        }
     }
 
     /**
