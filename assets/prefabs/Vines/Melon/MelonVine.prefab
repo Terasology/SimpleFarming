@@ -1,8 +1,0 @@
-{
-  "VineDefinition": {
-    "stem":"SimpleFarming:MelonVineStem",
-    "bud":"SimpleFarming:MelonBud",
-    "minGrowTime": 4000,
-    "maxGrowTime": 7000
-  }
-}

@@ -7,7 +7,23 @@
     "icon": "SimpleFarming:GuavaSeed",
     "stackId": "GuavaSeed"
   },
-  "SeedDefinition": {
-	"prefab":"SimpleFarming:GuavaBush"
+  "SeedDefinition": {},
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:YoungGuavaBush:engine:halfblock": {
+        "minTime": 1000,
+        "maxTime": 20000
+      },
+      "SimpleFarming:YoungGuavaBush": {
+        "minTime": 1000,
+        "maxTime": 20000
+      },
+      "SimpleFarming:FruitingGuavaBush": {
+        "minTime": 1000,
+        "maxTime": 20000
+      }
+    },
+    "produce": "SimpleFarming:Guava",
+    "seed": "SimpleFarming:GuavaSeed"
   }
 }

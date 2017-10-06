@@ -7,7 +7,7 @@
     "icon": "SimpleFarming:Gooseberry",
     "stackId": "Gooseberry"
   },
-  "SeedDefinition":{
-	"prefab":"SimpleFarming:GooseberryBush"
+  "SeedDefinition": {
+    "prefab": "SimpleFarming:GooseberryBush"
   }
 }

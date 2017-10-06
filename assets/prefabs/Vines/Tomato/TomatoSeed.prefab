@@ -7,7 +7,11 @@
     "icon": "SimpleFarming:TomatoSeed",
     "stackId": "Tomato Seed"
   },
-  "SeedDefinition": {
-    "prefab": "SimpleFarming:TomatoVine"
+  "SeedDefinition": {},
+  "VineDefinition": {
+    "stem": "SimpleFarming:TomatoVineStem",
+    "bud": "SimpleFarming:TomatoBud",
+    "minGrowTime": 4000,
+    "maxGrowTime": 7000
   }
 }

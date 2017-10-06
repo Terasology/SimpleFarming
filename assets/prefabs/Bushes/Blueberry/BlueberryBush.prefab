@@ -18,6 +18,6 @@
         "maxTime": 14000
       }
     },
-    "produce":"SimpleFarming:Blueberry"
+    "produce": "SimpleFarming:Blueberry"
   }
 }

@@ -214,7 +214,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param seed     The prefab of the entity to drop
      * @param position The position to drop above.
      */
-    private void dropSeeds(int numSeeds, Prefab seed, Vector3f position) {
+    private void dropSeeds(int numSeeds, String seed, Vector3f position) {
         for (int i = 0; i < numSeeds; i++) {
             EntityRef seedItem = entityManager.create(seed);
             seedItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
@@ -230,7 +230,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param harvester The entity to give the item to
      * @param target    The entity to take the item from
      */
-    private void dropProduce(Prefab produce, Vector3f position, EntityRef harvester, EntityRef target) {
+    private void dropProduce(String produce, Vector3f position, EntityRef harvester, EntityRef target) {
         EntityRef produceItem = entityManager.create(produce);
         boolean giveSuccess = inventoryManager.giveItem(harvester, target, produceItem);
         if (!giveSuccess) {

@@ -7,7 +7,23 @@
     "icon": "SimpleFarming:OrangeSeed",
     "stackId": "OrangeSeed"
   },
-  "SeedDefinition":{
-    "prefab":"SimpleFarming:OrangeBush"
+  "SeedDefinition": {},
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:YoungOrangeBush": {
+        "minTime": 5000,
+        "maxTime": 5000
+      },
+      "SimpleFarming:MatureOrangeBush": {
+        "minTime": 5000,
+        "maxTime": 5000
+      },
+      "SimpleFarming:FruitingOrangeBush": {
+        "minTime": 6000,
+        "maxTime": 10000
+      }
+    },
+    "seed": "SimpleFarming:OrangeSeed",
+    "produce": "SimpleFarming:Orange"
   }
 }

@@ -7,7 +7,23 @@
     "icon": "SimpleFarming:PeachSeed",
     "stackId": "PeachSeed"
   },
-  "SeedDefinition": {
-    "prefab": "SimpleFarming:PeachBush"
+  "SeedDefinition": {},
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:YoungPeachBush": {
+        "minTime": 5000,
+        "maxTime": 5000
+      },
+      "SimpleFarming:MaturePeachBush": {
+        "minTime": 5000,
+        "maxTime": 5000
+      },
+      "SimpleFarming:FruitingPeachBush": {
+        "minTime": 6000,
+        "maxTime": 10000
+      }
+    },
+    "seed": "SimpleFarming:PeachSeed",
+    "produce": "SimpleFarming:Peach"
   }
 }

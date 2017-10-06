@@ -1,8 +1,0 @@
-{
-  "VineDefinition": {
-    "stem":"SimpleFarming:SquashVineStem",
-    "bud":"SimpleFarming:SquashBud",
-    "minGrowTime": 4000,
-    "maxGrowTime": 7000
-  }
-}

@@ -7,7 +7,7 @@
     "icon": "SimpleFarming:Gojiberry",
     "stackId": "Gojiberry"
   },
-  "SeedDefinition":{
-	"prefab":"GojiberryBush"
+  "SeedDefinition": {
+    "prefab": "GojiberryBush"
   }
 }

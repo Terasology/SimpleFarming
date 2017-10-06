@@ -65,14 +65,15 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
         Vector3i position = new Vector3i(event.getTargetLocation());
         position.add(Vector3i.up());
         if (Side.inDirection(event.getHitNormal()) == Side.TOP && isValidPosition(position)) {
-            EntityRef plantEntity = entityManager.create(seedComponent.prefab);
-            plantEntity.send(new OnSeedPlanted(position));
+            /* If the prefab field is null, there is a DefinitionComponent on the seed */
+            EntityRef plantEntity = seedComponent.prefab == null ? seed : entityManager.create(seedComponent.prefab);
+            plantEntity.send(new OnSeedPlanted(position.addY(1)));
             inventoryManager.removeItem(seed.getOwner(), seed, seed, true, 1);
             event.consume();
         }
     }
 
-    public boolean isValidPosition(Vector3i position) {
+    private boolean isValidPosition(Vector3i position) {
         if (position == null) {
             return false;
         }

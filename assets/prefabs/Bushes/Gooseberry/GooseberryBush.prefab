@@ -1,6 +1,5 @@
 {
   "BushDefinition": {
-    "plantName": "Gooseberry Bush",
     "growthStages": {
       "SimpleFarming:YoungGooseberryBush:engine:halfblock": {
         "minTime": 5000,
@@ -19,6 +18,6 @@
         "maxTime": 10000
       }
     },
-	"produce":"SimpleFarming:Gooseberry"
+    "produce": "SimpleFarming:Gooseberry"
   }
 }

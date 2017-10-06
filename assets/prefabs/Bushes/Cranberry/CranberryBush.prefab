@@ -1,6 +1,5 @@
 {
   "BushDefinition": {
-    "plantName": "Cranberry bush",
     "growthStages": {
       "SimpleFarming:YoungCranberryFlower": {
         "minTime": 3000,
@@ -27,6 +26,6 @@
         "maxTime": 10000
       }
     },
-	"produce":"SimpleFarming:Cranberry"
+    "produce": "SimpleFarming:Cranberry"
   }
 }

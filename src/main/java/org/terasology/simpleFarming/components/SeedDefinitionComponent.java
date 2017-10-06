@@ -21,7 +21,6 @@ import org.terasology.entitySystem.Component;
  * Indicates the item is a seed and links to the prefab to be used to create the plant.
  */
 public class SeedDefinitionComponent implements Component {
-    /* Strings are used to avoid a circular reference when seed and produce are the same. */
     public String prefab;
 
 }

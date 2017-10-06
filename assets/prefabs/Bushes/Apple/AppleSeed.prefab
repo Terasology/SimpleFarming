@@ -7,7 +7,28 @@
     "icon": "SimpleFarming:AppleSeed",
     "stackId": "Apple Seed"
   },
-  "SeedDefinition": {
-    "prefab": "SimpleFarming:AppleBush"
+  "SeedDefinition": {},
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:YoungAppleBush:engine:halfblock": {
+        "minTime": 6000,
+        "maxTime": 12000
+      },
+      "SimpleFarming:YoungAppleBush": {
+        "minTime": 7000,
+        "maxTime": 14000
+      },
+      "SimpleFarming:MatureAppleBush": {
+        "minTime": 8000,
+        "maxTime": 16000
+      },
+      "SimpleFarming:FruitingAppleBush": {
+        "minTime": 8000,
+        "maxTime": 16000
+      }
+    },
+    "seed": "SimpleFarming:AppleSeed",
+    "produce": "SimpleFarming:Apple",
+    "sustainable": true
   }
 }

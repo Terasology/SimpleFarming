@@ -7,7 +7,11 @@
     "icon": "SimpleFarming:SquashSeed",
     "stackId": "Squash Seed"
   },
-  "SeedDefinition": {
-    "prefab": "SimpleFarming:SquashVine"
+  "SeedDefinition": {},
+  "VineDefinition": {
+    "stem": "SimpleFarming:SquashVineStem",
+    "bud": "SimpleFarming:SquashBud",
+    "minGrowTime": 4000,
+    "maxGrowTime": 7000
   }
 }

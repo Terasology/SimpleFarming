@@ -18,6 +18,6 @@
         "maxTime": 12000
       }
     },
-	"produce":"SimpleFarming:Cherry"
+    "produce": "SimpleFarming:Cherry"
   }
 }

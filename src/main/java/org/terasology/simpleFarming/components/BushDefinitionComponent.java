@@ -33,7 +33,7 @@ public class BushDefinitionComponent implements Component {
     public Vector3i position;
     public boolean sustainable = true;
     public EntityRef parent;
-    public Prefab seed;
-    public Prefab produce;
+    public String seed;
+    public String produce;
     public int currentStage;
 }

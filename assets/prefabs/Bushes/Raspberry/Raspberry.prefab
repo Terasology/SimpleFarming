@@ -7,7 +7,7 @@
     "icon": "SimpleFarming:Raspberry",
     "stackId": "Raspberry"
   },
-  "SeedDefinition":{
-	"prefab":"SimpleFarming:RaspberryBush"
+  "SeedDefinition": {
+    "prefab": "SimpleFarming:RaspberryBush"
   }
 }

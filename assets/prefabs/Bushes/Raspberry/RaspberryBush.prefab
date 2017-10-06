@@ -1,6 +1,5 @@
 {
   "BushDefinition": {
-    "plantName": "Raspberry Bush",
     "growthStages": {
       "SimpleFarming:YoungRaspberryBush:engine:halfblock": {
         "minTime": 5000,
@@ -19,6 +18,6 @@
         "maxTime": 12000
       }
     },
-	"produce":"SimpleFarming:Raspberry"
+    "produce": "SimpleFarming:Raspberry"
   }
 }

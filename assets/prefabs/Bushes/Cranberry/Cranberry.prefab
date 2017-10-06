@@ -8,6 +8,6 @@
     "stackId": "cranberry"
   },
   "SeedDefinition": {
-	"prefab":"CranberryBush"
+    "prefab": "CranberryBush"
   }
 }

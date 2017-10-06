@@ -1,6 +1,5 @@
 {
   "BushDefinition": {
-    "plantName": "Strawberry Bush",
     "growthStages": {
       "SimpleFarming:YoungStrawberryBush:engine:halfblock": {
         "minTime": 5000,
@@ -19,6 +18,6 @@
         "maxTime": 10000
       }
     },
-	"produce":"SimpleFarming:Strawberry"
+    "produce": "SimpleFarming:Strawberry"
   }
 }
