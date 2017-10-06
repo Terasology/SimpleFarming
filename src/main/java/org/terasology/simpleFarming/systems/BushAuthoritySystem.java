@@ -53,7 +53,7 @@ import java.util.Map;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BushAuthoritySystem extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(BushAuthoritySystem.class);
-
+    private static final float DROP_IMPULSE_AMOUNT = 22.0f;
     @In
     private WorldProvider worldProvider;
     @In
@@ -176,25 +176,12 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     public void onHarvest(ActivateEvent event, EntityRef entity) {
         EntityRef target = event.getTarget();
         EntityRef harvester = entity.equals(target) ? event.getInstigator() : entity;
-        /* Ensure the target is a plant and the entities are valid */
         if (!event.isConsumed() && areValidHarvestEntities(target, harvester)) {
             BushDefinitionComponent bushComponent = target.getComponent(BushDefinitionComponent.class);
 
             /* Produce is only given in the final stage */
             if (isInLastStage(bushComponent)) {
-                EntityRef produce;
-                /* Handle a dodgy produce */
-                try {
-                    produce = entityManager.create(bushComponent.produce);
-                    boolean giveSuccess = inventoryManager.giveItem(harvester, target, produce);
-                    if (!giveSuccess) {
-                        Vector3f position = event.getTargetLocation().add(0, 0.5f, 0);
-                        produce.send(new DropItemEvent(position));
-                        produce.send(new ImpulseEvent(random.nextVector3f(15.0f)));
-                    }
-                } catch (NullPointerException e) {
-                    logger.error("Unable to create produce: " + bushComponent.produce);
-                }
+                dropProduce(bushComponent.produce, event.getTargetLocation(), harvester, target);
                 if (bushComponent.sustainable) {
                     doBushGrowth(bushComponent, -1);
                 } else {
@@ -229,7 +216,16 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         for (int i = 0; i < numSeeds; i++) {
             EntityRef seedItem = entityManager.create(seed);
             seedItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
-            seedItem.send(new ImpulseEvent(random.nextVector3f(30.0f)));
+            seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
+        }
+    }
+
+    private void dropProduce(Prefab produce, Vector3f position, EntityRef harvester, EntityRef target) {
+        EntityRef produceItem = entityManager.create(produce);
+        boolean giveSuccess = inventoryManager.giveItem(harvester, target, produceItem);
+        if (!giveSuccess) {
+            produceItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
+            produceItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
         }
     }
 
