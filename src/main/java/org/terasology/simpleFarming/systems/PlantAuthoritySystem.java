@@ -65,17 +65,7 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
         Vector3i position = new Vector3i(event.getTargetLocation());
         position.add(Vector3i.up());
         if (Side.inDirection(event.getHitNormal()) == Side.TOP && isValidPosition(position)) {
-            EntityRef plantEntity;
-            if (seedComponent.vinePrefab != null) {
-                plantEntity = entityManager.create(seedComponent.vinePrefab);
-            } else if (seedComponent.bushPrefab != null) {
-                plantEntity = entityManager.create(seedComponent.bushPrefab);
-            } else if (seedComponent.treePrefab != null) {
-                plantEntity = entityManager.create(seedComponent.treePrefab);
-            } else {
-                logger.error("No plant prefab defined for seed entity " + seed.toString());
-                return;
-            }
+            EntityRef plantEntity = entityManager.create(seedComponent.prefab);
             plantEntity.send(new OnSeedPlanted(position));
             inventoryManager.removeItem(seed.getOwner(), seed, seed, true, 1);
             event.consume();

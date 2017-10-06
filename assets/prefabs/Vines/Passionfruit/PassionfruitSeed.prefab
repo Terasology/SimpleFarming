@@ -8,6 +8,6 @@
     "stackId": "Passionfruit Seed"
   },
   "SeedDefinition": {
-    "vinePrefab": "SimpleFarming:PassionfruitVine"
+    "prefab": "SimpleFarming:PassionfruitVine"
   }
 }

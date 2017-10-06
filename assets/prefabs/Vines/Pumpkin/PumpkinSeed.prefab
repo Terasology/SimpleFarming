@@ -8,6 +8,6 @@
     "stackId": "Pumpkin Seed"
   },
   "SeedDefinition": {
-    "vinePrefab": "SimpleFarming:PumpkinVine"
+    "prefab": "SimpleFarming:PumpkinVine"
   }
 }

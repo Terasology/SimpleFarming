@@ -8,6 +8,6 @@
     "stackId": "PeachSeed"
   },
   "SeedDefinition": {
-    "bushPrefab": "SimpleFarming:PeachBush"
+    "prefab": "SimpleFarming:PeachBush"
   }
 }

@@ -22,7 +22,7 @@
     ]
   },
   "SeedDefinition": {
-    "bushPrefab": "SimpleFarming:PotatoPlant"
+    "prefab": "SimpleFarming:PotatoPlant"
   }
 
 }

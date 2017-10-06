@@ -22,8 +22,6 @@ import org.terasology.entitySystem.Component;
  */
 public class SeedDefinitionComponent implements Component {
     /* Strings are used to avoid a circular reference when seed and produce are the same. */
-    public String vinePrefab;
-    public String bushPrefab;
-    public String treePrefab;
+    public String prefab;
 
 }

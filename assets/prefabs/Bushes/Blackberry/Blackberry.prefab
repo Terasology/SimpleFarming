@@ -25,6 +25,6 @@
     ]
   },
   "SeedDefinition": {
-    "bushPrefab": "SimpleFarming:BlackberryBush"
+    "prefab": "SimpleFarming:BlackberryBush"
   }
 }

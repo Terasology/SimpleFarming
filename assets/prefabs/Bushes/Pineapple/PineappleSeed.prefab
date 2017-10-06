@@ -8,6 +8,6 @@
     "stackId": "PineappleSeed"
   },
   "SeedDefinition": {
-    "bushPrefab": "SimpleFarming:PineappleBush"
+    "prefab": "SimpleFarming:PineappleBush"
   }
 }

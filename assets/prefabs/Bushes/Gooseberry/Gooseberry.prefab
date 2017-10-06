@@ -8,6 +8,6 @@
     "stackId": "Gooseberry"
   },
   "SeedDefinition":{
-	"bushPrefab":"SimpleFarming:GooseberryBush"
+	"prefab":"SimpleFarming:GooseberryBush"
   }
 }

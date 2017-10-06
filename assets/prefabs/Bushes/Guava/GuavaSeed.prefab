@@ -8,6 +8,6 @@
     "stackId": "GuavaSeed"
   },
   "SeedDefinition": {
-	"bushPrefab":"SimpleFarming:GuavaBush"
+	"prefab":"SimpleFarming:GuavaBush"
   }
 }

@@ -8,6 +8,6 @@
     "stackId": "Raspberry"
   },
   "SeedDefinition":{
-	"bushPrefab":"SimpleFarming:RaspberryBush"
+	"prefab":"SimpleFarming:RaspberryBush"
   }
 }

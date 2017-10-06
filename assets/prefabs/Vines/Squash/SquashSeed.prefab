@@ -8,6 +8,6 @@
     "stackId": "Squash Seed"
   },
   "SeedDefinition": {
-    "vinePrefab": "SimpleFarming:SquashVine"
+    "prefab": "SimpleFarming:SquashVine"
   }
 }

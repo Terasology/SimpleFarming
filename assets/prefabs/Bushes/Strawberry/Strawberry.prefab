@@ -8,6 +8,6 @@
     "stackId": "Strawberry"
   },
   "SeedDefinition":{
-	"bushPrefab":"SimpleFarming:StrawberryBush"
+	"prefab":"SimpleFarming:StrawberryBush"
   }
 }

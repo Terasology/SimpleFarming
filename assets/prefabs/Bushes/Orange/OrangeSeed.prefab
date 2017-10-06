@@ -8,6 +8,6 @@
     "stackId": "OrangeSeed"
   },
   "SeedDefinition":{
-    "bushPrefab":"SimpleFarming:OrangeBush"
+    "prefab":"SimpleFarming:OrangeBush"
   }
 }

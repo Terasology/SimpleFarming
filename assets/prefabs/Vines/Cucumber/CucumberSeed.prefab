@@ -8,6 +8,6 @@
     "stackId": "Cucumber Seed"
   },
   "SeedDefinition": {
-    "vinePrefab": "SimpleFarming:CucumberVine"
+    "prefab": "SimpleFarming:CucumberVine"
   }
 }

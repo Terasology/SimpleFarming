@@ -8,6 +8,6 @@
     "stackId": "Melon Seed"
   },
   "SeedDefinition": {
-    "vinePrefab": "SimpleFarming:MelonVine"
+    "prefab": "SimpleFarming:MelonVine"
   }
 }

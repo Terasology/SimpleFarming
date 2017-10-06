@@ -8,6 +8,6 @@
     "stackId": "Grape Seed"
   },
   "SeedDefinition": {
-    "vinePrefab": "SimpleFarming:GrapeVine"
+    "prefab": "SimpleFarming:GrapeVine"
   }
 }

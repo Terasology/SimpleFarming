@@ -8,6 +8,6 @@
     "stackId": "PearSeed"
   },
   "SeedDefinition":{
-	"bushPrefab":"SimpleFarming:PearBush"
+	"prefab":"SimpleFarming:PearBush"
   }
 }

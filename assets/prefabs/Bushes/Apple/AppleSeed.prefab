@@ -8,6 +8,6 @@
     "stackId": "Apple Seed"
   },
   "SeedDefinition": {
-    "bushPrefab": "SimpleFarming:AppleBush"
+    "prefab": "SimpleFarming:AppleBush"
   }
 }
