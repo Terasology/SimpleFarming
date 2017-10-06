@@ -31,7 +31,6 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
-import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
@@ -44,9 +43,8 @@ import org.terasology.world.block.entity.CreateBlockDropsEvent;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class VineAuthoritySystem extends BaseComponentSystem {
-    private static final Logger logger = LoggerFactory.getLogger(VineAuthoritySystem.class);
-    private static int maxNeighbours = 2;
-    private static double budChance = 0.2;
+    private static final int MAX_NEIGHBOURS = 2;
+    private static final double BUD_CHANCE = 0.2;
 
     @In
     private WorldProvider worldProvider;
@@ -85,7 +83,6 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * @param definitionEntity The vine entity
      * @param vineComponent    The vine's definition
      */
-
     @ReceiveEvent
     public void onVinePlanted(OnSeedPlanted event, EntityRef definitionEntity, VineDefinitionComponent vineComponent) {
         vineComponent.stem.setKeepActive(true);
@@ -133,7 +130,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
             nodeComponent.height = recurseGrow(nodeComponent.child, vineComponent) + 1;
 
         } else if (nodeComponent.child != null) {
-            if (random.nextDouble() < budChance) {
+            if (random.nextDouble() < BUD_CHANCE) {
                 if (addBud(node, vineComponent)) {
                     return nodeComponent.height;
                 }
@@ -190,9 +187,8 @@ public class VineAuthoritySystem extends BaseComponentSystem {
             nodeComponent.child.addComponent(new VineNodeComponent(parent, pos));
             parent.addOrSaveComponent(nodeComponent);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -202,6 +198,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * @param isBud  If the node is to be a bud.
      * @return A position to grow in or null if none found.
      */
+
     private Vector3i getGrowthPosition(VineNodeComponent parent, boolean isBud) {
         int i = 0;
         Vector3i nextPos;
@@ -211,12 +208,9 @@ public class VineAuthoritySystem extends BaseComponentSystem {
             nextPos.add(parent.position);
             i++;
         }
-        while ((!validatePosition(nextPos) || (countNeighbours(nextPos) > maxNeighbours && !isBud)) && i < spawnPos.length);
-        if (i == spawnPos.length) {
-            return null;
-        } else {
-            return nextPos;
-        }
+        while ((!validatePosition(nextPos) || (countNeighbours(nextPos) > MAX_NEIGHBOURS && !isBud)) && i < spawnPos.length);
+
+        return i == spawnPos.length ? null : nextPos;
     }
 
     /**
@@ -253,9 +247,13 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     }
 
 
-
+    /**
+     * Invalidate and remove all nodes in a vine from the specified node down.
+     *
+     * @param node The node to invalidate
+     */
     private void recurseKill(EntityRef node) {
-        VineNodeComponent nodeComponent =  node.getComponent(VineNodeComponent.class);
+        VineNodeComponent nodeComponent = node.getComponent(VineNodeComponent.class);
         worldProvider.setBlock(nodeComponent.position, airBlock);
         if (nodeComponent.child != null) {
             recurseKill(nodeComponent.child);
@@ -266,8 +264,14 @@ public class VineAuthoritySystem extends BaseComponentSystem {
         node.destroy();
     }
 
+    /**
+     * Recursively recalculates the height for each node from the end towards the root
+     *
+     * @param node   The node to calculate the height for.
+     * @param height The height of this node
+     */
     private void rebuildHeight(EntityRef node, int height) {
-        VineNodeComponent nodeComponent =  node.getComponent(VineNodeComponent.class);
+        VineNodeComponent nodeComponent = node.getComponent(VineNodeComponent.class);
         nodeComponent.height = height;
         if (nodeComponent.parent != null) {
             rebuildHeight(nodeComponent.parent, height + 1);
@@ -323,9 +327,9 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     /**
      * Adds a new delay of random length between the growths
      *
-     * @param entity The entity to have the timer set on
-     * @param min    The minimum duration
-     * @param max    THe maximum duration
+     * @param entity The entity to set the timer on
+     * @param min    The minimum duration in milliseconds
+     * @param max    THe maximum duration in milliseconds
      */
     private void resetDelay(EntityRef entity, int min, int max) {
         delayManager.addDelayedAction(entity, "SimpleFarming:" + entity.getId(), generateRandom(min, max));
@@ -353,8 +357,8 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     /**
      * Creates a random number between the minimum and the maximum.
      *
-     * @param min The minimum duration
-     * @param max The maximum duration
+     * @param min The minimum value
+     * @param max The maximum value
      * @return The random number or min if max <= min
      */
     private long generateRandom(int min, int max) {
