@@ -16,7 +16,9 @@
 package org.terasology.simpleFarming.events;
 
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3i;
 
+/**
+ * Sent when a bud is destroyed in order to update the parent vine node
+ */
 public class DoRemoveBud implements Event {
 }

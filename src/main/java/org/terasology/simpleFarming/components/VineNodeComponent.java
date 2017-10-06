@@ -19,10 +19,17 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3i;
 
+/**
+ * Used internally on each block of a vine.
+ *
+ * The vine is stored in a linked list esque format with each
+ * node being represented by one of these components on a block entity.
+ */
 public class VineNodeComponent implements Component {
     public Vector3i position;
-    public EntityRef child;
     public EntityRef bud;
+    /* Refers to the entity of the block further from or closer to the root respectively */
+    public EntityRef child;
     public EntityRef parent;
     public int height;
 

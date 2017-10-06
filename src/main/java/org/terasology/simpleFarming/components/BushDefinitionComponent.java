@@ -17,14 +17,16 @@ package org.terasology.simpleFarming.components;
 
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.world.block.ForceBlockActive;
 
 import java.util.Map;
 
+/**
+ * Stores the properties needed to grow a bush.
+ * Should be added to bush prefabs in order to be able to have them planted (via a SeedDefinitionComponent)
+ */
 public class BushDefinitionComponent implements Component {
     public Map<String, GrowthStage> growthStages = Maps.newTreeMap();
     public GrowthStage[] stages;

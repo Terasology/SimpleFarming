@@ -146,7 +146,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
 
     /**
      * Called when an attempt to harvest the bush is made.
-     * If the bush is
+     * If the plant is actually a bud then a link back to the vine is made.
      *
      * @param event  The activation event
      * @param entity The entity doing the harvesting
@@ -241,10 +241,9 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * Adds a new delay of random length between the items
      *
      * @param entity The entity to have the timer set on
-     * @param min    The minimum duration
-     * @param max    THe maximum duration
+     * @param min    The minimum duration in milliseconds
+     * @param max    THe maximum duration in milliseconds
      */
-
     private void resetDelay(EntityRef entity, int min, int max) {
         delayManager.addDelayedAction(entity, "SimpleFarming:" + entity.getId(), generateRandom(min, max));
     }
@@ -252,8 +251,8 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     /**
      * Creates a random number between the minimum and the maximum.
      *
-     * @param min The minimum duration
-     * @param max The maximum duration
+     * @param min The minimum number
+     * @param max The maximum number
      * @return The random number or min if max <= min
      */
     private long generateRandom(int min, int max) {

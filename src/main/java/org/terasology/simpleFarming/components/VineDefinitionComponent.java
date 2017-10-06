@@ -18,11 +18,23 @@ package org.terasology.simpleFarming.components;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.ForceBlockActive;
 
+/**
+ * Stores the data needed in order to grow a vine.
+ * Should be added to a prefab in order to be able to plant it via a SeedDefinitionComponent
+ */
 public class VineDefinitionComponent implements Component {
+    /**
+     * The block to use for a stem.
+     */
     public Block stem;
+    /**
+     * The prefab of the bush to use as the bud.
+     */
     public Prefab bud;
+    /**
+     * maxTime and minTime should be specified in milliseconds.
+     */
     public int minGrowTime;
     public int maxGrowTime;
 }

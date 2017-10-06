@@ -16,8 +16,10 @@
 package org.terasology.simpleFarming.events;
 
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3i;
 
+/**
+ * Sent in order to destroy a bush or a bud.
+ */
 public class DoDestroyPlant implements Event {
     public boolean isParentDead;
 

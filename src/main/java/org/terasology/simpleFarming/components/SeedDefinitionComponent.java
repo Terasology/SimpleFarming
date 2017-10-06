@@ -16,9 +16,12 @@
 package org.terasology.simpleFarming.components;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.prefab.Prefab;
 
+/**
+ * Indicates the item is a seed and links to the prefab to be used to create the plant.
+ */
 public class SeedDefinitionComponent implements Component {
+    /* Strings are used to avoid a circular reference when seed and produce are the same. */
     public String vinePrefab;
     public String bushPrefab;
     public String treePrefab;

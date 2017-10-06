@@ -20,10 +20,14 @@ import org.terasology.world.block.Block;
 
 /**
  * Represents a stage of growth for a bush
+ * Only used internally to store the stages in a more iterable method.
  */
 @MappedContainer
 public class GrowthStage {
     public Block block;
+    /**
+     * maxTime and minTime should be specified in milliseconds.
+     */
     public int minTime;
     public int maxTime;
 

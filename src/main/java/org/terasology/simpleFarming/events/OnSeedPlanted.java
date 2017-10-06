@@ -19,7 +19,14 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.math.geom.Vector3i;
 
 
+/**
+ * Sent to plant a new bush or vine depending on the components of the sending entity
+ */
 public class OnSeedPlanted implements Event {
+    /**
+     * Indicates the position at which the block should be set.
+     * This is the air block above the player targeted block
+     */
     private Vector3i rootPosition;
     public OnSeedPlanted(Vector3i position) {
         rootPosition = position;
