@@ -103,8 +103,9 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     /**
      * Called when a bush or bud is destroyed.
      * Delegates to the correct handler function in either case
-     * @param event The destroy plant event
-     * @param entity The entity sending
+     *
+     * @param event         The destroy plant event
+     * @param entity        The entity sending
      * @param bushComponent The bush component on the plant
      */
     @ReceiveEvent
@@ -117,7 +118,8 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     }
 
     /**
-     * Handles dropping the correct seeds when a bush is destoyed
+     * Handles dropping the correct seeds when a bush is destroyed
+     *
      * @param bushComponent The bush component of the entity
      */
     private void onBushDestroyed(BushDefinitionComponent bushComponent) {
@@ -130,8 +132,9 @@ public class BushAuthoritySystem extends BaseComponentSystem {
 
     /**
      * Handles dropping the correct seeds & notifying the vine when a bud is destroyed
+     *
      * @param bushComponent The component of the bud
-     * @param isParentDead Whether the parent vine still exists
+     * @param isParentDead  Whether the parent vine still exists
      */
     private void onBudDestroyed(BushDefinitionComponent bushComponent, boolean isParentDead) {
         if (!isParentDead) {
@@ -154,7 +157,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onBushGrowth(DelayedActionTriggeredEvent event, EntityRef bush, BushDefinitionComponent bushComponent) {
         EntityRef newBush = null;
-        if (bushComponent.currentStage < bushComponent.stages.length - 1) {
+        if (isInLastStage(bushComponent)) {
             newBush = doBushGrowth(bushComponent, 1);
         }
         resetDelay(newBush == null ? bush : newBush,
@@ -174,12 +177,11 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         EntityRef target = event.getTarget();
         EntityRef harvester = entity.equals(target) ? event.getInstigator() : entity;
         /* Ensure the target is a plant and the entities are valid */
-        if (!event.isConsumed() && target.exists() && harvester.exists()
-                && target.hasComponent(BushDefinitionComponent.class)) {
+        if (!event.isConsumed() && areValidHarvestEntities(target, harvester)) {
             BushDefinitionComponent bushComponent = target.getComponent(BushDefinitionComponent.class);
 
             /* Produce is only given in the final stage */
-            if (bushComponent.currentStage == bushComponent.stages.length - 1) {
+            if (isInLastStage(bushComponent)) {
                 EntityRef produce;
                 /* Handle a dodgy produce */
                 try {
@@ -218,8 +220,9 @@ public class BushAuthoritySystem extends BaseComponentSystem {
 
     /**
      * Drops a number of seeds at the position
+     *
      * @param numSeeds The amount of seeds to drop
-     * @param seed The prefab of the entity to drop
+     * @param seed     The prefab of the entity to drop
      * @param position The position to drop above.
      */
     private void dropSeeds(int numSeeds, Prefab seed, Vector3f position) {
@@ -267,6 +270,28 @@ public class BushAuthoritySystem extends BaseComponentSystem {
             stages[i].block.setKeepActive(true);
         }
         return stages;
+    }
+
+    /**
+     * Check if the entities in the harvest are valid
+     *
+     * @param target    The entity being harvested
+     * @param harvester The entity harvesting
+     * @return True if they are valid, false otherwise
+     */
+    private boolean areValidHarvestEntities(EntityRef target, EntityRef harvester) {
+        return target.exists() && harvester.exists()
+                && target.hasComponent(BushDefinitionComponent.class);
+    }
+
+    /**
+     * Checks if a bush is in the last stage of growth
+     *
+     * @param bushComponent The component of the bush entity to check
+     * @return True if the bush is in the last stage, false otherwise
+     */
+    private boolean isInLastStage(BushDefinitionComponent bushComponent) {
+        return bushComponent.currentStage == bushComponent.stages.length - 1;
     }
 
     /**
