@@ -293,6 +293,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
             return false;
         }
         Block belowBlock = worldProvider.getBlock(position.addY(-1));
+        position.addY(1);
         if (belowBlock.isPenetrable()) {
             return false;
         }
@@ -314,7 +315,8 @@ public class VineAuthoritySystem extends BaseComponentSystem {
             for (int z = -1; z <= 1; z++) {
                 pos.x = position.x + x;
                 pos.z = position.z + z;
-                if (worldProvider.getBlock(pos) != airBlock) {
+                Block neighbour = worldProvider.getBlock(pos);
+                if (!neighbour.equals(airBlock)) {
                     count++;
                 }
             }
