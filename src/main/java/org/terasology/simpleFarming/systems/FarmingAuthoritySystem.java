@@ -18,6 +18,7 @@ package org.terasology.simpleFarming.systems;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.core.logic.random.Interval;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
@@ -45,7 +46,6 @@ import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.PlantDefinitionComponent;
 import org.terasology.simpleFarming.components.PlantProduceComponent;
 import org.terasology.simpleFarming.components.PlantProduceCreationComponent;
-import org.terasology.simpleFarming.components.TimeRange;
 import org.terasology.simpleFarming.components.TreeDefinitionComponent;
 import org.terasology.simpleFarming.components.UnGrowPlantOnHarvestComponent;
 import org.terasology.simpleFarming.events.OnNewTreeGrowth;
@@ -124,8 +124,8 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         if (soilBlock.getBlockFamily().hasCategory(plantDefinitionComponent.soilCategory) && currentPlantBlock == blockManager.getBlock(BlockManager.AIR_ID)) {
             event.consume();
 
-            List<Map.Entry<String, TimeRange>> growthStages = getGrowthStages(plantDefinitionComponent);
-            TimeRange growthStage = growthStages.get(0).getValue();
+            List<Map.Entry<String, Interval>> growthStages = getGrowthStages(plantDefinitionComponent);
+            Interval growthStage = growthStages.get(0).getValue();
 
             Block plantBlock = blockManager.getBlock(growthStages.get(0).getKey());
             if (plantBlock == blockManager.getBlock(BlockManager.AIR_ID)) {
@@ -154,10 +154,10 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
         }
     }
 
-    private Map.Entry<String, TimeRange> getGrowthStage(PlantDefinitionComponent plantDefinitionComponent, int index) {
-        Map.Entry<String, TimeRange> growthStage = null;
+    private Map.Entry<String, Interval> getGrowthStage(PlantDefinitionComponent plantDefinitionComponent, int index) {
+        Map.Entry<String, Interval> growthStage = null;
         int i = 0;
-        for (Map.Entry<String, TimeRange> item : plantDefinitionComponent.growthStages.entrySet()) {
+        for (Map.Entry<String, Interval> item : plantDefinitionComponent.growthStages.entrySet()) {
             if (i == index) {
                 return item;
             }
@@ -189,8 +189,8 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
      * @param entity    Reference to the plant entity.
      * @param timeRange The time where the plant grow to the next stage
      */
-    private void schedulePlantGrowth(EntityRef entity, TimeRange timeRange) {
-        delayManager.addDelayedAction(entity, GROWTH_ACTION, timeRange.getTimeRange());
+    private void schedulePlantGrowth(EntityRef entity, Interval timeRange) {
+        delayManager.addDelayedAction(entity, GROWTH_ACTION, timeRange.sample());
     }
 
     @ReceiveEvent
@@ -222,15 +222,15 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
             delayManager.cancelDelayedAction(entity, GROWTH_ACTION);
         }
 
-        TimeRange nextGrowthStage = null;
+        Interval nextGrowthStage = null;
         String nextGrowthStageBlockName = "";
 
         // Find the next growth stage
-        List<Map.Entry<String, TimeRange>> growthStages = getGrowthStages(plantDefinitionComponent);
+        List<Map.Entry<String, Interval>> growthStages = getGrowthStages(plantDefinitionComponent);
         Block currentBlock = blockComponent.getBlock();
 
         for (int i = 0; i < growthStages.size() - 1; i++) {
-            TimeRange growthStage = growthStages.get(i).getValue();
+            Interval growthStage = growthStages.get(i).getValue();
             Block block = blockManager.getBlock(growthStages.get(i).getKey());
 
             if (block.equals(currentBlock) && block != blockManager.getBlock(BlockManager.AIR_ID)) {
@@ -293,19 +293,19 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
      * @param blockComponent            The block component corresponding to the event.
      */
     public void onPlantUnGrowth(OnPlantUnGrowth event, EntityRef entity, PlantDefinitionComponent plantDefinitionComponent, BlockComponent blockComponent) {
-        List<Map.Entry<String, TimeRange>> growthStages = getGrowthStages(plantDefinitionComponent);
+        List<Map.Entry<String, Interval>> growthStages = getGrowthStages(plantDefinitionComponent);
 
         if (growthStages.size() == 0) {
             return;
         }
 
         String previousGrowthStageBlockName = "";
-        TimeRange previousGrowthStage = growthStages.get(0).getValue();
+        Interval previousGrowthStage = growthStages.get(0).getValue();
 
         // Find the previous growth stage.
         Block currentBlock = blockComponent.getBlock();
         for (int i = 1; i < growthStages.size(); i++) {
-            TimeRange growthStage = growthStages.get(i).getValue();
+            Interval growthStage = growthStages.get(i).getValue();
             Block block = blockManager.getBlock(growthStages.get(i).getKey());
 
             if (block.equals(currentBlock) && block != blockManager.getBlock(BlockManager.AIR_ID)) {
@@ -470,13 +470,12 @@ public class FarmingAuthoritySystem extends BaseComponentSystem {
      *
      * @param p The definition of the plant.
      */
-    public List<Map.Entry<String, TimeRange>> getGrowthStages(PlantDefinitionComponent p) {
-        List<Map.Entry<String, TimeRange>> output = Lists.newLinkedList();
-        for (Map.Entry<String, TimeRange> item : p.growthStages.entrySet()) {
+    public List<Map.Entry<String, Interval>> getGrowthStages(PlantDefinitionComponent p) {
+        List<Map.Entry<String, Interval>> output = Lists.newLinkedList();
+        for (Map.Entry<String, Interval> item : p.growthStages.entrySet()) {
             output.add(item);
         }
 
         return output;
     }
 }
-

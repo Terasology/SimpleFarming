@@ -16,6 +16,7 @@
 package org.terasology.simpleFarming.components;
 
 import com.google.common.collect.Maps;
+import org.terasology.core.logic.random.Interval;
 import org.terasology.entitySystem.Component;
 
 import java.util.ArrayList;
@@ -44,5 +45,5 @@ public class TreeDefinitionComponent implements Component {
     /**
      * A list defining the growth stages that the fruits borne by the tree will go through
      */
-    public Map<String, TimeRange> fruitGrowthStages = Maps.newTreeMap();
+    public Map<String, Interval> fruitGrowthStages = Maps.newTreeMap();
 }

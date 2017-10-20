@@ -97,7 +97,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
 
             EntityRef vineEntity = plantVineAtPosition(vineDefinitionComponent, plantPosition, saplingBlock);
 
-            scheduleVineGrowth(vineEntity, vineDefinitionComponent.nextGrowth.getTimeRange());
+            scheduleVineGrowth(vineEntity, vineDefinitionComponent.nextGrowth.sample());
 
             inventoryManager.removeItem(seedItem.getOwner(), seedItem, seedItem, true, 1);
         }
@@ -178,7 +178,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onPlantGrowth(OnVineGrowth event, EntityRef entity, VineDefinitionComponent vineDefinitionComponent, BlockComponent blockComponent) {
         doVineGrowth(entity, vineDefinitionComponent);
-        scheduleVineGrowth(entity, vineDefinitionComponent.nextGrowth.getTimeRange());
+        scheduleVineGrowth(entity, vineDefinitionComponent.nextGrowth.sample());
     }
 
     private void doVineGrowth(EntityRef entity, VineDefinitionComponent vineDefinitionComponent) {

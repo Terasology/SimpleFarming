@@ -18,6 +18,7 @@ package org.terasology.simpleFarming.systems;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.core.logic.random.Interval;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -39,7 +40,6 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.PlantDefinitionComponent;
-import org.terasology.simpleFarming.components.TimeRange;
 import org.terasology.simpleFarming.components.TreeControllerComponent;
 import org.terasology.simpleFarming.components.TreeDefinitionComponent;
 import org.terasology.simpleFarming.components.TreeFruitCreationComponent;
@@ -108,11 +108,11 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 
         TreeControllerComponent treeController = new TreeControllerComponent();
 
-        List<Map.Entry<String, TimeRange>> growthStages = Lists.newLinkedList();
-        for (Map.Entry<String, TimeRange> entry : treeDefinitionComponent.fruitGrowthStages.entrySet()) {
+        List<Map.Entry<String, Interval>> growthStages = Lists.newLinkedList();
+        for (Map.Entry<String, Interval> entry : treeDefinitionComponent.fruitGrowthStages.entrySet()) {
             growthStages.add(entry);
         }
-        TimeRange initialTimeRange = growthStages.get(0).getValue();
+        Interval initialTimeRange = growthStages.get(0).getValue();
 
         Block fruitBlock = blockManager.getBlock(growthStages.get(0).getKey());
         if (fruitBlock == null) {
@@ -177,7 +177,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 
         EntityRef controllerEntity = blockEntityRegistry.getBlockEntityAt(baseLocation);
         controllerEntity.addComponent(treeController);
-        scheduleTreeGrowth(controllerEntity, initialTimeRange.getTimeRange());
+        scheduleTreeGrowth(controllerEntity, initialTimeRange.sample());
     }
 
     /**
@@ -196,7 +196,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         while (fruitBlocksIt.hasNext()) {
             Vector3i fruitPos = fruitBlocksIt.next();
             Block blockAtFruitPos = worldProvider.getBlock(fruitPos);
-            Map.Entry<String, TimeRange> nextGrowthStage = findStageEntry(treeController, blockAtFruitPos, false);
+            Map.Entry<String, Interval> nextGrowthStage = findStageEntry(treeController, blockAtFruitPos, false);
 
             // check for block being removed
             if (!treeController.fruitGrowthStages.containsKey(blockAtFruitPos.toString())) {
@@ -209,14 +209,14 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
             }
 
             Block nextGrowthStageBlock = blockManager.getBlock(nextGrowthStage.getKey());
-            TimeRange nextGrowthStageRange = nextGrowthStage.getValue();
+            Interval nextGrowthStageRange = nextGrowthStage.getValue();
 
             if (nextGrowthStageBlock == null) {
                 continue;
             }
 
             worldProvider.setBlock(fruitPos, nextGrowthStageBlock);
-            timeToNextGrowth = Math.max(timeToNextGrowth, nextGrowthStageRange.getTimeRange());
+            timeToNextGrowth = Math.max(timeToNextGrowth, nextGrowthStageRange.sample());
         }
         controllerEntity.saveComponent(treeController);
 
@@ -289,18 +289,18 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         if (currentStageBlock == null) {
             return;
         }
-        Map.Entry<String, TimeRange> prevGrowthStage = findStageEntry(treeController, currentStageBlock, true);
+        Map.Entry<String, Interval> prevGrowthStage = findStageEntry(treeController, currentStageBlock, true);
 
         if (prevGrowthStage == null || prevGrowthStage.getKey().isEmpty() || prevGrowthStage.getValue() == null) {
             return;
         }
 
         Block prevGrowthStageBlock = blockManager.getBlock(prevGrowthStage.getKey());
-        TimeRange prevGrowthStageRange = prevGrowthStage.getValue();
+        Interval prevGrowthStageRange = prevGrowthStage.getValue();
 
         if (fruitPos != null && prevGrowthStageBlock != null) {
             worldProvider.setBlock(fruitPos, prevGrowthStageBlock);
-            scheduleTreeGrowth(entity, prevGrowthStageRange.getTimeRange());
+            scheduleTreeGrowth(entity, prevGrowthStageRange.sample());
         }
     }
 
@@ -346,13 +346,13 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         seedItem.send(new ImpulseEvent(random.nextVector3f(30.0f)));
     }
 
-    private Map.Entry<String, TimeRange> findStageEntry(TreeControllerComponent treeController, Block fruitBlock, boolean findPrevious) {
-        List<Map.Entry<String, TimeRange>> fruitGrowthStages = Lists.newLinkedList();
-        for (Map.Entry<String, TimeRange> item : treeController.fruitGrowthStages.entrySet()) {
+    private Map.Entry<String, Interval> findStageEntry(TreeControllerComponent treeController, Block fruitBlock, boolean findPrevious) {
+        List<Map.Entry<String, Interval>> fruitGrowthStages = Lists.newLinkedList();
+        for (Map.Entry<String, Interval> item : treeController.fruitGrowthStages.entrySet()) {
             fruitGrowthStages.add(item);
         }
         for (int index = 0; index < fruitGrowthStages.size(); index++) {
-            Map.Entry<String, TimeRange> growthStage = fruitGrowthStages.get(index);
+            Map.Entry<String, Interval> growthStage = fruitGrowthStages.get(index);
             Block block = blockManager.getBlock(growthStage.getKey());
             if (block != null && fruitBlock == block) {
                 if (findPrevious && index > 0) {
