@@ -15,6 +15,7 @@
  */
 package org.terasology.simpleFarming.components;
 
+import org.terasology.core.logic.random.Interval;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3i;
 
@@ -49,8 +50,8 @@ public class VineDefinitionComponent implements Component {
     /** Whether the vine is currently in the sapling stage. */
     public boolean isSapling = true;
 
-    /** A TimeRange used to calculate the time till the next growth cycle. */
-    public TimeRange nextGrowth;
+    /** An Interval used to calculate the time till the next growth cycle. */
+    public Interval nextGrowth;
 
     /** The number of growth cycles left for the vine to become ripe. */
     public int growthsTillRipe;

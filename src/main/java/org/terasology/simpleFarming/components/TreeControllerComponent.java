@@ -16,6 +16,7 @@
 package org.terasology.simpleFarming.components;
 
 import com.google.common.collect.Maps;
+import org.terasology.core.logic.random.Interval;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.ForceBlockActive;
@@ -29,7 +30,7 @@ public class TreeControllerComponent implements Component {
      * A map defining the growth stages that the fruits borne by this tree will go through
      * and the time they will remain at this stage.
      */
-    public Map<String, TimeRange> fruitGrowthStages = Maps.newTreeMap();
+    public Map<String, Interval> fruitGrowthStages = Maps.newTreeMap();
 
     /**
      * A list of the positions of the fruits in this tree.

@@ -16,6 +16,7 @@
 package org.terasology.simpleFarming.components;
 
 import com.google.common.collect.Maps;
+import org.terasology.core.logic.random.Interval;
 import org.terasology.entitySystem.Component;
 import org.terasology.world.block.ForceBlockActive;
 import java.util.Map;
@@ -23,10 +24,10 @@ import java.util.Map;
 @ForceBlockActive
 public class PlantDefinitionComponent implements Component {
     /**
-     * Map containing the growth stages of this plant. The string indicates the block URI, and the TimeRange indicates
+     * Map containing the growth stages of this plant. The string indicates the block URI, and the Interval indicates
      * the range of time necessary to move into the next growth stage.
      */
-    public Map<String, TimeRange> growthStages = Maps.newTreeMap();
+    public Map<String, Interval> growthStages = Maps.newTreeMap();
 
     /** The category of the soil */
     public String soilCategory = "Soil";
