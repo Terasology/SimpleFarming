@@ -20,26 +20,52 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3i;
 
 /**
- * Used internally on each block of a vine.
+ * Component used to store information about the current state of a particular vine.
+ * <p>
+ * Each {@link VineDefinitionComponent#stem} block that is part of the vine has a block entity
+ * associated with a different instance of this component; these instances are linked together by
+ * the {@link #child} and {@link #parent} fields as a doubly-linked list.
  *
- * The vine is stored in a linked list esque format with each
- * node being represented by one of these components on a block entity.
+ * @see org.terasology.simpleFarming.systems.VineAuthoritySystem
  */
 public class VineNodeComponent implements Component {
+
+    /** The position of this stem block. */
     public Vector3i position;
+
+    /**
+     * Any bud attached to this stem block.  Null if there is no bud yet.
+     * <p>
+     * The bud should have a reciprocal link to this entity in its
+     * {@link BushDefinitionComponent#parent} field.
+     * <p>
+     * Note that each stem block can produce at most one bud at a time.
+     */
     public EntityRef bud;
-    /* Refers to the entity of the block further from or closer to the root respectively */
+
+    /** The adjacent stem block that is further from the root.  Null if this is the vine tip. */
     public EntityRef child;
+
+    /** The adjacent stem block that is closer to the root.  Null if this is the root. */
     public EntityRef parent;
+
+    /** The distance (through the vine) from this block to the root.  Zero if this is the root. */
     public int height;
 
+    /** Default constructor required for persistence. */
     public VineNodeComponent() {
     }
 
+    /** Construct a component at the given position. */
     public VineNodeComponent(Vector3i position) {
         this.position = position;
     }
 
+    /**
+     * Construct a component at the given position, with the given parent.
+     * <p>
+     * Does not establish the reciprocal link from parent to child.
+     */
     public VineNodeComponent(EntityRef parent, Vector3i position) {
         this.parent = parent;
         this.position = position;

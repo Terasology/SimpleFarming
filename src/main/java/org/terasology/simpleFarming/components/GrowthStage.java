@@ -19,21 +19,26 @@ import org.terasology.reflection.MappedContainer;
 import org.terasology.world.block.Block;
 
 /**
- * Represents a stage of growth for a bush
- * Only used internally to store the stages in a more iterable method.
+ * Represents a stage of growth for a bush.
+ *
+ * @see BushDefinitionComponent
  */
 @MappedContainer
 public class GrowthStage {
+    /** The block to use for this stage. */
     public Block block;
-    /**
-     * maxTime and minTime should be specified in milliseconds.
-     */
+
+    /** Minimum time before the next growth stage, in milliseconds. */
     public int minTime;
+
+    /** Maximum time before the next growth stage, in milliseconds. */
     public int maxTime;
 
+    /** Default constructor required for persistence. */
     public GrowthStage() {
     }
 
+    /** Construct a copy of the given {@code GrowthStage}. */
     public GrowthStage(GrowthStage clone) {
         this.block = clone.block;
         this.maxTime = clone.maxTime;

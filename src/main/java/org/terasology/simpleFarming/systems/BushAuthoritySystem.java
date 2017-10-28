@@ -15,14 +15,10 @@
  */
 package org.terasology.simpleFarming.systems;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.GrowthStage;
+import org.terasology.simpleFarming.components.SeedDefinitionComponent;
 import org.terasology.simpleFarming.events.DoDestroyPlant;
 import org.terasology.simpleFarming.events.DoRemoveBud;
 import org.terasology.simpleFarming.events.OnSeedPlanted;
@@ -35,7 +31,6 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
-import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.math.geom.Vector3f;
@@ -47,52 +42,41 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.entity.CreateBlockDropsEvent;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * System managing the lifecycle of bushes.
+ * <p>
+ * See {@link BushDefinitionComponent} for an explanation of the lifecycle.  This system also
+ * manages vine buds, which are similar to bushes in many respects.  See
+ * {@link org.terasology.simpleFarming.components.VineDefinitionComponent} for an explanation of
+ * the vine lifecycle.
+ */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BushAuthoritySystem extends BaseComponentSystem {
+
+    /** Maximum single-axis impulse for seed and produce drops. */
     private static final float DROP_IMPULSE_AMOUNT = 22.0f;
-    @In
-    private WorldProvider worldProvider;
-    @In
-    private BlockManager blockManager;
-    @In
-    private InventoryManager inventoryManager;
-    @In
-    private BlockEntityRegistry blockEntityRegistry;
-    @In
-    private EntityManager entityManager;
-    @In
-    private DelayManager delayManager;
+
+    @In private WorldProvider worldProvider;
+    @In private BlockManager blockManager;
+    @In private InventoryManager inventoryManager;
+    @In private BlockEntityRegistry blockEntityRegistry;
+    @In private EntityManager entityManager;
+    @In private DelayManager delayManager;
 
     private FastRandom random = new FastRandom();
 
     /**
-     * Called when a bush seed is planted
+     * Called when each {@code BushDefinitionComponent} is first added to an entity.
+     * <p>
+     * Handles construction of {@link BushDefinitionComponent#stages} from
+     * {@link BushDefinitionComponent#growthStages}.
      *
-     * @param event         The seed planting event
-     * @param bush          The bush entity that has just been made
-     * @param bushComponent The bush definition component
-     */
-    @ReceiveEvent
-    public void onBushPlanted(OnSeedPlanted event, EntityRef bush, BushDefinitionComponent bushComponent) {
-        bushComponent.position = event.getPosition();
-        bushComponent.currentStage = -1;
-
-        EntityRef newBush = doBushGrowth(bushComponent, 1);
-        resetDelay(newBush, bushComponent.stages[0].minTime, bushComponent.stages[0].maxTime);
-        bush.saveComponent(bushComponent);
-    }
-
-    /**
-     * Called when a bushComponent is added to an entity.
-     * Converts the stages to an array
-     *
-     * @param event         The addition event
-     * @param bush          The bush entity
-     * @param bushComponent THe bush component being added
+     * @param event         the addition event
+     * @param bush          the bush entity
+     * @param bushComponent the bush component being added
      */
     @ReceiveEvent
     public void onBushComponentAdded(OnActivatedComponent event, EntityRef bush, BushDefinitionComponent bushComponent) {
@@ -101,164 +85,10 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     }
 
     /**
-     * Called when a bush or bud is destroyed.
-     * Delegates to the correct handler function in either case
+     * Builds the list of growth stages from the prefab data.
      *
-     * @param event         The destroy plant event
-     * @param entity        The entity sending
-     * @param bushComponent The bush component on the plant
-     */
-    @ReceiveEvent
-    public void onPlantDestroyed(DoDestroyPlant event, EntityRef entity, BushDefinitionComponent bushComponent) {
-        if (bushComponent.parent == null) {
-            onBushDestroyed(bushComponent);
-        } else {
-            onBudDestroyed(bushComponent, event.isParentDead);
-        }
-    }
-
-    /**
-     * Handles dropping the correct seeds when a bush is destroyed
-     *
-     * @param bushComponent The bush component of the entity
-     */
-    private void onBushDestroyed(BushDefinitionComponent bushComponent) {
-        if (bushComponent.currentStage == bushComponent.stages.length - 1) {
-            dropSeeds(random.nextInt(1, 3),
-                    bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
-                    bushComponent.position.toVector3f());
-        }
-    }
-
-    /**
-     * Handles dropping the correct seeds & notifying the vine when a bud is destroyed
-     *
-     * @param bushComponent The component of the bud
-     * @param isParentDead  Whether the parent vine still exists
-     */
-    private void onBudDestroyed(BushDefinitionComponent bushComponent, boolean isParentDead) {
-        if (!isParentDead) {
-            bushComponent.parent.send(new DoRemoveBud());
-        }
-        worldProvider.setBlock(bushComponent.position, blockManager.getBlock(BlockManager.AIR_ID));
-        dropSeeds(1,
-                bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
-                bushComponent.position.toVector3f());
-
-    }
-
-    /**
-     * Called when the bush should grow
-     *
-     * @param event         The event indicating the timer has ended
-     * @param bush          The bush to grow
-     * @param bushComponent The bush's definition
-     */
-    @ReceiveEvent
-    public void onBushGrowth(DelayedActionTriggeredEvent event, EntityRef bush, BushDefinitionComponent bushComponent) {
-        EntityRef newBush = null;
-        if (!isInLastStage(bushComponent)) {
-            newBush = doBushGrowth(bushComponent, 1);
-        }
-        resetDelay(newBush == null ? bush : newBush,
-                bushComponent.stages[bushComponent.currentStage].minTime,
-                bushComponent.stages[bushComponent.currentStage].maxTime);
-    }
-
-    /**
-     * Called when an attempt to harvest the bush is made.
-     * If the plant is actually a bud then a link back to the vine is made.
-     *
-     * @param event  The activation event
-     * @param entity The entity doing the harvesting
-     */
-    @ReceiveEvent
-    public void onHarvest(ActivateEvent event, EntityRef entity) {
-        EntityRef target = event.getTarget();
-        EntityRef harvester = entity.equals(target) ? event.getInstigator() : entity;
-        if (!event.isConsumed() && areValidHarvestEntities(target, harvester)) {
-
-            BushDefinitionComponent bushComponent = target.getComponent(BushDefinitionComponent.class);
-            /* Produce is only given in the final stage */
-            if (isInLastStage(bushComponent)) {
-                dropProduce(bushComponent.produce, event.getTargetLocation(), harvester, target);
-                if (bushComponent.sustainable) {
-                    resetDelay(doBushGrowth(bushComponent, -1),
-                    bushComponent.stages[bushComponent.currentStage].minTime,
-                            bushComponent.stages[bushComponent.currentStage].maxTime);
-                } else {
-                    entity.send(new DoDestroyPlant());
-                    worldProvider.setBlock(bushComponent.position, blockManager.getBlock(BlockManager.AIR_ID));
-                }
-                event.consume();
-            }
-        }
-    }
-
-    /**
-     * Handles the seed drop on plant destroyed event.
-     *
-     * @param event  The event corresponding to the plant destroy.
-     * @param entity Reference to the plant entity.
-     */
-    @ReceiveEvent
-    public void onBushDestroyed(CreateBlockDropsEvent event, EntityRef entity, BushDefinitionComponent bushComponent) {
-        entity.send(new DoDestroyPlant());
-        event.consume();
-    }
-
-    /**
-     * Drops a number of seeds at the position
-     *
-     * @param numSeeds The amount of seeds to drop
-     * @param seed     The prefab of the entity to drop
-     * @param position The position to drop above.
-     */
-    private void dropSeeds(int numSeeds, String seed, Vector3f position) {
-        for (int i = 0; i < numSeeds; i++) {
-            EntityRef seedItem = entityManager.create(seed);
-            seedItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
-            seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
-        }
-    }
-
-    /**
-     * Creates the produce and gives it to the harvester or drops it
-     *
-     * @param produce   The produce to create
-     * @param position  The position to drop at
-     * @param harvester The entity to give the item to
-     * @param target    The entity to take the item from
-     */
-    private void dropProduce(String produce, Vector3f position, EntityRef harvester, EntityRef target) {
-        EntityRef produceItem = entityManager.create(produce);
-        boolean giveSuccess = inventoryManager.giveItem(harvester, target, produceItem);
-        if (!giveSuccess) {
-            produceItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
-            produceItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
-        }
-    }
-
-    /**
-     * Grow the bush by one stage in a specified direction
-     *
-     * @param bushComponent The definition of the bush to grow
-     * @param direction     The direction to grow in. positive indicates forward & negative indicated backwards
-     */
-    private EntityRef doBushGrowth(BushDefinitionComponent bushComponent, int direction) {
-        bushComponent.currentStage += direction;
-        worldProvider.setBlock(bushComponent.position, bushComponent.stages[bushComponent.currentStage].block);
-        EntityRef newBush = blockEntityRegistry.getBlockEntityAt(bushComponent.position);
-        newBush.addOrSaveComponent(bushComponent);
-        return newBush;
-    }
-
-
-    /**
-     * Builds the list of growth stages from the prefab data
-     *
-     * @param growthStages The prefab GrowthStage data
-     * @return The array of growth stages
+     * @param growthStages the prefab GrowthStage data
+     * @return the array of growth stages
      */
     private GrowthStage[] buildGrowthStages(Map<String, GrowthStage> growthStages) {
         Set<Map.Entry<String, GrowthStage>> entrySet = growthStages.entrySet();
@@ -274,44 +104,235 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     }
 
     /**
-     * Check if the entities in the harvest are valid
+     * Called immediately after a bush seed has been planted.
+     * <p>
+     * Sets the bush's position and initial growth stage and starts the timer for its next growth
+     * event (according to the {@link GrowthStage#minTime} and {@link GrowthStage#maxTime} values
+     * for this growth stage).  When the timer expires,
+     * {@link #onBushGrowth(DelayedActionTriggeredEvent, EntityRef, BushDefinitionComponent)}
+     * will be called.
      *
-     * @param target    The entity being harvested
-     * @param harvester The entity harvesting
-     * @return True if they are valid, false otherwise
+     * @param event         the seed planting event
+     * @param bush          the newly-created bush entity
+     * @param bushComponent the bush's definition
+     * @see PlantAuthoritySystem#onSeedPlant(ActivateEvent, EntityRef, SeedDefinitionComponent)
      */
-    private boolean areValidHarvestEntities(EntityRef target, EntityRef harvester) {
-        return target.exists() && harvester.exists()
-                && target.hasComponent(BushDefinitionComponent.class);
+    @ReceiveEvent
+    public void onBushPlanted(OnSeedPlanted event, EntityRef bush, BushDefinitionComponent bushComponent) {
+        bushComponent.position = event.getPosition();
+        bushComponent.currentStage = -1;
+
+        EntityRef newBush = doBushGrowth(bushComponent, 1);
+        resetDelay(newBush, bushComponent.stages[0].minTime, bushComponent.stages[0].maxTime);
+        bush.saveComponent(bushComponent);
     }
 
     /**
-     * Checks if a bush is in the last stage of growth
+     * Called when the bush or vine bud should grow.
+     * <p>
+     * Updates the current growth stage, and then resets the timer, as appropriate to the new stage.
      *
-     * @param bushComponent The component of the bush entity to check
-     * @return True if the bush is in the last stage, false otherwise
+     * @param event         the event indicating the timer has ended
+     * @param bush          the bush to grow
+     * @param bushComponent the bush's definition
+     */
+    @ReceiveEvent
+    public void onBushGrowth(DelayedActionTriggeredEvent event, EntityRef bush, BushDefinitionComponent bushComponent) {
+        EntityRef newBush = null;
+        if (!isInLastStage(bushComponent)) {
+            newBush = doBushGrowth(bushComponent, 1);
+        }
+        resetDelay(newBush == null ? bush : newBush,
+            bushComponent.stages[bushComponent.currentStage].minTime,
+            bushComponent.stages[bushComponent.currentStage].maxTime);
+    }
+
+    /**
+     * Grows a bush or vine bud by the specified number of stages.
+     * <p>
+     * If {@code stages} is negative, this can "un-grow" the bush.
+     *
+     * @param bushComponent the definition of the bush being grown
+     * @param stages        the number of stages to grow; negative values represent un-growth
+     */
+    private EntityRef doBushGrowth(BushDefinitionComponent bushComponent, int stages) {
+        bushComponent.currentStage += stages;
+        worldProvider.setBlock(bushComponent.position, bushComponent.stages[bushComponent.currentStage].block);
+        EntityRef newBush = blockEntityRegistry.getBlockEntityAt(bushComponent.position);
+        newBush.addOrSaveComponent(bushComponent);
+        return newBush;
+    }
+
+    /**
+     * Called when an attempt to harvest the bush is made.
+     * <p>
+     * Drops produce as appropriate, and then resets or destroys the bush, as indicated by
+     * the bush's {@link BushDefinitionComponent#sustainable sustainable} value.
+     *
+     * @param event  the activation event
+     * @param entity the entity doing the harvesting
+     */
+    @ReceiveEvent
+    public void onHarvest(ActivateEvent event, EntityRef entity) {
+        EntityRef target = event.getTarget();
+        EntityRef harvester = entity.equals(target) ? event.getInstigator() : entity;
+        if (!event.isConsumed() && areValidHarvestEntities(target, harvester)) {
+
+            BushDefinitionComponent bushComponent = target.getComponent(BushDefinitionComponent.class);
+            /* Produce is only given in the final stage */
+            if (isInLastStage(bushComponent)) {
+                dropProduce(bushComponent.produce, event.getTargetLocation(), harvester, target);
+                if (bushComponent.sustainable) {
+                    resetDelay(doBushGrowth(bushComponent, -1),
+                        bushComponent.stages[bushComponent.currentStage].minTime,
+                        bushComponent.stages[bushComponent.currentStage].maxTime);
+                } else {
+                    entity.send(new DoDestroyPlant());
+                    worldProvider.setBlock(bushComponent.position, blockManager.getBlock(BlockManager.AIR_ID));
+                }
+                event.consume();
+            }
+        }
+    }
+
+    /**
+     * Checks if the entities involved in a harvest event are valid.
+     * <p>
+     * The entities are valid if they both exist, and if the target is a bush or vine bud (i.e., an
+     * entity possessing a {@link BushDefinitionComponent}).
+     *
+     * @param target    the entity being harvested
+     * @param harvester the entity doing the harvesting
+     * @return true if they are valid, false otherwise
+     */
+    private boolean areValidHarvestEntities(EntityRef target, EntityRef harvester) {
+        return target.exists() && harvester.exists()
+            && target.hasComponent(BushDefinitionComponent.class);
+    }
+
+    /**
+     * Called when a bush or vine bud has been destroyed.
+     * <p>
+     * Delegates to {@link #onPlantDestroyed(DoDestroyPlant, EntityRef, BushDefinitionComponent)}
+     * via a {@link DoDestroyPlant} event.
+     *
+     * @param event  the block destruction event
+     * @param entity the bush or vine bud being destroyed
+     */
+    @ReceiveEvent
+    public void onBushDestroyed(CreateBlockDropsEvent event, EntityRef entity, BushDefinitionComponent bushComponent) {
+        entity.send(new DoDestroyPlant());
+        event.consume();
+    }
+
+    /**
+     * Called when a bush or bud is destroyed.
+     * <p>
+     * Delegates to either {@link #onBushDestroyed(BushDefinitionComponent)} or
+     * {@link #onBudDestroyed(BushDefinitionComponent, boolean)} as appropriate.
+     *
+     * @param event         the destroy plant event
+     * @param entity        the entity sending the event; not used
+     * @param bushComponent the bush component on the plant
+     */
+    @ReceiveEvent
+    public void onPlantDestroyed(DoDestroyPlant event, EntityRef entity, BushDefinitionComponent bushComponent) {
+        if (bushComponent.parent == null) {
+            onBushDestroyed(bushComponent);
+        } else {
+            onBudDestroyed(bushComponent, event.isParentDead);
+        }
+    }
+
+    /**
+     * Handles dropping the correct seeds when a bush (not a vine bud) is destroyed.
+     *
+     * @param bushComponent the bush component of the entity
+     */
+    private void onBushDestroyed(BushDefinitionComponent bushComponent) {
+        if (bushComponent.currentStage == bushComponent.stages.length - 1) {
+            dropSeeds(random.nextInt(1, 3),
+                    bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
+                    bushComponent.position.toVector3f());
+        }
+    }
+
+    /**
+     * Handles dropping the correct seeds and notifying the vine when a bud is destroyed.
+     *
+     * @param bushComponent the component of the bud
+     * @param isParentDead  whether the parent vine still exists
+     */
+    private void onBudDestroyed(BushDefinitionComponent bushComponent, boolean isParentDead) {
+        if (!isParentDead) {
+            bushComponent.parent.send(new DoRemoveBud());
+        }
+        worldProvider.setBlock(bushComponent.position, blockManager.getBlock(BlockManager.AIR_ID));
+        dropSeeds(1,
+                bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
+                bushComponent.position.toVector3f());
+
+    }
+
+    /**
+     * Drops a number of seeds at the position.
+     *
+     * @param numSeeds the number of seeds to drop
+     * @param seed     the prefab of the seed entity
+     * @param position the position to drop above
+     */
+    private void dropSeeds(int numSeeds, String seed, Vector3f position) {
+        for (int i = 0; i < numSeeds; i++) {
+            EntityRef seedItem = entityManager.create(seed);
+            seedItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
+            seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
+        }
+    }
+
+    /**
+     * Creates the produce and gives it to the harvester or drops it.
+     *
+     * @param produce   the prefab of the produce entity
+     * @param position  the position to drop above
+     * @param harvester the entity to give the item to
+     * @param target    the bush or vine bud (the "giver" of the item)
+     */
+    private void dropProduce(String produce, Vector3f position, EntityRef harvester, EntityRef target) {
+        EntityRef produceItem = entityManager.create(produce);
+        boolean giveSuccess = inventoryManager.giveItem(harvester, target, produceItem);
+        if (!giveSuccess) {
+            produceItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
+            produceItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
+        }
+    }
+
+    /**
+     * Checks if a bush is in the last stage of its growth.
+     *
+     * @param bushComponent the component of the bush entity to check
+     * @return true if the bush is in the last stage, false otherwise
      */
     private boolean isInLastStage(BushDefinitionComponent bushComponent) {
         return bushComponent.currentStage == bushComponent.stages.length - 1;
     }
 
     /**
-     * Adds a new delay of random length between the items
+     * Starts a new growth timer with random duration, subject to the given bounds.
      *
-     * @param entity The entity to have the timer set on
-     * @param min    The minimum duration in milliseconds
-     * @param max    THe maximum duration in milliseconds
+     * @param entity the entity to set the timer on
+     * @param min    the minimum duration in milliseconds
+     * @param max    the maximum duration in milliseconds
      */
     private void resetDelay(EntityRef entity, int min, int max) {
         delayManager.addDelayedAction(entity, "SimpleFarming:" + entity.getId(), generateRandom(min, max));
     }
 
     /**
-     * Creates a random number between the minimum and the maximum.
+     * Returns a random integer in the specified interval.
      *
-     * @param min The minimum number
-     * @param max The maximum number
-     * @return The random number or min if max <= min
+     * @param min the minimum number
+     * @param max the maximum number
+     * @return the random number, or {@code min} if {@code max <= min}
      */
     private long generateRandom(int min, int max) {
         return max <= min ? min : random.nextLong(min, max);
