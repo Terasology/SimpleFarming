@@ -16,10 +16,12 @@
 package org.terasology.simpleFarming.systems;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.characters.CharacterHeldItemComponent;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.GrowthStage;
@@ -66,6 +68,8 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     private EntityManager entityManager;
     @In
     private DelayManager delayManager;
+    @In
+    private LocalPlayer localPlayer;
 
     private FastRandom random = new FastRandom();
 
@@ -102,7 +106,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
 
     /**
      * Called when a bush or bud is destroyed.
-     * Delegates to the correct handler function in either case
+     * Delegates to the correct handler function in either case and checks whether a glove was used to break the bush.
      *
      * @param event         The destroy plant event
      * @param entity        The entity sending
@@ -114,6 +118,11 @@ public class BushAuthoritySystem extends BaseComponentSystem {
             onBushDestroyed(bushComponent);
         } else {
             onBudDestroyed(bushComponent, event.isParentDead);
+        }
+        EntityRef selected = localPlayer.getCharacterEntity().getComponent(CharacterHeldItemComponent.class).selectedItem;
+        boolean b = selected.getParentPrefab().getName().equalsIgnoreCase("SimpleFarming:gloves");
+        if(b){
+            onGloveBreak(bushComponent);
         }
     }
 
@@ -145,6 +154,14 @@ public class BushAuthoritySystem extends BaseComponentSystem {
                 bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
                 bushComponent.position.toVector3f());
 
+    }
+
+    /**
+     * Handles dropping the produce of the plant
+     * @param bushComponent The component of the bush
+     */
+    private void onGloveBreak(BushDefinitionComponent bushComponent){
+        dropSeeds(random.nextInt(1,3), bushComponent.produce, bushComponent.position.toVector3f());
     }
 
     /**
