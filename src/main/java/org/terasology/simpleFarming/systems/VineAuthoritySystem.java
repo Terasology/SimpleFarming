@@ -15,7 +15,9 @@
  */
 package org.terasology.simpleFarming.systems;
 
+import org.terasology.logic.common.ActivateEvent;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
+import org.terasology.simpleFarming.components.SeedDefinitionComponent;
 import org.terasology.simpleFarming.components.VineNodeComponent;
 import org.terasology.simpleFarming.events.DoDestroyPlant;
 import org.terasology.simpleFarming.events.DoRemoveBud;
@@ -38,30 +40,39 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.entity.CreateBlockDropsEvent;
 
-
+/**
+ * System managing the lifecycle of vines.
+ * <p>
+ * See {@link VineDefinitionComponent} for an explanation of the vine lifecycle.
+ */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class VineAuthoritySystem extends BaseComponentSystem {
+
+    /** The maximum number of non-air blocks adjacent to a vine stem block. */
     private static final int MAX_NEIGHBOURS = 2;
-    private static final double BUD_CHANCE = 0.2;
-
-    @In
-    private WorldProvider worldProvider;
-    @In
-    private BlockManager blockManager;
-    @In
-    private BlockEntityRegistry blockEntityRegistry;
-    @In
-    private DelayManager delayManager;
-    @In
-    private EntityManager entityManager;
-
-    private FastRandom random = new FastRandom();
-    private Block airBlock;
-    private Vector3i[] spawnPos = new Vector3i[4];
 
     /**
-     * Called when the system is being set up. Used to create instances of various things.
+     * The percentage chance that a new bud will spawn each growth cycle.
+     * <p>
+     * This is checked for each vine stem block that doesn't already have a bud, every growth
+     * cycle.
      */
+    private static final double BUD_CHANCE = 0.2;
+
+    @In private WorldProvider worldProvider;
+    @In private BlockManager blockManager;
+    @In private BlockEntityRegistry blockEntityRegistry;
+    @In private DelayManager delayManager;
+    @In private EntityManager entityManager;
+
+    private FastRandom random = new FastRandom();
+
+    /** The standard air block, cached on initialization. */
+    private Block airBlock;
+
+    /** Array holding all possible spawn directions. */
+    private Vector3i[] spawnPos = new Vector3i[4];
+
     @Override
     public void postBegin() {
         super.postBegin();
@@ -72,14 +83,18 @@ public class VineAuthoritySystem extends BaseComponentSystem {
         spawnPos[3] = new Vector3i(0, 0, -1);
     }
 
-
     /**
-     * Called when a new vine is to be planted.
-     * Handles placing the block, setting up the first node and delegates the periodic growth call
+     * Called immediately after a new vine has been planted.
+     * <p>
+     * Places the root block, creates the {@link VineNodeComponent} associated to the root, and
+     * starts the growth timer.  When the timer expires,
+     * {@link #onVineGrowth(DelayedActionTriggeredEvent, EntityRef, VineNodeComponent, VineDefinitionComponent)}
+     * will be called.
      *
-     * @param event            The event containing the position
-     * @param definitionEntity The vine entity
-     * @param vineComponent    The vine's definition
+     * @param event            the seed planting event
+     * @param definitionEntity the newly-created vine entity
+     * @param vineComponent    the vine's definition
+     * @see PlantAuthoritySystem#onSeedPlant(ActivateEvent, EntityRef, SeedDefinitionComponent)
      */
     @ReceiveEvent
     public void onVinePlanted(OnSeedPlanted event, EntityRef definitionEntity, VineDefinitionComponent vineComponent) {
@@ -92,35 +107,35 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     }
 
     /**
-     * Called regularly to grow the current vine.
+     * Called periodically to grow the current vine.
+     * <p>
+     * See {@link #recurseGrow(EntityRef, VineDefinitionComponent)} for details of what happens during a growth cycle.
+     * After the growth cycle is complete, restarts the growth timer.
      *
-     * @param event         The event called periodically
-     * @param vine          The vine entity
+     * @param event         the event indicating the timer has ended
+     * @param root          the vine root
      * @param nodeComponent The vine's definition
      */
     @ReceiveEvent
-    public void onVineGrowth(DelayedActionTriggeredEvent event, EntityRef vine, VineNodeComponent nodeComponent, VineDefinitionComponent vineComponent) {
+    public void onVineGrowth(DelayedActionTriggeredEvent event, EntityRef root, VineNodeComponent nodeComponent, VineDefinitionComponent vineComponent) {
         if (nodeComponent.height != -1) {
             if (nodeComponent.height < 20) {
-                recurseGrow(vine, vineComponent);
+                recurseGrow(root, vineComponent);
             }
-            resetDelay(vine, vineComponent.minGrowTime, vineComponent.maxGrowTime);
+            resetDelay(root, vineComponent.minGrowTime, vineComponent.maxGrowTime);
         }
     }
 
     /**
      * Recursively grows the vine.
-     * This first checks if the node already has a bud.
-     * If it does and it also has a child and we recurse onto it.
      * <p>
-     * If it does have a child but no bud then there is a chance for it to grow a bud.
-     * If we aren't growing a bud then we recurse onto the child
-     * <p>
-     * If we don't have a child then add one.
+     * Called once for each stem block in the vine.  Each stem block that doesn't already have a bud
+     * has a chance to grow one, and if the vine is not already at maximum length (20 blocks),
+     * a new stem block is added at the end.
      *
-     * @param node          The current node to process
-     * @param vineComponent The vine's definition
-     * @return True if we were able to grow something. Else false
+     * @param node          the current node to process
+     * @param vineComponent the vine's definition
+     * @return the {@link VineNodeComponent#height} of this node, after all growth is complete
      */
     private int recurseGrow(EntityRef node, VineDefinitionComponent vineComponent) {
         VineNodeComponent nodeComponent = node.getComponent(VineNodeComponent.class);
@@ -144,10 +159,17 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     }
 
     /**
-     * Add a new bud to the vine
+     * Attempts to add a new bud to the vine.
+     * <p>
+     * After the new bud entity has been created, passes control to the {@link BushAuthoritySystem}
+     * via an {@link OnSeedPlanted} event.  The {@code BushAuthoritySystem} is responsible for
+     * managing the remainder of the bud's lifecycle.
+     * <p>
+     * This method can fail to add a bud if there are no valid positions adjacent to {@code parent}.
+     * See {@link #isValidPosition(Vector3i)} for the definition of a valid position.
      *
-     * @param parent The node to add the bud off
-     * @return True if we could add a bud, false otherwise
+     * @param parent the budding vine node
+     * @return true if a bud was added, or false if no valid position for a bud could be found
      */
     private boolean addBud(EntityRef parent, VineDefinitionComponent vineComponent) {
         VineNodeComponent nodeComponent = parent.getComponent(VineNodeComponent.class);
@@ -169,11 +191,15 @@ public class VineAuthoritySystem extends BaseComponentSystem {
 
 
     /**
-     * Grows a new child vine section
+     * Attempts to grow a new block of vine stem.
+     * <p>
+     * This method can fail to add a new stem block if there are no valid positions adjacent to
+     * {@code parent}.  See {@link #isValidPosition(Vector3i)} for the definition of a valid
+     * position.
      *
-     * @param parent        The vine node to attach to
-     * @param vineComponent The definition of the vine
-     * @return True if the child was added, false otherwise.
+     * @param parent        the vine node to attach to
+     * @param vineComponent the vine's definition
+     * @return true if the child was added, or false if no valid position could be found
      */
     private boolean addChild(EntityRef parent, VineDefinitionComponent vineComponent) {
         VineNodeComponent nodeComponent = parent.getComponent(VineNodeComponent.class);
@@ -190,13 +216,21 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     }
 
     /**
+     * Returns the position to spawn a new vine element in.
+     * <p>
+     * The positions considered are the four positions adjacent to {@code parent} and on the same Y-level.
+     * See {@link #isValidPosition(Vector3i)} for the definition of a valid position; additionally, a
+     * position is considered invalid if it is horizontally adjacent to more than {@link #MAX_NEIGHBOURS}
+     * non-air blocks.
+     * <p>
+     * If a valid position exists, returns one selected at random; otherwise returns null.
+     *
      * Get the position to spawn a new vine element in
      *
-     * @param parent The node this new element will be attached to
-     * @param isBud  If the node is to be a bud.
-     * @return A position to grow in or null if none found.
+     * @param parent the node this new element will be attached to
+     * @param isBud  if the node is to be a bud.
+     * @return a position to grow in, or null if none exist
      */
-
     private Vector3i getGrowthPosition(VineNodeComponent parent, boolean isBud) {
         int i = 0;
         Vector3i nextPos;
@@ -212,77 +246,16 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     }
 
     /**
-     * Called when a bud is destroyed
+     * Checks if the position is a valid position for a new stem or bud.
+     * <p>
+     * A position is considered valid if:
+     * <ol>
+     *   <li>It is currently occupied by an air block.</li>
+     *   <li>The block immediately beneath it is not {@linkplain Block#isPenetrable()} penetrable.</li>
+     * </ol>
      *
-     * @param event  The remove event
-     * @param entity A dummy entity
-     */
-    @ReceiveEvent
-    public void onBudRemove(DoRemoveBud event, EntityRef entity, VineNodeComponent nodeComponent) {
-        nodeComponent.bud = null;
-        entity.saveComponent(nodeComponent);
-    }
-
-    /**
-     * Handles the seed drop on plant destroyed event.
-     *
-     * @param event  The event corresponding to the plant destroy.
-     * @param entity Reference to the plant entity.
-     */
-    @ReceiveEvent
-    public void onVineDestroyed(CreateBlockDropsEvent event, EntityRef entity, VineNodeComponent nodeComponent) {
-        recurseKill(entity);
-        if (nodeComponent.parent == null) {
-            nodeComponent.height = -1;
-        } else {
-            VineNodeComponent parentNodeComponent = nodeComponent.parent.getComponent(VineNodeComponent.class);
-            parentNodeComponent.child.destroy();
-            parentNodeComponent.child = null;
-            nodeComponent.parent.saveComponent(parentNodeComponent);
-            rebuildHeight(nodeComponent.parent, 0);
-        }
-        event.consume();
-    }
-
-
-    /**
-     * Invalidate and remove all nodes in a vine from the specified node down.
-     *
-     * @param node The node to invalidate
-     */
-    private void recurseKill(EntityRef node) {
-        VineNodeComponent nodeComponent = node.getComponent(VineNodeComponent.class);
-        worldProvider.setBlock(nodeComponent.position, airBlock);
-        if (nodeComponent.child != null) {
-            recurseKill(nodeComponent.child);
-        }
-        if (nodeComponent.bud != null) {
-            nodeComponent.bud.send(new DoDestroyPlant(true));
-        }
-        node.destroy();
-    }
-
-    /**
-     * Recursively recalculates the height for each node from the end towards the root
-     *
-     * @param node   The node to calculate the height for.
-     * @param height The height of this node
-     */
-    private void rebuildHeight(EntityRef node, int height) {
-        VineNodeComponent nodeComponent = node.getComponent(VineNodeComponent.class);
-        nodeComponent.height = height;
-        if (nodeComponent.parent != null) {
-            rebuildHeight(nodeComponent.parent, height + 1);
-        }
-        node.saveComponent(nodeComponent);
-    }
-
-
-    /**
-     * Checks if the position is a valid position to grow in.
-     *
-     * @param position The position to check for
-     * @return True if a vine can grow there. False otherwise
+     * @param position the position to check for validity; null returns false
+     * @return true if a vine can grow there, false otherwise
      */
     private boolean isValidPosition(Vector3i position) {
         if (position == null) {
@@ -301,11 +274,12 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     }
 
     /**
-     * Counts how many non air blocks are next to the position.
-     * Only counts in the x-z plane and includes the position itself
+     * Counts how many non-air blocks are next to the given position.
+     * <p>
+     * Only blocks in the same x-z plane are considered, and the position itself is disregarded.
      *
-     * @param position The position to check at
-     * @return The number of blocks found.
+     * @param position the position whose neighbours to count
+     * @return the number of blocks found
      */
     private int countNeighbours(Vector3i position) {
         int count = 0;
@@ -325,21 +299,77 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     }
 
     /**
-     * Adds a new delay of random length between the growths
+     * Called when a bud is destroyed.
      *
-     * @param entity The entity to set the timer on
-     * @param min    The minimum duration in milliseconds
-     * @param max    THe maximum duration in milliseconds
+     * @param event  the removal event
+     * @param parent the bud's parent node
+     * @see BushAuthoritySystem#onBudDestroyed(BushDefinitionComponent, boolean)
      */
-    private void resetDelay(EntityRef entity, int min, int max) {
-        delayManager.addDelayedAction(entity, "SimpleFarming:" + entity.getId(), generateRandom(min, max));
+    @ReceiveEvent
+    public void onBudRemove(DoRemoveBud event, EntityRef parent, VineNodeComponent nodeComponent) {
+        nodeComponent.bud = null;
+        parent.saveComponent(nodeComponent);
     }
 
+    /**
+     * Called when a vine stem block is destroyed.
+     * <p>
+     * Destroys all vine blocks (both stems and buds) that are now disconnected from the root.
+     *
+     * @param event  the block destruction event
+     * @param entity the vine stem block being destroyed
+     */
+    @ReceiveEvent
+    public void onVineDestroyed(CreateBlockDropsEvent event, EntityRef entity, VineNodeComponent nodeComponent) {
+        recurseKill(entity);
+        if (nodeComponent.parent == null) {
+            nodeComponent.height = -1;
+        } else {
+            VineNodeComponent parentNodeComponent = nodeComponent.parent.getComponent(VineNodeComponent.class);
+            parentNodeComponent.child.destroy();
+            parentNodeComponent.child = null;
+            nodeComponent.parent.saveComponent(parentNodeComponent);
+            rebuildHeight(nodeComponent.parent, 0);
+        }
+        event.consume();
+    }
+
+    /**
+     * Invalidate and remove all nodes in a vine from the specified node down.
+     *
+     * @param node the node to invalidate from
+     */
+    private void recurseKill(EntityRef node) {
+        VineNodeComponent nodeComponent = node.getComponent(VineNodeComponent.class);
+        worldProvider.setBlock(nodeComponent.position, airBlock);
+        if (nodeComponent.child != null) {
+            recurseKill(nodeComponent.child);
+        }
+        if (nodeComponent.bud != null) {
+            nodeComponent.bud.send(new DoDestroyPlant(true));
+        }
+        node.destroy();
+    }
+
+    /**
+     * Recursively recalculates the height for each node from the end towards the root.
+     *
+     * @param node   the node to calculate the height for
+     * @param height the height of this node
+     */
+    private void rebuildHeight(EntityRef node, int height) {
+        VineNodeComponent nodeComponent = node.getComponent(VineNodeComponent.class);
+        nodeComponent.height = height;
+        if (nodeComponent.parent != null) {
+            rebuildHeight(nodeComponent.parent, height + 1);
+        }
+        node.saveComponent(nodeComponent);
+    }
 
     /**
      * Shuffles an array in place.
      *
-     * @param elements The array to shuffle
+     * @param elements the array to shuffle
      */
     private void shuffleArray(Vector3i[] elements) {
         Vector3i temp;
@@ -355,15 +385,24 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     }
 
     /**
-     * Creates a random number between the minimum and the maximum.
+     * Starts a new growth timer with random duration, subject to the given bounds.
      *
-     * @param min The minimum value
-     * @param max The maximum value
-     * @return The random number or min if max <= min
+     * @param entity the entity to set the timer on
+     * @param min    the minimum duration in milliseconds
+     * @param max    the maximum duration in milliseconds
+     */
+    private void resetDelay(EntityRef entity, int min, int max) {
+        delayManager.addDelayedAction(entity, "SimpleFarming:" + entity.getId(), generateRandom(min, max));
+    }
+
+    /**
+     * Returns a random integer in the specified interval.
+     *
+     * @param min The minimum number
+     * @param max The maximum number
+     * @return the random number, or {@code min} if {@code max <= min}
      */
     private long generateRandom(int min, int max) {
         return max == 0 ? min : random.nextInt(min, max);
     }
-
-
 }

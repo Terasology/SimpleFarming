@@ -18,16 +18,18 @@ package org.terasology.simpleFarming.events;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.math.geom.Vector3i;
 
-
 /**
- * Sent to plant a new bush or vine depending on the components of the sending entity
+ * Sent to a new bush or vine immediately after it has been planted.
  */
 public class OnSeedPlanted implements Event {
+
     /**
-     * Indicates the position at which the block should be set.
-     * This is the air block above the player targeted block
+     * The position of the new bush or vine root.
+     * <p>
+     * This is the air block above the block that the player targeted with the seed.
      */
     private Vector3i rootPosition;
+
     public OnSeedPlanted(Vector3i position) {
         rootPosition = position;
     }
