@@ -1,0 +1,27 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Test Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:TestSeed",
+    "stackId": "Test Seed"
+  },
+  "SeedDefinition": {},
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:TestBush:engine:halfblock": {
+        "minTime": 500,
+        "maxTime": 500
+      },
+      "SimpleFarming:TestBush": {
+        "minTime": 500,
+        "maxTime": 500
+      },
+      "SimpleFarming:MatureTestBush": {}
+    },
+    "seed": "SimpleFarming:TestSeed",
+    "produce": "SimpleFarming:TestProduce",
+    "sustainable": true
+  }
+}
