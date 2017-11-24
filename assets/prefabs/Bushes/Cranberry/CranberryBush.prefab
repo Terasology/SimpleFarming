@@ -1,14 +1,6 @@
 {
   "BushDefinition": {
     "growthStages": {
-      "SimpleFarming:YoungCranberryFlower": {
-        "minTime": 3000,
-        "maxTime": 6000
-      },
-      "SimpleFarming:MatureCranberryFlower": {
-        "minTime": 3000,
-        "maxTime": 6000
-      },
       "SimpleFarming:YoungCranberryBush:engine:halfblock": {
         "minTime": 6000,
         "maxTime": 12000

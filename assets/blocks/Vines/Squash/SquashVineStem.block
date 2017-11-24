@@ -1,5 +1,8 @@
 {
   "basedOn": "SimpleFarming:BaseBush",
   "displayName": "Squash Vine Stem",
-  "tile": "SimpleFarming:SquashVineStem"
+  "tiles": {
+    "sides": "SimpleFarming:SquashVineStem",
+    "topBottom": "SimpleFarming:YoungSquashBud"
+  }
 }

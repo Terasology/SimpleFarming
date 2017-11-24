@@ -1,6 +1,0 @@
-{
-  "basedOn": "Core:Plant",
-  "displayName": "Baby Tomato",
-  "tile": "SimpleFarming:BabyTomato",
-  "waving": true
-}

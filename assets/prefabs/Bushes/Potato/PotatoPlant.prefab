@@ -1,19 +1,19 @@
 {
   "BushDefinition": {
     "growthStages": {
-      "SimpleFarming:YoungPotato": {
+      "SimpleFarming:YoungPotatoBush:engine:halfblock": {
         "minTime": 6000,
         "maxTime": 12000
       },
-      "SimpleFarming:MaturePotato": {
+      "SimpleFarming:YoungPotatoBush": {
         "minTime": 7000,
         "maxTime": 14000
       },
-      "SimpleFarming:FloweringPotato": {
+      "SimpleFarming:MaturePotatoBush": {
         "maxRandom": 8000,
         "fixed": 16000
       },
-      "SimpleFarming:GrownPotato": {
+      "SimpleFarming:FruitingPotatoBush": {
         "maxRandom": 8000,
         "fixed": 16000
       }
