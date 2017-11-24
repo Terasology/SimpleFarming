@@ -9,6 +9,10 @@
         "minTime": 2000,
         "maxTime": 2500
       },
+      "SimpleFarming:MaturePumpkinBud": {
+        "minTime": 5000,
+        "maxTime": 6000
+      },
       "SimpleFarming:FruitingPumpkinBud": {
         "minTime": 5000,
         "maxTime": 12000

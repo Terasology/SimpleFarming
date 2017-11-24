@@ -1,6 +1,0 @@
-{
-  "basedOn": "Core:Plant",
-  "displayName": "Grown Potato",
-  "tile": "SimpleFarming:GrownPotato",
-  "waving": true
-}

@@ -9,6 +9,10 @@
         "minTime": 2000,
         "maxTime": 2500
       },
+      "SimpleFarming:MatureSquashBud": {
+        "minTime": 2000,
+        "maxTime": 2500
+      },
       "SimpleFarming:FruitingSquashBud": {
         "minTime": 5000,
         "maxTime": 12000

@@ -10,6 +10,10 @@
   "SeedDefinition": {},
   "BushDefinition": {
     "growthStages": {
+      "SimpleFarming:YoungPeachBush:engine:halfblock": {
+        "minTime": 1000,
+        "maxTime": 2500
+      },
       "SimpleFarming:YoungPeachBush": {
         "minTime": 5000,
         "maxTime": 5000

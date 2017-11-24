@@ -1,5 +1,8 @@
 {
   "basedOn": "SimpleFarming:BaseBush",
   "displayName": "Passionfruit Vine Stem",
-  "tile": "SimpleFarming:PassionfruitVineStem"
+  "tiles": {
+    "sides": "SimpleFarming:MelonVineStem",
+    "topBottom": "SimpleFarming:YoungMelonBud"
+  }
 }

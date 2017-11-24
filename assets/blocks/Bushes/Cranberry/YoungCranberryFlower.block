@@ -1,6 +1,0 @@
-{
-  "basedOn": "Core:plant",
-  "displayName": "Young Cranberry flower",
-  "tile":"SimpleFarming:YoungCranberryFlower",
-  "waving": true
-}
