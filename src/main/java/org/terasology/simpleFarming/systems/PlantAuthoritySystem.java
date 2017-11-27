@@ -101,7 +101,12 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
             return false;
         }
         Block targetBlock = worldProvider.getBlock(position);
-        Block belowBlock = worldProvider.getBlock(new Vector3i(position).addY(-1));
+
+        /* Avoid construction of a transient Vector3i in order to save memory */
+        position.addY(-1);
+        Block belowBlock = worldProvider.getBlock(position);
+        position.addY(1);
+
         return (targetBlock == airBlock && !belowBlock.isPenetrable());
     }
 }
