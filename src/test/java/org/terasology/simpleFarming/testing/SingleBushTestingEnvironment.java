@@ -174,21 +174,21 @@ public class SingleBushTestingEnvironment extends ModuleTestingEnvironment {
         assertEquals(air, worldProvider.getBlock(BUSH_LOCATION));
     }
 
-    protected final void assertActionDropsSeeds(Runnable block) {
-        assertActionDropsPrefabs(block, component.seed);
+    protected final void assertActionDropsSeeds(Runnable action) {
+        assertActionDropsPrefabs(action, component.seed);
     }
 
-    protected final void assertActionDropsProduce(Runnable block) {
-        assertActionDropsPrefabs(block, component.produce);
+    protected final void assertActionDropsProduce(Runnable action) {
+        assertActionDropsPrefabs(action, component.produce);
     }
 
-    protected final void assertActionDropsSeedsAndProduce(Runnable block) {
-        assertActionDropsPrefabs(block, component.seed, component.produce);
+    protected final void assertActionDropsSeedsAndProduce(Runnable action) {
+        assertActionDropsPrefabs(action, component.seed, component.produce);
     }
 
-    private void assertActionDropsPrefabs(Runnable block, String... prefabs) {
+    private void assertActionDropsPrefabs(Runnable action, String... prefabs) {
         final TestEventReceiver<DropItemEvent> dropSpy = new TestEventReceiver<>(getHostContext(), DropItemEvent.class);
-        block.run();
+        action.run();
         for (String prefab : prefabs) {
             assertListContainsEntityFromPrefab(dropSpy.getEntityRefs(), prefab);
         }
