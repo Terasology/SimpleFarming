@@ -15,8 +15,6 @@
  */
 package org.terasology.simpleFarming.systems;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.simpleFarming.components.SeedDefinitionComponent;
 import org.terasology.simpleFarming.events.OnSeedPlanted;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -44,7 +42,6 @@ import org.terasology.world.block.BlockManager;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class PlantAuthoritySystem extends BaseComponentSystem {
-    private static final Logger logger = LoggerFactory.getLogger(PlantAuthoritySystem.class);
 
     @In private InventoryManager inventoryManager;
     @In private WorldProvider worldProvider;
@@ -80,12 +77,11 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
         if (event.getTargetLocation() == null || event.isConsumed()) {
             return;
         }
-        Vector3i position = new Vector3i(event.getTargetLocation());
-        position.add(Vector3i.up());
+        Vector3i position = new Vector3i(event.getTargetLocation()).addY(1);
         if (Side.inDirection(event.getHitNormal()) == Side.TOP && isValidPosition(position)) {
             /* If the prefab field is null, there is a DefinitionComponent on the seed */
             EntityRef plantEntity = seedComponent.prefab == null ? seed : entityManager.create(seedComponent.prefab);
-            plantEntity.send(new OnSeedPlanted(position.addY(1)));
+            plantEntity.send(new OnSeedPlanted(position));
             inventoryManager.removeItem(seed.getOwner(), seed, seed, true, 1);
             event.consume();
         }
@@ -105,13 +101,12 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
             return false;
         }
         Block targetBlock = worldProvider.getBlock(position);
-        if (targetBlock != airBlock) {
-            return false;
-        }
-        Block belowBlock = worldProvider.getBlock(position.addY(-1));
-        if (belowBlock.isPenetrable()) {
-            return false;
-        }
-        return true;
+
+        /* Avoid construction of a transient Vector3i in order to save memory */
+        position.addY(-1);
+        Block belowBlock = worldProvider.getBlock(position);
+        position.addY(1);
+
+        return (targetBlock == airBlock && !belowBlock.isPenetrable());
     }
 }
