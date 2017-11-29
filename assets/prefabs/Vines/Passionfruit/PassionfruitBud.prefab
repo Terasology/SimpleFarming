@@ -1,0 +1,24 @@
+{
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:YoungPassionfruitBud:engine:halfblock": {
+        "minTime": 2000,
+        "maxTime": 2500
+      },
+      "SimpleFarming:YoungPassionfruitBud": {
+        "minTime": 1000,
+        "maxTime": 5000
+      },
+      "SimpleFarming:MaturePassionfruitBud": {
+        "minTime": 1000,
+        "maxTime": 5000
+      },
+      "SimpleFarming:FruitingPassionfruitBud": {
+        "minTime": 5000,
+        "maxTime": 12000
+      }
+    },
+    "seed": "SimpleFarming:PassionfruitSeed",
+    "produce": "SimpleFarming:Passionfruit"
+  }
+}

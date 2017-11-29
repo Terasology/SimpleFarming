@@ -1,0 +1,8 @@
+{
+  "basedOn": "SimpleFarming:BaseBush",
+  "displayName": "Tomato Vine Stem",
+  "tiles": {
+    "sides": "SimpleFarming:TomatoVineStem",
+    "topBottom": "SimpleFarming:YoungTomatoBud"
+  }
+}

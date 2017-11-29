@@ -1,0 +1,33 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Peach Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:PeachSeed",
+    "stackId": "PeachSeed"
+  },
+  "SeedDefinition": {},
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:YoungPeachBush:engine:halfblock": {
+        "minTime": 1000,
+        "maxTime": 2500
+      },
+      "SimpleFarming:YoungPeachBush": {
+        "minTime": 5000,
+        "maxTime": 5000
+      },
+      "SimpleFarming:MaturePeachBush": {
+        "minTime": 5000,
+        "maxTime": 5000
+      },
+      "SimpleFarming:FruitingPeachBush": {
+        "minTime": 6000,
+        "maxTime": 10000
+      }
+    },
+    "seed": "SimpleFarming:PeachSeed",
+    "produce": "SimpleFarming:Peach"
+  }
+}

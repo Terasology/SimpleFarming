@@ -1,0 +1,13 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Gooseberry"
+  },
+  "Item": {
+    "icon": "SimpleFarming:Gooseberry",
+    "stackId": "Gooseberry"
+  },
+  "SeedDefinition": {
+    "prefab": "SimpleFarming:GooseberryBush"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Guava Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:GuavaSeed",
+    "stackId": "GuavaSeed"
+  },
+  "SeedDefinition": {},
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:YoungGuavaBush:engine:halfblock": {
+        "minTime": 1000,
+        "maxTime": 2000
+      },
+      "SimpleFarming:YoungGuavaBush": {
+        "minTime": 1000,
+        "maxTime": 2000
+      },
+      "SimpleFarming:MatureGuavaBush": {
+        "minTime": 8000,
+        "maxTime": 10000
+      },
+      "SimpleFarming:FruitingGuavaBush": {
+        "minTime": 13000,
+        "maxTime": 20000
+      }
+    },
+    "produce": "SimpleFarming:Guava",
+    "seed": "SimpleFarming:GuavaSeed"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "basedOn": "SimpleFarming:BaseBush",
+  "displayName": "Cucumber Vine Stem",
+  "tiles": {
+    "sides": "SimpleFarming:CucumberVineStem",
+    "topBottom": "SimpleFarming:YoungCucumberBud"
+  }
+}

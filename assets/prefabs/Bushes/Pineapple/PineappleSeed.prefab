@@ -1,0 +1,29 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Pineapple Seed"
+  },
+  "Item": {
+    "icon": "SimpleFarming:PineappleSeed",
+    "stackId": "PineappleSeed"
+  },
+  "SeedDefinition": {},
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:YoungPineappleBush": {
+        "minTime": 4000,
+        "maxTime": 6000
+      },
+      "SimpleFarming:MaturePineappleBush": {
+        "minTime": 5000,
+        "maxTime": 8000
+      },
+      "SimpleFarming:FruitingPineappleBush": {
+        "minTime": 4000,
+        "maxTime": 7000
+      }
+    },
+    "seed": "SimpleFarming:PineappleSeed",
+    "produce": "SimpleFarming:Pineapple"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "BushDefinition": {
+    "growthStages": {
+      "SimpleFarming:YoungTomatoBud:engine:halfblock": {
+        "minTime": 1000,
+        "maxTime": 5000
+      },
+      "SimpleFarming:YoungTomatoBud": {
+        "minTime": 2000,
+        "maxTime": 2500
+      },
+      "SimpleFarming:MatureTomatoBud": {
+        "minTime": 2500,
+        "maxTime": 6000
+      },
+      "SimpleFarming:FruitingTomatoBud": {
+        "minTime": 5000,
+        "maxTime": 12000
+      }
+    },
+    "seed": "SimpleFarming:TomatoSeed",
+    "produce": "SimpleFarming:Tomato"
+  }
+}

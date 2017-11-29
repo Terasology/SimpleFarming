@@ -1,0 +1,13 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Raspberry"
+  },
+  "Item": {
+    "icon": "SimpleFarming:Raspberry",
+    "stackId": "Raspberry"
+  },
+  "SeedDefinition": {
+    "prefab": "SimpleFarming:RaspberryBush"
+  }
+}
