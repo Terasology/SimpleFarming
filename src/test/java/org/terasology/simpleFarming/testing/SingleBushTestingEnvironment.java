@@ -95,7 +95,7 @@ public class SingleBushTestingEnvironment extends ModuleTestingEnvironment {
 
     private void plantSeed() {
         final EntityRef seed = entityManager.create(BUSH_SEED_PREFAB);
-        final Vector3f dirtPosition = new Vector3f(BUSH_LOCATION.toVector3f()).add(Vector3f.down());
+        final Vector3f dirtPosition = BUSH_LOCATION.toVector3f().add(Vector3f.down());
         final EntityRef target = entityManager.create(new LocationComponent(dirtPosition));
         seed.send(new ActivateEvent(
                 target,          // target
