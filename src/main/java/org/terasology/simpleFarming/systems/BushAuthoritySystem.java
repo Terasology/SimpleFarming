@@ -189,6 +189,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
                 } else {
                     entity.send(new DoDestroyPlant());
                     worldProvider.setBlock(bushComponent.position, blockManager.getBlock(BlockManager.AIR_ID));
+                    entity.destroy();
                 }
                 event.consume();
             }
