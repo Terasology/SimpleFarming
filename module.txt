@@ -1,6 +1,6 @@
 {
     "id" : "SimpleFarming",
-    "version" : "2.0.1-SNAPSHOT",
+    "version" : "2.0.2-SNAPSHOT",
     "author" : "Josharias, Mandar Juvekar, patrick Wang, Harry Wang, mdj117, SufurElite, He Who Shall Not Be Named (VaibhavBajaj), andriii25, smsunarto, DhananjayGarg, Jay Gupta",
 
     "displayName" : "Simple Farming",
