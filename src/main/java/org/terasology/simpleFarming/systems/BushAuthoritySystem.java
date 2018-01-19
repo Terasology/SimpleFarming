@@ -152,12 +152,13 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      */
     @ReceiveEvent
     public void onCheatGrowth(ActivateEvent event, EntityRef item, CheatGrowthComponent cheatGrowthComponent, ItemComponent itemComponent) {
-        if (!areValidHarvestEntities(event.getTarget(), event.getInstigator())) {
+        EntityRef target = event.getTarget();
+        if (!areValidHarvestEntities(target, event.getInstigator())) {
             return;
         }
 
-        BlockComponent blockComponent = event.getTarget().getComponent(BlockComponent.class);
-        BushDefinitionComponent bushDefinitionComponent = event.getTarget().getComponent(BushDefinitionComponent.class);
+        BlockComponent blockComponent = target.getComponent(BlockComponent.class);
+        BushDefinitionComponent bushDefinitionComponent = target.getComponent(BushDefinitionComponent.class);
         if (cheatGrowthComponent.causesUnGrowth) {
             doBushGrowth(blockComponent.getPosition(), bushDefinitionComponent, -1);
         } else {

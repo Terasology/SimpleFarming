@@ -142,6 +142,16 @@ public class VineAuthoritySystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Called when an item with the cheat component is used on a block
+     * <p>
+     * Grows the targeted vine
+     *
+     * @param event
+     * @param item
+     * @param cheatGrowthComponent
+     * @param itemComponent
+     */
     @ReceiveEvent
     public void onCheatGrowth(ActivateEvent event, EntityRef item, CheatGrowthComponent cheatGrowthComponent, ItemComponent itemComponent) {
         EntityRef target = event.getTarget();
