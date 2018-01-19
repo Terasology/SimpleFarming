@@ -17,7 +17,11 @@ package org.terasology.simpleFarming.systems;
 
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.simpleFarming.components.*;
+import org.terasology.simpleFarming.components.BushDefinitionComponent;
+import org.terasology.simpleFarming.components.CheatGrowthComponent;
+import org.terasology.simpleFarming.components.SeedDefinitionComponent;
+import org.terasology.simpleFarming.components.VineDefinitionComponent;
+import org.terasology.simpleFarming.components.VineNodeComponent;
 import org.terasology.simpleFarming.events.DoDestroyPlant;
 import org.terasology.simpleFarming.events.DoRemoveBud;
 import org.terasology.simpleFarming.events.OnSeedPlanted;
@@ -46,7 +50,9 @@ import org.terasology.world.block.entity.CreateBlockDropsEvent;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class VineAuthoritySystem extends BaseComponentSystem {
 
-    /** The maximum number of non-air blocks adjacent to a vine stem block. */
+    /**
+     * The maximum number of non-air blocks adjacent to a vine stem block.
+     */
     private static final int MAX_NEIGHBOURS = 2;
 
     /**
@@ -57,18 +63,27 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      */
     private static final double BUD_CHANCE = 0.2;
 
-    @In private WorldProvider worldProvider;
-    @In private BlockManager blockManager;
-    @In private BlockEntityRegistry blockEntityRegistry;
-    @In private DelayManager delayManager;
-    @In private EntityManager entityManager;
+    @In
+    private WorldProvider worldProvider;
+    @In
+    private BlockManager blockManager;
+    @In
+    private BlockEntityRegistry blockEntityRegistry;
+    @In
+    private DelayManager delayManager;
+    @In
+    private EntityManager entityManager;
 
     private FastRandom random = new FastRandom();
 
-    /** The standard air block, cached on initialization. */
+    /**
+     * The standard air block, cached on initialization.
+     */
     private Block airBlock;
 
-    /** Array holding all possible spawn directions. */
+    /**
+     * Array holding all possible spawn directions.
+     */
     private Vector3i[] spawnPos = new Vector3i[4];
 
     @Override
@@ -120,7 +135,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
 
     private void doGrowVine(EntityRef root, VineNodeComponent nodeComponent, VineDefinitionComponent vineComponent) {
         if (nodeComponent.length != -1) {
-            if (nodeComponent.length < 20) {
+            if (nodeComponent.length < vineComponent.maxLength) {
                 recurseGrow(root, vineComponent);
             }
             resetDelay(root, vineComponent.minGrowTime, vineComponent.maxGrowTime);
@@ -129,14 +144,15 @@ public class VineAuthoritySystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void onCheatGrowth(ActivateEvent event, EntityRef item, CheatGrowthComponent cheatGrowthComponent, ItemComponent itemComponent) {
-        if (!event.getTarget().hasComponent(VineDefinitionComponent.class) || !event.getTarget().hasComponent(VineNodeComponent.class)) {
+        EntityRef target = event.getTarget();
+        if (!target.hasComponent(VineDefinitionComponent.class) || !target.hasComponent(VineNodeComponent.class)) {
             return;
         }
 
-        VineDefinitionComponent vineDefinitionComponent = event.getTarget().getComponent(VineDefinitionComponent.class);
-        VineNodeComponent vineNodeComponent = event.getTarget().getComponent(VineNodeComponent.class);
+        VineDefinitionComponent vineDefinitionComponent = target.getComponent(VineDefinitionComponent.class);
+        VineNodeComponent vineNodeComponent = target.getComponent(VineNodeComponent.class);
         if (!cheatGrowthComponent.causesUnGrowth) {
-            doGrowVine(event.getTarget(), vineNodeComponent, vineDefinitionComponent);
+            doGrowVine(target, vineNodeComponent, vineDefinitionComponent);
         }
     }
 
@@ -238,7 +254,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * non-air blocks.
      * <p>
      * If a valid position exists, returns one selected at random; otherwise returns null.
-     *
+     * <p>
      * Get the position to spawn a new vine element in
      *
      * @param parent the node this new element will be attached to
@@ -265,8 +281,8 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * <p>
      * A position is considered valid if:
      * <ol>
-     *   <li>It is currently occupied by an air block.</li>
-     *   <li>The block immediately beneath it is not {@linkplain Block#isPenetrable()} penetrable.</li>
+     * <li>It is currently occupied by an air block.</li>
+     * <li>The block immediately beneath it is not {@linkplain Block#isPenetrable()} penetrable.</li>
      * </ol>
      *
      * @param position the position to check for validity; null returns false

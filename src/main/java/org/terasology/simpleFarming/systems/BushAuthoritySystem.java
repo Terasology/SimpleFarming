@@ -64,15 +64,23 @@ import java.util.Set;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BushAuthoritySystem extends BaseComponentSystem {
 
-    /** Maximum single-axis impulse for seed and produce drops. */
+    /**
+     * Maximum single-axis impulse for seed and produce drops.
+     */
     private static final float DROP_IMPULSE_AMOUNT = 22.0f;
 
-    @In private WorldProvider worldProvider;
-    @In private BlockManager blockManager;
-    @In private InventoryManager inventoryManager;
-    @In private BlockEntityRegistry blockEntityRegistry;
-    @In private EntityManager entityManager;
-    @In private DelayManager delayManager;
+    @In
+    private WorldProvider worldProvider;
+    @In
+    private BlockManager blockManager;
+    @In
+    private InventoryManager inventoryManager;
+    @In
+    private BlockEntityRegistry blockEntityRegistry;
+    @In
+    private EntityManager entityManager;
+    @In
+    private DelayManager delayManager;
 
     private FastRandom random = new FastRandom();
 
@@ -132,6 +140,16 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     }
 
 
+    /**
+     * Called when an item with the cheat component is used on a block
+     * <p>
+     * Grows or "un-grow" the targeted bush
+     *
+     * @param event
+     * @param item
+     * @param cheatGrowthComponent
+     * @param itemComponent
+     */
     @ReceiveEvent
     public void onCheatGrowth(ActivateEvent event, EntityRef item, CheatGrowthComponent cheatGrowthComponent, ItemComponent itemComponent) {
         if (!areValidHarvestEntities(event.getTarget(), event.getInstigator())) {
@@ -156,30 +174,32 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param stages        the number of stages to grow; negative values represent un-growth
      */
     private void doBushGrowth(Vector3i position, BushDefinitionComponent bushComponent, int stages) {
-        EntityRef newBush = null;
-        Map.Entry<String, GrowthStage> stage = null;
-        if (!isInLastStage(bushComponent) || stages < 0) {
+        if (!isInLastStage(bushComponent)
+                // allow negative growth from the last stage
+                || stages < 0) {
             bushComponent.currentStage += stages;
-            stage = getGrowthStage(bushComponent, bushComponent.currentStage);
+            Map.Entry<String, GrowthStage> stage = getGrowthStage(bushComponent, bushComponent.currentStage);
             worldProvider.setBlock(position, blockManager.getBlock(stage.getKey()));
-            newBush = blockEntityRegistry.getBlockEntityAt(position);
+            EntityRef newBush = blockEntityRegistry.getBlockEntityAt(position);
             newBush.addOrSaveComponent(bushComponent);
-        }
-        if( newBush != null && stage.getValue().maxTime > 0 && stage.getValue().minTime > 0) {
-            resetDelay(newBush,
-                    stage.getValue().minTime,
-                    stage.getValue().maxTime);
+
+            if (stage.getValue().maxTime > 0 && stage.getValue().minTime > 0) {
+                resetDelay(newBush,
+                        stage.getValue().minTime,
+                        stage.getValue().maxTime);
+            }
         }
     }
 
     /**
      * Safely get the growth stage from the given index
+     *
      * @param bushComponent
      * @param index
      * @return
      */
     public static Map.Entry<String, GrowthStage> getGrowthStage(BushDefinitionComponent bushComponent, int index) {
-        return (new ArrayList<>(bushComponent.growthStages.entrySet())).get(Math.min(bushComponent.growthStages.size() -1, Math.max(0, index)));
+        return (new ArrayList<>(bushComponent.growthStages.entrySet())).get(Math.min(bushComponent.growthStages.size() - 1, Math.max(0, index)));
     }
 
     /**
@@ -194,9 +214,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onHarvest(ActivateEvent event, EntityRef entity, BushDefinitionComponent bushComponent, BlockComponent blockComponent) {
         EntityRef harvester = event.getInstigator();
-        if (!event.isConsumed() && areValidHarvestEntities(entity, harvester)
-                // only let player characters harvest to avoid item use triggering a harvest
-                && harvester.hasComponent(PlayerCharacterComponent.class)) {
+        if (!event.isConsumed() && areValidHarvestEntities(entity, harvester)) {
             /* Produce is only given in the final stage */
             if (isInLastStage(bushComponent)) {
                 dropProduce(bushComponent.produce, event.getTargetLocation(), harvester, entity);
@@ -224,8 +242,8 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      */
     private boolean areValidHarvestEntities(EntityRef target, EntityRef harvester) {
         return target.exists() && harvester.exists()
-            && target.hasComponent(BushDefinitionComponent.class)
-            && target.hasComponent(BlockComponent.class);
+                && target.hasComponent(BushDefinitionComponent.class)
+                && target.hasComponent(BlockComponent.class);
     }
 
     /**
