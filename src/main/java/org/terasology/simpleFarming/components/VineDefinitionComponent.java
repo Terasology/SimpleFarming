@@ -18,6 +18,7 @@ package org.terasology.simpleFarming.components;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.ForceBlockActive;
 
 /**
  * Stores all data needed to grow a vine.
@@ -35,6 +36,7 @@ import org.terasology.world.block.Block;
  *
  * @see org.terasology.simpleFarming.systems.VineAuthoritySystem
  */
+@ForceBlockActive
 public class VineDefinitionComponent implements Component {
 
     /** The block to use for a stem. */
@@ -60,4 +62,9 @@ public class VineDefinitionComponent implements Component {
      * @see org.terasology.simpleFarming.systems.VineAuthoritySystem#onVineGrowth
      */
     public int maxGrowTime;
+
+    /**
+     * The maximum length a vine can grow
+     */
+    public int maxLength = 20;
 }

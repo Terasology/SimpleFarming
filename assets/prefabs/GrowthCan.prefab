@@ -1,0 +1,14 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Growth Can"
+  },
+  "Item": {
+    "icon": "SimpleFarming:SimpleFarming#GrowthCan",
+    "renderWithIcon": true,
+    "stackId": "SimpleFarming:GrowthCan"
+  },
+  "CheatGrowth": {
+    "causesUnGrowth": false
+  }
+}

@@ -22,14 +22,17 @@ import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.players.PlayerCharacterComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.moduletestingenvironment.ModuleTestingEnvironment;
 import org.terasology.moduletestingenvironment.TestEventReceiver;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
+import org.terasology.simpleFarming.systems.BushAuthoritySystem;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 
 import static org.junit.Assert.*;
@@ -115,7 +118,7 @@ public class SingleBushTestingEnvironment extends ModuleTestingEnvironment {
     }
 
     protected final int getFinalGrowthStageIndex() {
-        return component.stages.length - 1;
+        return component.growthStages.size() - 1;
     }
 
     protected final void makeBushUnsustainable() {
@@ -129,9 +132,11 @@ public class SingleBushTestingEnvironment extends ModuleTestingEnvironment {
      * world (and therefore be detectable via {@link #assertActionDropsProduce(Runnable)}).
      */
     protected final void harvestBush() {
+        EntityRef player = entityManager.create();
+        player.addComponent(new PlayerCharacterComponent());
         bush.send(new ActivateEvent(
                 bush,                    // target
-                entityManager.create(),  // instigator
+                player,  // instigator
                 null,                    // origin
                 null,                    // direction
                 null,                    // hit position
@@ -165,7 +170,9 @@ public class SingleBushTestingEnvironment extends ModuleTestingEnvironment {
      */
     protected final void assertBushInStage(int stage) {
         assertEquals(stage, component.currentStage);
-        assertEquals(component.stages[stage].block, worldProvider.getBlock(component.position));
+        BlockComponent blockComponent = bush.getComponent(BlockComponent.class);
+        String block = BushAuthoritySystem.getGrowthStage(component, stage).getKey();
+        assertEquals(block, worldProvider.getBlock(blockComponent.getPosition()).toString());
     }
 
     /** Asserts that both the bush block and the bush entity have been destroyed. */
