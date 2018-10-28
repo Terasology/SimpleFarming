@@ -18,6 +18,7 @@ package org.terasology.simpleFarming.components;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.world.block.ForceBlockActive;
 
 /**
  * Component used to store information about the current state of a particular vine.
@@ -28,6 +29,7 @@ import org.terasology.math.geom.Vector3i;
  *
  * @see org.terasology.simpleFarming.systems.VineAuthoritySystem
  */
+@ForceBlockActive
 public class VineNodeComponent implements Component {
 
     /** The position of this stem block. */
@@ -50,7 +52,7 @@ public class VineNodeComponent implements Component {
     public EntityRef parent;
 
     /** The distance (through the vine) from this block to the root.  Zero if this is the root. */
-    public int height;
+    public int length;
 
     /** Default constructor required for persistence. */
     public VineNodeComponent() {

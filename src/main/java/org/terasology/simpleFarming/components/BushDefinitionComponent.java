@@ -19,6 +19,7 @@ import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.world.block.ForceBlockActive;
 
 import java.util.Map;
 
@@ -39,6 +40,7 @@ import java.util.Map;
  *
  * @see org.terasology.simpleFarming.systems.BushAuthoritySystem
  */
+@ForceBlockActive
 public class BushDefinitionComponent implements Component {
 
     /**
@@ -79,14 +81,8 @@ public class BushDefinitionComponent implements Component {
      */
     public String produce;
 
-    /** The position of a particular bush block. */
-    public Vector3i position;
-
     /** The index of the current stage for this particular bush. */
     public int currentStage;
-
-    /** Array generated from {@code growthStages} for internal use.  Do not use. */
-    public GrowthStage[] stages;
 
     /** Used by vine buds to refer to the parent stem. */
     public EntityRef parent;

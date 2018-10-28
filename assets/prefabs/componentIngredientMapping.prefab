@@ -1,0 +1,9 @@
+{
+  "ComponentToIngredient": {
+    "componentMap": {
+      "SeedDefinition": [
+        "Seed"
+      ]
+    }
+  }
+}
