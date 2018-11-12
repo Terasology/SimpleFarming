@@ -242,7 +242,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 			addLog(new Vector3i(location), log, false, rootEntity);
 		}
 		
-		Set<Vector3i> leaves = currentStage.leaves;
+		Set<Vector3i> leaves = currentStage.getLeaves();
 		for(Vector3i leafLocation : leaves) {
 			addLeaf(new Vector3i(logComponent.location).add(leafLocation), leaf, rootComponent);
 		}
