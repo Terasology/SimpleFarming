@@ -15,32 +15,41 @@
  */
 package org.terasology.simpleFarming.components;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.terasology.math.geom.Vector3i;
 import org.terasology.reflection.MappedContainer;
-import org.terasology.world.block.Block;
 
 /**
- * Represents a stage of growth for a bush.
- *
- * @see BushDefinitionComponent
+ * Represents a stage of growth for a tree.
+ * <p>
+ * Contains the positions of leaves relative to the root block and the number of logs this growth stage should contain.
+ * 
+ * @see SaplingDefinitionComponent
  */
 @MappedContainer
-public class GrowthStage {
-    /** The block to use for this stage. */
-    public Block block;
+public class TreeGrowthStage {
+    /** Number of logs this stage should have. */
+	public int height;
+	
+	/** Locations of each leaf in this stage, relative to the root (the lowest log block). */
+	public Set<Vector3i> leaves = new HashSet<>();
 
-    /** Minimum time before the next growth stage, in milliseconds. */
+    /** Minimum time before this growth stage, in milliseconds. */
     public int minTime;
 
-    /** Maximum time before the next growth stage, in milliseconds. */
+    /** Maximum time before this growth stage, in milliseconds. */
     public int maxTime;
 
     /** Default constructor required for persistence. */
-    public GrowthStage() {
+    public TreeGrowthStage() {
     }
 
     /** Construct a copy of the given {@code GrowthStage}. */
-    public GrowthStage(GrowthStage clone) {
-        this.block = clone.block;
+    public TreeGrowthStage(TreeGrowthStage clone) {
+    	this.height = clone.height;
+    	this.leaves = clone.leaves;
         this.maxTime = clone.maxTime;
         this.minTime = clone.minTime;
     }

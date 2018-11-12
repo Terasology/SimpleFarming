@@ -46,13 +46,13 @@ public class BushDefinitionComponent implements Component {
     /**
      * Map associating prefabs with growth stages.  Generally specified by a prefab.
      * <p>
-     * Keys are block names and values are {@link GrowthStage} objects.
+     * Keys are block names and values are {@link BushGrowthStage} objects.
      * <p>
      * The order in which entries occur is significant.  A bush will start in the first stage and
      * progress forward through the list.  When it reaches its final stage, it can be harvested
      * (via the "use" action) to yield {@link #produce}.
      */
-    public Map<String, GrowthStage> growthStages = Maps.newTreeMap();
+    public Map<String, BushGrowthStage> growthStages = Maps.newTreeMap();
 
     /**
      * Whether the bush should survive being harvested.  Defaults to true; specified by prefab.

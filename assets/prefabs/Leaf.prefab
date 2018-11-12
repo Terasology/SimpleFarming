@@ -1,0 +1,21 @@
+{
+	"BushDefinition": {
+		"growthStages": {
+			"SimpleFarming:YoungFruitBush": {
+				"minTime": 5000,
+				"maxTime": 5000
+			},
+			"SimpleFarming:MatureFruitBush": {
+				"minTime": 5000,
+				"maxTime": 5000
+			},
+			"SimpleFarming:FruitingFruitBush": {
+				"minTime": 6000,
+				"maxTime": 10000
+			}
+		},
+		"currentStage": 2,
+		"seed": "SimpleFarming:sapling",
+		"produce": "SimpleFarming:fruit"
+	}
+}

@@ -26,7 +26,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.moduletestingenvironment.ModuleTestingEnvironment;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
-import org.terasology.simpleFarming.components.GrowthStage;
+import org.terasology.simpleFarming.components.BushGrowthStage;
 import org.terasology.simpleFarming.components.SeedDefinitionComponent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -139,7 +139,7 @@ public class PlantAuthoritySystemTest extends ModuleTestingEnvironment {
      */
     private EntityRef makeTestSeed() {
         final BushDefinitionComponent bushDefinition = new BushDefinitionComponent();
-        bushDefinition.growthStages = Collections.singletonMap(BUSH_BLOCK, new GrowthStage());
+        bushDefinition.growthStages = Collections.singletonMap(BUSH_BLOCK, new BushGrowthStage());
 
         return entityManager.create(
                 new SeedDefinitionComponent(),

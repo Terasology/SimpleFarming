@@ -1,0 +1,17 @@
+{
+	"parent": "engine:iconItem",
+	"Item": {
+	  "icon": "SimpleFarming:Fruit",
+	  "stackId": "SimpleFarming:Fruit",
+	  "consumedOnUse": true
+	},
+	"DisplayName": {
+	  "name": "Fruit"
+	},
+	"Food": {
+	  "filling": 0.5
+	},
+	"Drink": {
+	  "filling": 0.5
+	}
+}

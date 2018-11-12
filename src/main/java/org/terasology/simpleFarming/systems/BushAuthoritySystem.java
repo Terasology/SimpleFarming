@@ -21,7 +21,7 @@ import org.terasology.logic.players.PlayerCharacterComponent;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.CheatGrowthComponent;
-import org.terasology.simpleFarming.components.GrowthStage;
+import org.terasology.simpleFarming.components.BushGrowthStage;
 import org.terasology.simpleFarming.components.SeedDefinitionComponent;
 import org.terasology.simpleFarming.events.DoDestroyPlant;
 import org.terasology.simpleFarming.events.DoRemoveBud;
@@ -90,12 +90,12 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param growthStages the prefab GrowthStage data
      * @return the array of growth stages
      */
-    private GrowthStage[] buildGrowthStages(Map<String, GrowthStage> growthStages) {
-        Set<Map.Entry<String, GrowthStage>> entrySet = growthStages.entrySet();
-        GrowthStage[] stages = new GrowthStage[entrySet.size()];
+    private BushGrowthStage[] buildGrowthStages(Map<String, BushGrowthStage> growthStages) {
+        Set<Map.Entry<String, BushGrowthStage>> entrySet = growthStages.entrySet();
+        BushGrowthStage[] stages = new BushGrowthStage[entrySet.size()];
         int i = 0;
-        for (Map.Entry<String, GrowthStage> entry : entrySet) {
-            stages[i] = new GrowthStage(entry.getValue());
+        for (Map.Entry<String, BushGrowthStage> entry : entrySet) {
+            stages[i] = new BushGrowthStage(entry.getValue());
             stages[i].block = blockManager.getBlock(entry.getKey());
             stages[i].block.setKeepActive(true);
             i++;
@@ -107,7 +107,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * Called immediately after a bush seed has been planted.
      * <p>
      * Sets the bush's position and initial growth stage and starts the timer for its next growth
-     * event (according to the {@link GrowthStage#minTime} and {@link GrowthStage#maxTime} values
+     * event (according to the {@link BushGrowthStage#minTime} and {@link BushGrowthStage#maxTime} values
      * for this growth stage).  When the timer expires,
      * {@link #onBushGrowth(DelayedActionTriggeredEvent, EntityRef, BushDefinitionComponent, BlockComponent)}
      * will be called.
@@ -179,7 +179,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
                 // allow negative growth from the last stage
                 || stages < 0) {
             bushComponent.currentStage += stages;
-            Map.Entry<String, GrowthStage> stage = getGrowthStage(bushComponent, bushComponent.currentStage);
+            Map.Entry<String, BushGrowthStage> stage = getGrowthStage(bushComponent, bushComponent.currentStage);
             worldProvider.setBlock(position, blockManager.getBlock(stage.getKey()));
             EntityRef newBush = blockEntityRegistry.getBlockEntityAt(position);
             newBush.addOrSaveComponent(bushComponent);
@@ -199,7 +199,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param index
      * @return
      */
-    public static Map.Entry<String, GrowthStage> getGrowthStage(BushDefinitionComponent bushComponent, int index) {
+    public static Map.Entry<String, BushGrowthStage> getGrowthStage(BushDefinitionComponent bushComponent, int index) {
         return (new ArrayList<>(bushComponent.growthStages.entrySet())).get(Math.min(bushComponent.growthStages.size() - 1, Math.max(0, index)));
     }
 
