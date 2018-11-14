@@ -15,8 +15,6 @@
  */
 package org.terasology.simpleFarming.systems;
 
-import org.terasology.simpleFarming.components.SeedDefinitionComponent;
-import org.terasology.simpleFarming.events.OnSeedPlanted;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -28,6 +26,8 @@ import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
+import org.terasology.simpleFarming.components.SeedDefinitionComponent;
+import org.terasology.simpleFarming.events.OnSeedPlanted;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -64,8 +64,8 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
      * player was targeting the top of a valid block per {@link #isValidPosition}), creates an
      * entity from the {@linkplain SeedDefinitionComponent#prefab prefab} associated with the seed,
      * and sends that entity an {@link OnSeedPlanted} event.  It is then the responsibility of the
-     * appropriate authority ({@link BushAuthoritySystem} or {@link VineAuthoritySystem}) to manage
-     * the plant.
+     * appropriate authority ({@link BushAuthoritySystem}, {@link VineAuthoritySystem} or
+     * {@link TreeAuthoritySystem}) to manage the plant.
      *
      * @param event         the activation event
      * @param seed          the seed item

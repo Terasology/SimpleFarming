@@ -35,6 +35,9 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.entity.CreateBlockDropsEvent;
 
+/**
+ * Manages the growth, destruction, and other events for trees.
+ */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class TreeAuthoritySystem extends BaseComponentSystem {
 	@SuppressWarnings("unused")
@@ -66,6 +69,15 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         airBlock = blockManager.getBlock(BlockManager.AIR_ID);
 	}
 	
+	/**
+	 * Creates a sapling and adds the SaplingDefinitionComponent to it, then resets the growth timer using {@link #resetDelay(EntityRef, int, int)}.
+	 * 
+	 * @param event The event for the seed being planted.
+	 * @param definitionEntity The entity receiving the event, not used.
+	 * @param saplingComponent The component defining the sapling.
+	 * 
+	 * @see PlantAuthoritySystem
+	 */
 	@ReceiveEvent
 	public void onTreePlanted(OnSeedPlanted event, EntityRef definitionEntity, SaplingDefinitionComponent saplingComponent) {
 		worldProvider.setBlock(event.getPosition(), saplingComponent.sapling);
@@ -76,11 +88,32 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         resetDelay(sapling, currentStage.minTime, currentStage.maxTime);
 	}
 	
+	/**
+	 * Grows the sapling into a tree using {@link #growSapling(SaplingDefinitionComponent)}.
+	 * 
+	 * @param event The delayed growth event.
+	 * @param sapling The sapling's block entity in the world, not used.
+	 * @param saplingComponent The sapling definition used to grow the tree.
+	 */
 	@ReceiveEvent
     public void onSaplingGrowth(DelayedActionTriggeredEvent event, EntityRef sapling, SaplingDefinitionComponent saplingComponent) {
 		growSapling(saplingComponent);
 	}
 	
+	/**
+	 * Grows a tree based on a growth timer. This is done by first checking if the tree can be grown, then destroying the old one and growing a
+	 * new tree with the next growth stage. After that, the growth timer is reset if there is another stage.
+	 * 
+	 * @param event The delayed growth event.
+	 * @param rootEntity The block entity of the lowest log block in the tree, aka the "root".
+	 * @param logComponent The log component of the entity.
+	 * @param rootComponent The root component of the entity.
+	 * 
+	 * @see #canGenerateTree(EntityRef)
+	 * @see #destroyTree(EntityRef, Vector3i)
+	 * @see #generateTree(EntityRef)
+	 * @see #resetDelay(EntityRef, int, int)
+	 */
 	@ReceiveEvent
 	public void onRootGrowth(DelayedActionTriggeredEvent event, EntityRef rootEntity, LogComponent logComponent, RootComponent rootComponent) {
 		if(!rootComponent.alive || rootComponent.growthStage+1 == rootComponent.growthStages.size()) {
@@ -99,6 +132,17 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		}
 	}
 	
+	/**
+	 * Reacts to an item with a CheatGrowthComponent being used on a sapling or log block, and appropriately grows or un-grows the tree.
+	 * 
+	 * @param event The event from right-clicking with an item.
+	 * @param item The item that was used.
+	 * @param cheatGrowthComponent The CheatGrowthComponent of that item.
+	 * @param itemComponent The ItemComponent of that item, not used.
+	 * 
+	 * @see #growSapling(SaplingDefinitionComponent)
+	 * @see #onRootGrowth(DelayedActionTriggeredEvent, EntityRef, LogComponent, RootComponent)
+	 */
 	@ReceiveEvent
 	public void onCheatGrowth(ActivateEvent event, EntityRef item, CheatGrowthComponent cheatGrowthComponent, ItemComponent itemComponent) {
 		EntityRef target = event.getTarget();
@@ -150,6 +194,15 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		}
 	}
 	
+	/**
+	 * Ensures that the sapling item is dropped when a sapling is destroyed, and not the block itself.
+	 * The sapling item is taken from the {@link BushDefinitionComponent#seed} of the {@link SaplingDefinitionComponent#leaf}
+	 * prefab.
+	 * 
+	 * @param event The event for items being dropped from the block.
+	 * @param sapling The sapling's block entity.
+	 * @param saplingComponent The sapling's definition.
+	 */
 	@ReceiveEvent
 	public void onSaplingDestroyed(CreateBlockDropsEvent event, EntityRef sapling, SaplingDefinitionComponent saplingComponent) {
 		String seed = saplingComponent.leaf.getComponent(BushDefinitionComponent.class).seed;
@@ -160,11 +213,30 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         event.consume();
 	}
 	
+	/**
+	 * Destroys a log block and all of the logs above it, along with all of the leaves on the tree, then marks the root as dead.
+	 * This is done by calling {@link #destroyLog(DoDestroyEvent, EntityRef)}.
+	 * 
+	 * @param event The event for a log being destroyed.
+	 * @param log The block entity of the log which got destroyed.
+	 * @param logComponent The log's LogComponent
+	 */
 	@ReceiveEvent
 	public void onLogDestroyed(DoDestroyEvent event, EntityRef log, LogComponent logComponent) {
 		destroyLog(event, log);
 	}
 	
+	/**
+	 * Checks if a root is able to generate the tree for its current growth stage. It is able to generate if nothing is blocking
+	 * the positions where new log blocks would go. Because this method is also used for checking if a currently existing tree can be
+	 * grown, it will consider logs and leaves which are part of the same tree to be valid spaces.
+	 * 
+	 * @param rootEntity The block entity for the root of the tree.
+	 * 
+	 * @return Whether or not the tree can be generated.
+	 * 
+	 * @see #isValidBlock(Vector3i, EntityRef)
+	 */
 	private boolean canGenerateTree(EntityRef rootEntity) {
 		LogComponent logComponent = rootEntity.getComponent(LogComponent.class);
 		RootComponent rootComponent = rootEntity.getComponent(RootComponent.class);
@@ -179,6 +251,16 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		return true;
 	}
 
+	/**
+	 * Checks if the position is a valid space to spawn a new block. The space is considered valid if it is an air block or if it is part
+	 * of the tree.
+	 * 
+	 * @param position The position to check.
+	 * @param rootEntity The block entity of the root of the tree this block will be part of, used for checking if existing blocks are part
+	 * of the same tree.
+	 * 
+	 * @return Whether or not the position is valid.
+	 */
 	private boolean isValidBlock(Vector3i position, EntityRef rootEntity) {
 		if(position == null) {
 			return false;
@@ -197,6 +279,13 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		return b == airBlock;
 	}
 
+	/**
+	 * Checks whether the given position is a valid space to spawn a block. This method considers only air blocks to be valid spaces.
+	 * 
+	 * @param position The position to check.
+	 * 
+	 * @return Whether or not the position is valid.
+	 */
 	private boolean isValidBlock(Vector3i position) {
 		if(position == null) {
 			return false;
@@ -206,6 +295,16 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		return b == airBlock;
 	}
 
+	/**
+	 * Grows a sapling into a tree by first creating a root, then generating the tree if it can grow, otherwise reverting back to the
+	 * sapling form.
+	 * 
+	 * @param saplingComponent The sapling's definition.
+	 * 
+	 * @see #addLog(Vector3i, Block, boolean, SaplingDefinitionComponent)
+	 * @see #canGenerateTree(EntityRef)
+	 * @see #generateTree(EntityRef)
+	 */
 	private void growSapling(SaplingDefinitionComponent saplingComponent) {
 		Vector3i location = saplingComponent.location;
 		Block log = saplingComponent.log;
@@ -228,6 +327,15 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		}
 	}
 	
+	/**
+	 * Creates a tree using the root's current growth stage.
+	 * 
+	 * @param rootEntity The block entity for the root.
+	 * 
+	 * @see TreeGrowthStage
+	 * @see #addLog(Vector3i, Block, boolean, EntityRef)
+	 * @see #addLeaf(Vector3i, Prefab, RootComponent)
+	 */
 	private void generateTree(EntityRef rootEntity) {
 		LogComponent logComponent = rootEntity.getComponent(LogComponent.class);
 		RootComponent rootComponent = rootEntity.getComponent(RootComponent.class);
@@ -251,6 +359,17 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		rootEntity.addOrSaveComponent(rootComponent);
 	}
 	
+	/**
+	 * Creates a log block. This method does not add any components, it is mainly a helper method.
+	 * 
+	 * @param location The place to add the log.
+	 * @param log The block to use for the log.
+	 * @param force Whether or not the log should be forced into its position, ignoring its validity.
+	 * 
+	 * @return The newly created log's block entity.
+	 * 
+	 * @see #addLog(Vector3i, Block, boolean, EntityRef)
+	 */
 	private EntityRef addLog(Vector3i location, Block log, boolean force) {
 		if(force || isValidBlock(location)) {
 			worldProvider.setBlock(location, log);
@@ -259,6 +378,19 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		return EntityRef.NULL;
 	}
 	
+	/**
+	 * Creates a log block and adds a {@link LogComponent} to it.
+	 * 
+	 * @param location The place to add the log.
+	 * @param log The block to use for the log.
+	 * @param force Whether or not the log should be forced into its position, ignoring its validity.
+	 * @param root The root entity of the current tree, stored in the LogComponent. If it is {@link EntityRef.NULL}, this log will be
+	 * set as its own root.
+	 * 
+	 * @return The newly created log's block entity.
+	 * 
+	 * @see #addLog(Vector3i, Block, boolean)
+	 */
 	private EntityRef addLog(Vector3i location, Block log, boolean force, EntityRef root) {
 		EntityRef logEntity = addLog(location, log, force);
 		if(logEntity != null && logEntity != EntityRef.NULL) {
@@ -276,6 +408,18 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		return logEntity;
 	}
 	
+	/**
+	 * Creates a new log and gives it a {@link LogComponent} and a {@link RootComponent}.
+	 * 
+	 * @param location The place to add the log.
+	 * @param log The block to use for the log.
+	 * @param force Whether or not the log should be forced into its position, ignoring its validity.
+	 * @param base The sapling definition to base this root off of.
+	 * 
+	 * @return The newly created log's block entity.
+	 * 
+	 * @see #addLog(Vector3i, Block, boolean, EntityRef)
+	 */
 	private EntityRef addLog(Vector3i location, Block log, boolean force, SaplingDefinitionComponent base) {
 		EntityRef logEntity = addLog(location, log, force, EntityRef.NULL);
 		if(logEntity != null && logEntity != EntityRef.NULL) {
@@ -285,6 +429,16 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		return logEntity;
 	}
 	
+	/**
+	 * Creates a leaf at the specified location. This method only creates the bush block, it is mainly a helper method.
+	 * 
+	 * @param location The place to add the leaf block.
+	 * @param leaf The prefab for the leaf. It should have a {@link BushDefinitionComponent}
+	 * 
+	 * @return The newly created leaf's block entity.
+	 * 
+	 * @see #addLeaf(Vector3i, Prefab, RootComponent)
+	 */
 	private EntityRef addLeaf(Vector3i location, Prefab leaf) {
 		if(isValidBlock(location)) {
 			EntityRef leafEntity = entityManager.create(leaf);
@@ -294,6 +448,18 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		return EntityRef.NULL;
 	}
 	
+	/**
+	 * Creates a leaf at the specified location and adds it to a tree using its root.
+	 * 
+	 * @param location The place to add the leaf block.
+	 * @param leaf The prefab for the leaf. It should have a {@link BushDefinitionComponent}
+	 * @param rootComponent The RootComponent to add the leaf's {@link EntityRef} to.
+	 * 
+	 * @return The newly created leaf's block entity.
+	 * 
+	 * @see #addLeaf(Vector3i, Prefab)
+	 * @see RootComponent#leaves
+	 */
 	private EntityRef addLeaf(Vector3i location, Prefab leaf, RootComponent rootComponent) {
 		EntityRef leafEntity = addLeaf(location, leaf);
 		if(leafEntity != null && leafEntity != EntityRef.NULL) {
@@ -302,6 +468,12 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		return leafEntity;
 	}
 	
+	/**
+	 * Destroys all of the blocks in a tree except for the root. This is done usually to make way for a new growth stage of the tree.
+	 * 
+	 * @param rootEntity The root of the tree.
+	 * @param location The root's location.
+	 */
 	private void destroyTree(EntityRef rootEntity, Vector3i location) {
 		location.addY(1);
 		EntityRef aboveLogEntity = blockEntityRegistry.getExistingEntityAt(location);
@@ -312,6 +484,16 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		}
 	}
 
+	/**
+	 * Destroys a log block in a tree, and all of the logs above it along with all of the leaves on a tree. Also marks the tree as
+	 * no longer alive so that it does not grow anymore.
+	 * 
+	 * @param event The event for the log being destroyed. If it is present, it will be sent to all other blocks which are destroyed,
+	 * allowing them to drop items, otherwise, the blocks will simply be replaced with air, allowing for growth or un-growth.
+	 * @param log The log to be destroyed.
+	 * 
+	 * @see #destroyLeaves(Set, DoDestroyEvent)
+	 */
 	private void destroyLog(DoDestroyEvent event, EntityRef log) {
 		LogComponent logComponent = log.getComponent(LogComponent.class);
 		EntityRef rootEntity = logComponent.root;
@@ -340,6 +522,15 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		}
 	}
 
+	/**
+	 * Destroys all of the leaves in a set of leaves.
+	 * 
+	 * @param leaves The set of leaves to destroy.
+	 * @param event The event for the leaves being destroyed. If it is present, it will be sent to all blocks which are destroyed,
+	 * allowing them to drop items, otherwise, the blocks will simply be replaced with air, allowing for growth or un-growth.
+	 * 
+	 * @see RootComponent#leaves
+	 */
 	private void destroyLeaves(Set<EntityRef> leaves, DoDestroyEvent event) {
 		for(EntityRef leaf : leaves) {
 			if(leaf.exists() && leaf.hasComponent(BushDefinitionComponent.class)) {
