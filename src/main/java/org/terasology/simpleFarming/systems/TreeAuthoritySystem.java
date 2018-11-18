@@ -17,8 +17,6 @@ package org.terasology.simpleFarming.systems;
 
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -55,10 +53,7 @@ import org.terasology.world.block.entity.CreateBlockDropsEvent;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class TreeAuthoritySystem extends BaseComponentSystem {
-	@SuppressWarnings("unused")
-	private static final Logger LOGGER = LoggerFactory.getLogger(TreeAuthoritySystem.class);
-
-    /**
+	/**
      * Maximum single-axis impulse for seed and produce drops.
      */
     private static final float DROP_IMPULSE_AMOUNT = 22.0f;
