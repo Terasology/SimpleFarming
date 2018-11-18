@@ -258,10 +258,11 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		TreeGrowthStage currentStage = rootComponent.growthStages.get(rootComponent.growthStage);
 		Vector3i location = new Vector3i(logComponent.location).addY(1);
 		int rootY = location.y;
-		for(; location.y-rootY < currentStage.height-1; location.addY(1)) {
+		while(location.y-rootY < currentStage.height-1) {
 			if(!isValidBlock(location, rootEntity)) {
 				return false;
 			}
+			location.addY(1);
 		}
 		return true;
 	}
@@ -361,8 +362,9 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		TreeGrowthStage currentStage = rootComponent.growthStages.get(rootComponent.growthStage);
 		Vector3i location = new Vector3i(logComponent.location).addY(1);
 		int rootY = location.y;
-		for(; location.y-rootY < currentStage.height-1; location.addY(1)) {
+		while(location.y-rootY < currentStage.height-1) {
 			addLog(new Vector3i(location), log, false, rootEntity);
+            location.addY(1);
 		}
 		
 		Set<Vector3i> leaves = currentStage.getLeaves();
