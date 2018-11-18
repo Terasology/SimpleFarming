@@ -112,7 +112,9 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 	 */
 	@ReceiveEvent
     public void onSaplingGrowth(DelayedActionTriggeredEvent event, EntityRef sapling, SaplingDefinitionComponent saplingComponent) {
-		growSapling(saplingComponent);
+	    if(event.getActionId().equals("SimpleFarming:" + sapling.getId() + ":Growth")) {
+		    growSapling(saplingComponent);
+	    }
 	}
 	
 	/**
@@ -131,7 +133,8 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 	 */
 	@ReceiveEvent
 	public void onRootGrowth(DelayedActionTriggeredEvent event, EntityRef rootEntity, LogComponent logComponent, RootComponent rootComponent) {
-		if(!rootComponent.alive || rootComponent.growthStage+1 == rootComponent.growthStages.size()) {
+	    if(!rootComponent.alive || rootComponent.growthStage+1 == rootComponent.growthStages.size()
+		        || !event.getActionId().equals("SimpleFarming:" + rootEntity.getId() + ":Growth")) {
 			return;
 		}
 		
@@ -570,7 +573,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
      * @param max    the maximum duration in milliseconds
      */
     private void resetDelay(EntityRef entity, int min, int max) {
-    	String actionId = "SimpleFarming:" + entity.getId();
+    	String actionId = "SimpleFarming:" + entity.getId() + ":Growth";
     	if(delayManager.hasDelayedAction(entity, actionId)) {
     		delayManager.cancelDelayedAction(entity, actionId);
     	}
