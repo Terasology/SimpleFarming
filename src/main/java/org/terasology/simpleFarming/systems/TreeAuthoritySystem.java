@@ -402,7 +402,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 	 */
 	private EntityRef addLog(Vector3i location, Block log, boolean force, EntityRef root) {
 		EntityRef logEntity = addLog(location, log, force);
-		if(logEntity != null && logEntity != EntityRef.NULL) {
+		if(logEntity != EntityRef.NULL) {
 			LogComponent logComponent = new LogComponent();
 			
 			logComponent.location = location;
@@ -431,7 +431,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 	 */
 	private EntityRef addLog(Vector3i location, Block log, boolean force, SaplingDefinitionComponent base) {
 		EntityRef logEntity = addLog(location, log, force, EntityRef.NULL);
-		if(logEntity != null && logEntity != EntityRef.NULL) {
+		if(logEntity != EntityRef.NULL) {
 			RootComponent rootComponent = new RootComponent(base);
 			logEntity.addOrSaveComponent(rootComponent);
 		}
@@ -471,7 +471,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 	 */
 	private EntityRef addLeaf(Vector3i location, Prefab leaf, RootComponent rootComponent) {
 		EntityRef leafEntity = addLeaf(location, leaf);
-		if(leafEntity != null && leafEntity != EntityRef.NULL) {
+		if(leafEntity != EntityRef.NULL) {
 			rootComponent.leaves.add(leafEntity);
 		}
 		return leafEntity;
