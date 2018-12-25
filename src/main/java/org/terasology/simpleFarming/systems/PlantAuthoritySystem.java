@@ -28,6 +28,8 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.SeedDefinitionComponent;
 import org.terasology.simpleFarming.events.OnSeedPlanted;
+import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -50,6 +52,8 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
 
     /** The standard air block, cached on initialization. */
     private Block airBlock;
+    
+    private static Random random = new FastRandom();
 
     @Override
     public void postBegin() {
@@ -108,5 +112,16 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
         position.addY(1);
 
         return (targetBlock == airBlock && !belowBlock.isPenetrable());
+    }
+
+    /**
+     * Returns a random integer in the specified interval.
+     *
+     * @param min The minimum number
+     * @param max The maximum number
+     * @return the random number, or {@code min} if {@code max <= min}
+     */
+    public static long generateRandom(int min, int max) {
+        return max == 0 ? min : random.nextInt(min, max);
     }
 }

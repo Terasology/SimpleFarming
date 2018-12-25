@@ -566,18 +566,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
     	if(delayManager.hasDelayedAction(entity, actionId)) {
     		delayManager.cancelDelayedAction(entity, actionId);
     	}
-        delayManager.addDelayedAction(entity, actionId, generateRandom(min, max));
-    }
-
-    /**
-     * Returns a random integer in the specified interval.
-     *
-     * @param min The minimum number
-     * @param max The maximum number
-     * @return the random number, or {@code min} if {@code max <= min}
-     */
-    private long generateRandom(int min, int max) {
-        return max == 0 ? min : random.nextInt(min, max);
+        delayManager.addDelayedAction(entity, actionId, PlantAuthoritySystem.generateRandom(min, max));
     }
 
     /**

@@ -381,17 +381,6 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param max    the maximum duration in milliseconds
      */
     private void resetDelay(EntityRef entity, int min, int max) {
-        delayManager.addDelayedAction(entity, "SimpleFarming:" + entity.getId(), generateRandom(min, max));
-    }
-
-    /**
-     * Returns a random integer in the specified interval.
-     *
-     * @param min the minimum number
-     * @param max the maximum number
-     * @return the random number, or {@code min} if {@code max <= min}
-     */
-    private long generateRandom(int min, int max) {
-        return max <= min ? min : random.nextLong(min, max);
+        delayManager.addDelayedAction(entity, "SimpleFarming:" + entity.getId(), PlantAuthoritySystem.generateRandom(min, max));
     }
 }
