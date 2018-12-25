@@ -282,16 +282,9 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		}
 		
 		EntityRef e = blockEntityRegistry.getExistingEntityAt(position);
-		if(e != EntityRef.NULL && e.hasComponent(LogComponent.class)
-				&& e.getComponent(LogComponent.class).root == rootEntity) {
-			return true;
-		}
-		if(rootEntity.getComponent(RootComponent.class).leaves.contains(e)) {
-			return true;
-		}
-		
-		Block b = worldProvider.getBlock(position);
-		return b == airBlock;
+		return isValidBlock(position) //Air block
+		        || (e != EntityRef.NULL && e.hasComponent(LogComponent.class) && e.getComponent(LogComponent.class).root == rootEntity)   //Log Block
+		        || rootEntity.getComponent(RootComponent.class).leaves.contains(e);   //Leaf block
 	}
 
 	/**
