@@ -15,17 +15,10 @@
  */
 package org.terasology.simpleFarming.systems;
 
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.players.PlayerCharacterComponent;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.simpleFarming.components.BushDefinitionComponent;
-import org.terasology.simpleFarming.components.CheatGrowthComponent;
-import org.terasology.simpleFarming.components.BushGrowthStage;
-import org.terasology.simpleFarming.components.SeedDefinitionComponent;
-import org.terasology.simpleFarming.events.DoDestroyPlant;
-import org.terasology.simpleFarming.events.DoRemoveBud;
-import org.terasology.simpleFarming.events.OnSeedPlanted;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
+
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -36,22 +29,25 @@ import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
+import org.terasology.simpleFarming.components.BushDefinitionComponent;
+import org.terasology.simpleFarming.components.BushGrowthStage;
+import org.terasology.simpleFarming.components.CheatGrowthComponent;
+import org.terasology.simpleFarming.components.SeedDefinitionComponent;
+import org.terasology.simpleFarming.events.DoDestroyPlant;
+import org.terasology.simpleFarming.events.DoRemoveBud;
+import org.terasology.simpleFarming.events.OnSeedPlanted;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.entity.CreateBlockDropsEvent;
-import org.terasology.world.block.loader.BlockFamilyDefinition;
-
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * System managing the lifecycle of bushes.
@@ -288,7 +284,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      */
     private void onBushDestroyed(Vector3i position, BushDefinitionComponent bushComponent) {
         if (bushComponent.currentStage == bushComponent.growthStages.size() - 1) {
-            dropSeeds(random.nextInt(1, 3),
+            dropSeeds(numSeeds(bushComponent),
                     bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
                     position.toVector3f());
         }
@@ -324,6 +320,30 @@ public class BushAuthoritySystem extends BaseComponentSystem {
             seedItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
             seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
         }
+    }
+    
+    /**
+     * Generates a random number of seeds to drop for a bush.
+     * 
+     * @param bushComponent The bush definition whose {@link BushDefinitionComponent#seedDropChances} will be used
+     * @return A randomly generated number of seeds to drop
+     */
+    private int numSeeds(BushDefinitionComponent bushComponent) {
+        int sum = 0;
+        for(int weight : bushComponent.seedDropChances) {
+            sum += weight;
+        }
+        
+        int rand = random.nextInt(sum);
+        
+        for(int i=0; i<bushComponent.seedDropChances.size(); i++) {
+            int weight = bushComponent.seedDropChances.get(i);
+            if(rand < weight) {
+                return i;
+            }
+            rand -= weight;
+        }
+        return 0;
     }
 
     /**
