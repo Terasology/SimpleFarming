@@ -26,7 +26,6 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.health.DoDestroyEvent;
@@ -50,7 +49,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.entity.CreateBlockDropsEvent;
-import org.terasology.world.block.items.BlockItemComponent;
+import org.terasology.world.block.items.BlockItemFactory;
 
 /**
  * Manages the growth, destruction, and other events for trees.
@@ -73,6 +72,8 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
     @In
     private EntityManager entityManager;
 
+    private BlockItemFactory blockItemFactory;
+
     private FastRandom random = new FastRandom();
 
     private Block airBlock;
@@ -80,6 +81,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
     @Override
     public void postBegin() {
         super.postBegin();
+        blockItemFactory = new BlockItemFactory(entityManager);
         airBlock = blockManager.getBlock(BlockManager.AIR_ID);
     }
 
@@ -548,20 +550,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         }
 
         if(doItemDrops) {
-            EntityRef logItem = entityManager.create("blockItemBase");
-            Block logBlock = log.getComponent(BlockComponent.class).block;
-
-            BlockItemComponent blockItemComponent = logItem.getComponent(BlockItemComponent.class);
-            blockItemComponent.blockFamily = logBlock.getBlockFamily();
-            logItem.addOrSaveComponent(blockItemComponent);
-
-            DisplayNameComponent displayNameComponent = new DisplayNameComponent();
-            displayNameComponent.name = logBlock.getDisplayName();
-            logItem.addOrSaveComponent(displayNameComponent);
-
-            ItemComponent itemComponent = logItem.getComponent(ItemComponent.class);
-            itemComponent.stackId = "block:"+logBlock.getURI().toString();
-
+            EntityRef logItem = blockItemFactory.newInstance(log.getComponent(BlockComponent.class).block.getBlockFamily(), 1);
             logItem.send(new DropItemEvent(logComponent.location.toVector3f().add(0, 0.5f, 0)));
             logItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
         }
