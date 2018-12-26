@@ -26,6 +26,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.health.DoDestroyEvent;
@@ -40,6 +41,7 @@ import org.terasology.simpleFarming.components.LogComponent;
 import org.terasology.simpleFarming.components.RootComponent;
 import org.terasology.simpleFarming.components.SaplingDefinitionComponent;
 import org.terasology.simpleFarming.components.TreeGrowthStage;
+import org.terasology.simpleFarming.events.DoDestroyPlant;
 import org.terasology.simpleFarming.events.OnSeedPlanted;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
@@ -48,6 +50,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.entity.CreateBlockDropsEvent;
+import org.terasology.world.block.items.BlockItemComponent;
 
 /**
  * Manages the growth, destruction, and other events for trees.
@@ -210,35 +213,64 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 	
 	/**
 	 * Ensures that the sapling item is dropped when a sapling is destroyed, and not the block itself.
-	 * The sapling item is taken from the {@link BushDefinitionComponent#seed} of the {@link SaplingDefinitionComponent#leaf}
-	 * prefab.
+	 * Sends the sapling a {@link DoDestroyPlant} event to destroy it properly.
 	 * 
 	 * @param event The event for items being dropped from the block.
 	 * @param sapling The sapling's block entity.
 	 * @param saplingComponent The sapling's definition.
+	 * 
+	 * @see #onSaplingDestroyed(DoDestroyPlant, EntityRef, SaplingDefinitionComponent)
 	 */
 	@ReceiveEvent
 	public void onSaplingDestroyed(CreateBlockDropsEvent event, EntityRef sapling, SaplingDefinitionComponent saplingComponent) {
-		String seed = saplingComponent.leaf.getComponent(BushDefinitionComponent.class).seed;
-		EntityRef seedItem = entityManager.create(seed);
-        seedItem.send(new DropItemEvent(saplingComponent.location.toVector3f().add(0, 0.5f, 0)));
-        seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
-        
-        event.consume();
+		sapling.send(new DoDestroyPlant());
+	    event.consume();
 	}
 	
 	/**
-	 * Destroys a log block and all of the logs above it, along with all of the leaves on the tree, then marks the root as dead.
-	 * This is done by calling {@link #destroyLog(DoDestroyEvent, EntityRef)}.
+     * Drops the sapling as an item.
+     * The sapling item is taken from the {@link BushDefinitionComponent#seed} of the {@link SaplingDefinitionComponent#leaf}
+     * prefab.
+     * 
+     * @param event The event for the sapling being destroyed.
+     * @param sapling The sapling's block entity.
+     * @param saplingComponent The sapling's definition.
+     */
+	@ReceiveEvent
+	public void onSaplingDestroyed(DoDestroyPlant event, EntityRef sapling, SaplingDefinitionComponent saplingComponent) {
+	    String seed = saplingComponent.leaf.getComponent(BushDefinitionComponent.class).seed;
+        EntityRef seedItem = entityManager.create(seed);
+        seedItem.send(new DropItemEvent(saplingComponent.location.toVector3f().add(0, 0.5f, 0)));
+        seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
+	}
+	
+	/**
+	 * Handles the destruction of a log block by sending it a {@link DoDestroyPlant} event.
 	 * 
 	 * @param event The event for a log being destroyed.
 	 * @param log The block entity of the log which got destroyed.
 	 * @param logComponent The log's LogComponent
+	 * 
+	 * @see #onLogDestroyed(DoDestroyPlant, EntityRef, LogComponent)
 	 */
 	@ReceiveEvent
-	public void onLogDestroyed(DoDestroyEvent event, EntityRef log, LogComponent logComponent) {
-		destroyLog(event, log);
+	public void onLogDestroyed(CreateBlockDropsEvent event, EntityRef log, LogComponent logComponent) {
+		log.send(new DoDestroyPlant());
+		event.consume();
 	}
+    
+    /**
+     * Destroys a log block and all of the logs above it, along with all of the leaves on the tree, then marks the root as dead.
+     * This is done by calling {@link #destroyLog(DoDestroyEvent, EntityRef)}.
+     * 
+     * @param event The event for a log being destroyed.
+     * @param log The block entity of the log which got destroyed.
+     * @param logComponent The log's LogComponent
+     */
+    @ReceiveEvent
+    public void onLogDestroyed(DoDestroyPlant event, EntityRef log, LogComponent logComponent) {
+        destroyLog(log, true);
+    }
 	
 	/**
 	 * Checks if a root is able to generate the tree for its current growth stage. It is able to generate if nothing is blocking
@@ -489,7 +521,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 		location.addY(-1);
 		if(aboveLogEntity != EntityRef.NULL && aboveLogEntity.hasComponent(LogComponent.class)
 				&& aboveLogEntity.getComponent(LogComponent.class).root == rootEntity) {
-			destroyLog(null, aboveLogEntity);
+			destroyLog(aboveLogEntity, false);
 		}
 	}
 
@@ -497,36 +529,52 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 	 * Destroys a log block in a tree, and all of the logs above it along with all of the leaves on a tree. Also marks the tree as
 	 * no longer alive so that it does not grow anymore.
 	 * 
-	 * @param event The event for the log being destroyed. If it is present, it will be sent to all other blocks which are destroyed,
-	 * allowing them to drop items, otherwise, the blocks will simply be replaced with air, allowing for growth or un-growth.
 	 * @param log The log to be destroyed.
+	 * @param doItemDrops Whether or not the tree should drop its items. If true, then the leaves and logs will be sent
+     * {@link DoDestroyPlant} events. Otherwise, they will just be replaced with air.
 	 * 
-	 * @see #destroyLeaves(Set, DoDestroyEvent)
+	 * @see #destroyLeaves(Set, boolean)
 	 */
-	private void destroyLog(DoDestroyEvent event, EntityRef log) {
+	private void destroyLog(EntityRef log, boolean doItemDrops) {
 		LogComponent logComponent = log.getComponent(LogComponent.class);
 		EntityRef rootEntity = logComponent.root;
 		RootComponent rootComponent = rootEntity.getComponent(RootComponent.class);
 		
-		if(rootComponent.alive) {
-			destroyLeaves(rootComponent.leaves, event);
+		if(rootComponent != null && rootComponent.alive) {
+			destroyLeaves(rootComponent.leaves, doItemDrops);
 			rootComponent.leaves.clear();
 			rootComponent.alive = false;
 			rootEntity.addOrSaveComponent(rootComponent);
 		}
 		
-		if(event == null) {
-			worldProvider.setBlock(logComponent.location, airBlock);
+		if(doItemDrops) {
+		    EntityRef logItem = entityManager.create("blockItemBase");
+		    Block logBlock = log.getComponent(BlockComponent.class).block;
+		    
+		    BlockItemComponent blockItemComponent = logItem.getComponent(BlockItemComponent.class);
+		    blockItemComponent.blockFamily = logBlock.getBlockFamily();
+		    logItem.addOrSaveComponent(blockItemComponent);
+		    
+		    DisplayNameComponent displayNameComponent = new DisplayNameComponent();
+		    displayNameComponent.name = logBlock.getDisplayName();
+		    logItem.addOrSaveComponent(displayNameComponent);
+		    
+		    ItemComponent itemComponent = logItem.getComponent(ItemComponent.class);
+		    itemComponent.stackId = "block:"+logBlock.getURI().toString();
+		    
+	        logItem.send(new DropItemEvent(logComponent.location.toVector3f().add(0, 0.5f, 0)));
+	        logItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
 		}
+        worldProvider.setBlock(logComponent.location, airBlock);
 		
 		Vector3i aboveLocation = new Vector3i(logComponent.location).addY(1);
 		EntityRef aboveLogEntity = blockEntityRegistry.getExistingEntityAt(aboveLocation);
 		if(aboveLogEntity != EntityRef.NULL && aboveLogEntity.hasComponent(LogComponent.class)
 				&& aboveLogEntity.getComponent(LogComponent.class).root == rootEntity) {
-			if(event == null) {
-				destroyLog(null, aboveLogEntity);
+			if(doItemDrops) {
+				aboveLogEntity.send(new DoDestroyPlant());
 			} else {
-				aboveLogEntity.send(event);
+				destroyLog(aboveLogEntity, false);
 			}
 		}
 	}
@@ -535,20 +583,19 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 	 * Destroys all of the leaves in a set of leaves.
 	 * 
 	 * @param leaves The set of leaves to destroy.
-	 * @param event The event for the leaves being destroyed. If it is present, it will be sent to all blocks which are destroyed,
-	 * allowing them to drop items, otherwise, the blocks will simply be replaced with air, allowing for growth or un-growth.
+	 * @param doItemDrops Whether or not the leaves should drop their items (saplings). If true, then the leaves will be sent
+	 * {@link DoDestroyPlant} events. Otherwise, they will just be replaced with air.
 	 * 
 	 * @see RootComponent#leaves
 	 */
-	private void destroyLeaves(Set<EntityRef> leaves, DoDestroyEvent event) {
+	private void destroyLeaves(Set<EntityRef> leaves, boolean doItemDrops) {
 		for(EntityRef leaf : leaves) {
 			if(leaf.exists() && leaf.hasComponent(BushDefinitionComponent.class)) {
 				Vector3i leafLocation = leaf.getComponent(BlockComponent.class).position;
-				if(event != null) {
-					leaf.send(event);
-				} else {
-					worldProvider.setBlock(leafLocation, airBlock);
+				if(doItemDrops) {
+					leaf.send(new DoDestroyPlant());
 				}
+				worldProvider.setBlock(leafLocation, airBlock);
 			}
 		}
 	}
