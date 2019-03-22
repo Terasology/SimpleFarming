@@ -28,7 +28,6 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
-import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.math.geom.Vector3i;
@@ -80,7 +79,6 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 
     @Override
     public void postBegin() {
-        super.postBegin();
         blockItemFactory = new BlockItemFactory(entityManager);
         airBlock = blockManager.getBlock(BlockManager.AIR_ID);
     }
@@ -171,45 +169,8 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
             }
         } else if(target.hasComponent(LogComponent.class)) {
             EntityRef rootEntity = target.getComponent(LogComponent.class).root;
-            RootComponent rootComponent = rootEntity.getComponent(RootComponent.class);
-            if(!rootComponent.alive) {
-                return;
-            }
 
-            LogComponent logComponent = rootEntity.getComponent(LogComponent.class);
-            if(cheatGrowthComponent.causesUnGrowth) {
-                if(rootComponent.growthStage == 0) {
-                    destroyTree(rootEntity, logComponent.location);
-                    worldProvider.setBlock(logComponent.location, rootComponent.sapling);
-                    EntityRef saplingEntity = blockEntityRegistry.getExistingEntityAt(logComponent.location);
-                    SaplingDefinitionComponent saplingComponent = new SaplingDefinitionComponent(rootComponent, logComponent.location);
-                    saplingEntity.addOrSaveComponent(saplingComponent);
-                    TreeGrowthStage currentStage = saplingComponent.growthStages.get(0);
-                    resetDelay(saplingEntity, currentStage.minTime, currentStage.maxTime);
-                    return;
-                }
-                rootComponent.growthStage--;
-                rootEntity.addOrSaveComponent(rootComponent);
-                destroyTree(rootEntity, logComponent.location);
-                generateTree(rootEntity);
-                TreeGrowthStage nextStage = rootComponent.growthStages.get(rootComponent.growthStage+1);
-                resetDelay(rootEntity, nextStage.minTime, nextStage.maxTime);
-            } else {
-                if(rootComponent.growthStage+1 == rootComponent.growthStages.size()) {
-                    return;
-                }
-
-                rootComponent.growthStage++;
-                if(canGenerateTree(rootEntity)) {
-                    rootEntity.addOrSaveComponent(rootComponent);
-                    destroyTree(rootEntity, logComponent.location);
-                    generateTree(rootEntity);
-                    if(rootComponent.growthStage+1 < rootComponent.growthStages.size()) {
-                        TreeGrowthStage nextStage = rootComponent.growthStages.get(rootComponent.growthStage+1);
-                        resetDelay(rootEntity, nextStage.minTime, nextStage.maxTime);
-                    }
-                }
-            }
+            cheatGrowTree(cheatGrowthComponent.causesUnGrowth, rootEntity);
         }
     }
 
@@ -263,7 +224,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 
     /**
      * Destroys a log block and all of the logs above it, along with all of the leaves on the tree, then marks the root as dead.
-     * This is done by calling {@link #destroyLog(DoDestroyEvent, EntityRef)}.
+     * This is done by calling {@link #destroyLog(EntityRef, boolean)}.
      * 
      * @param event The event for a log being destroyed.
      * @param log The block entity of the log which got destroyed.
@@ -272,6 +233,48 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onLogDestroyed(DoDestroyPlant event, EntityRef log, LogComponent logComponent) {
         destroyLog(log, true);
+    }
+
+    private void cheatGrowTree(boolean causesUnGrowth, EntityRef rootEntity) {
+        LogComponent logComponent = rootEntity.getComponent(LogComponent.class);
+        RootComponent rootComponent = rootEntity.getComponent(RootComponent.class);
+        if(!rootComponent.alive) {
+            return;
+        }
+
+        if(causesUnGrowth) {
+            if(rootComponent.growthStage == 0) {
+                destroyTree(rootEntity, logComponent.location);
+                worldProvider.setBlock(logComponent.location, rootComponent.sapling);
+                EntityRef saplingEntity = blockEntityRegistry.getExistingEntityAt(logComponent.location);
+                SaplingDefinitionComponent saplingComponent = new SaplingDefinitionComponent(rootComponent, logComponent.location);
+                saplingEntity.addOrSaveComponent(saplingComponent);
+                TreeGrowthStage currentStage = saplingComponent.growthStages.get(0);
+                resetDelay(saplingEntity, currentStage.minTime, currentStage.maxTime);
+                return;
+            }
+            rootComponent.growthStage--;
+            rootEntity.addOrSaveComponent(rootComponent);
+            destroyTree(rootEntity, logComponent.location);
+            generateTree(rootEntity);
+            TreeGrowthStage nextStage = rootComponent.growthStages.get(rootComponent.growthStage+1);
+            resetDelay(rootEntity, nextStage.minTime, nextStage.maxTime);
+        } else {
+            if(rootComponent.growthStage+1 == rootComponent.growthStages.size()) {
+                return;
+            }
+
+            rootComponent.growthStage++;
+            if(canGenerateTree(rootEntity)) {
+                rootEntity.addOrSaveComponent(rootComponent);
+                destroyTree(rootEntity, logComponent.location);
+                generateTree(rootEntity);
+                if(rootComponent.growthStage+1 < rootComponent.growthStages.size()) {
+                    TreeGrowthStage nextStage = rootComponent.growthStages.get(rootComponent.growthStage+1);
+                    resetDelay(rootEntity, nextStage.minTime, nextStage.maxTime);
+                }
+            }
+        }
     }
 
     /**
