@@ -170,7 +170,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         } else if(target.hasComponent(LogComponent.class)) {
             EntityRef rootEntity = target.getComponent(LogComponent.class).root;
 
-            cheatGrowTree(cheatGrowthComponent.causesUnGrowth, rootEntity);
+            shiftTreeGrowth(cheatGrowthComponent.causesUnGrowth, rootEntity);
         }
     }
 
@@ -235,14 +235,20 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         destroyLog(log, true);
     }
 
-    private void cheatGrowTree(boolean causesUnGrowth, EntityRef rootEntity) {
+    /**
+     * Grows or ungrows a tree 1 stage if possible.
+     * 
+     * @param ungrowth If true, the tree will un-grow 1 stage. Otherwise, the tree will grow forward 1 stage.
+     * @param rootEntity The block entity for the root of the tree.
+     */
+    private void shiftTreeGrowth(boolean ungrowth, EntityRef rootEntity) {
         LogComponent logComponent = rootEntity.getComponent(LogComponent.class);
         RootComponent rootComponent = rootEntity.getComponent(RootComponent.class);
         if(!rootComponent.alive) {
             return;
         }
 
-        if(causesUnGrowth) {
+        if(ungrowth) {
             if(rootComponent.growthStage == 0) {
                 destroyTree(rootEntity, logComponent.location);
                 worldProvider.setBlock(logComponent.location, rootComponent.sapling);
