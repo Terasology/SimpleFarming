@@ -35,6 +35,7 @@ import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.CheatGrowthComponent;
+import org.terasology.simpleFarming.components.LeafStructureComponent;
 import org.terasology.simpleFarming.components.LogComponent;
 import org.terasology.simpleFarming.components.RootComponent;
 import org.terasology.simpleFarming.components.SaplingDefinitionComponent;
@@ -616,106 +617,15 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 
     /**
      * Gets the leaf locations for a growth stage.
-     * If using a default configuration, the leaves will automatically be adjusted to the {@link TreeGrowthStage#height}
      * 
      * @param growthStage The growth stage to get the values from.
      * 
      * @return A Set of all of the locations where a leaf should be grown.
      */
     private static Set<Vector3i> getLeaves(TreeGrowthStage growthStage) {
-        if(growthStage.defLeaves == 0) {
-            return growthStage.leaves;
-        }
-
-        Vector3i location = new Vector3i(0, growthStage.height-1, 0);
-        Set<Vector3i> defLeafSet = new HashSet<>();
-        switch(growthStage.defLeaves) {
-        case 3:
-            defLeafSet.add(new Vector3i(0, 2, 0).add(location));
-            defLeafSet.add(new Vector3i(1, 2, 0).add(location));
-            defLeafSet.add(new Vector3i(-1, 2, 0).add(location));
-            defLeafSet.add(new Vector3i(0, 2, 1).add(location));
-            defLeafSet.add(new Vector3i(0, 2, -1).add(location));
-            defLeafSet.add(new Vector3i(1, 2, 1).add(location));
-            defLeafSet.add(new Vector3i(-1, 2, 1).add(location));
-            defLeafSet.add(new Vector3i(1, 2, -1).add(location));
-            defLeafSet.add(new Vector3i(-1, 2, -1).add(location));
-
-            defLeafSet.add(new Vector3i(2, 1, 1).add(location));
-            defLeafSet.add(new Vector3i(2, 1, 0).add(location));
-            defLeafSet.add(new Vector3i(2, 1, -1).add(location));
-            defLeafSet.add(new Vector3i(2, 0, 1).add(location));
-            defLeafSet.add(new Vector3i(2, 0, 0).add(location));
-            defLeafSet.add(new Vector3i(2, 0, -1).add(location));
-            defLeafSet.add(new Vector3i(2, -1, 1).add(location));
-            defLeafSet.add(new Vector3i(2, -1, 0).add(location));
-            defLeafSet.add(new Vector3i(2, -1, -1).add(location));
-
-            defLeafSet.add(new Vector3i(-2, 1, 1).add(location));
-            defLeafSet.add(new Vector3i(-2, 1, 0).add(location));
-            defLeafSet.add(new Vector3i(-2, 1, -1).add(location));
-            defLeafSet.add(new Vector3i(-2, 0, 1).add(location));
-            defLeafSet.add(new Vector3i(-2, 0, 0).add(location));
-            defLeafSet.add(new Vector3i(-2, 0, -1).add(location));
-            defLeafSet.add(new Vector3i(-2, -1, 1).add(location));
-            defLeafSet.add(new Vector3i(-2, -1, 0).add(location));
-            defLeafSet.add(new Vector3i(-2, -1, -1).add(location));
-
-            defLeafSet.add(new Vector3i(1, 1, 2).add(location));
-            defLeafSet.add(new Vector3i(0, 1, 2).add(location));
-            defLeafSet.add(new Vector3i(-1, 1, 2).add(location));
-            defLeafSet.add(new Vector3i(1, 0, 2).add(location));
-            defLeafSet.add(new Vector3i(0, 0, 2).add(location));
-            defLeafSet.add(new Vector3i(-1, 0, 2).add(location));
-            defLeafSet.add(new Vector3i(1, -1, 2).add(location));
-            defLeafSet.add(new Vector3i(0, -1, 2).add(location));
-            defLeafSet.add(new Vector3i(-1, -1, 2).add(location));
-
-            defLeafSet.add(new Vector3i(1, 1, -2).add(location));
-            defLeafSet.add(new Vector3i(0, 1, -2).add(location));
-            defLeafSet.add(new Vector3i(-1, 1, -2).add(location));
-            defLeafSet.add(new Vector3i(1, 0, -2).add(location));
-            defLeafSet.add(new Vector3i(0, 0, -2).add(location));
-            defLeafSet.add(new Vector3i(-1, 0, -2).add(location));
-            defLeafSet.add(new Vector3i(1, -1, -2).add(location));
-            defLeafSet.add(new Vector3i(0, -1, -2).add(location));
-            defLeafSet.add(new Vector3i(-1, -1, -2).add(location));
-        case 2:
-            defLeafSet.add(new Vector3i(-1, 1, 1).add(location));
-            defLeafSet.add(new Vector3i(1, 1, -1).add(location));
-            defLeafSet.add(new Vector3i(-1, 1, -1).add(location));
-            defLeafSet.add(new Vector3i(1, 1, 1).add(location));
-
-            defLeafSet.add(new Vector3i(1, 1, 0).add(location));
-            defLeafSet.add(new Vector3i(0, 1, 1).add(location));
-            defLeafSet.add(new Vector3i(-1, 1, 0).add(location));
-            defLeafSet.add(new Vector3i(0, 1, -1).add(location));
-
-
-            defLeafSet.add(new Vector3i(-1, 0, 1).add(location));
-            defLeafSet.add(new Vector3i(1, 0, -1).add(location));
-            defLeafSet.add(new Vector3i(-1, 0, -1).add(location));
-            defLeafSet.add(new Vector3i(1, 0, 1).add(location));
-
-
-            defLeafSet.add(new Vector3i(-1, -1, 1).add(location));
-            defLeafSet.add(new Vector3i(1, -1, -1).add(location));
-            defLeafSet.add(new Vector3i(-1, -1, -1).add(location));
-            defLeafSet.add(new Vector3i(1, -1, 1).add(location));
-
-            defLeafSet.add(new Vector3i(1, -1, 0).add(location));
-            defLeafSet.add(new Vector3i(0, -1, 1).add(location));
-            defLeafSet.add(new Vector3i(-1, -1, 0).add(location));
-            defLeafSet.add(new Vector3i(0, -1, -1).add(location));
-        case 1:
-            defLeafSet.add(new Vector3i(0, 1, 0).add(location));
-
-            defLeafSet.add(new Vector3i(1, 0, 0).add(location));
-            defLeafSet.add(new Vector3i(0, 0, 1).add(location));
-            defLeafSet.add(new Vector3i(-1, 0, 0).add(location));
-            defLeafSet.add(new Vector3i(0, 0, -1).add(location));
-            break;
-        }
-        return defLeafSet;
+        Set<Vector3i> locations = growthStage.leafStructure.getComponent(LeafStructureComponent.class).leaves;
+        Set<Vector3i> adjustedLocations = new HashSet<>();
+        locations.forEach(location -> adjustedLocations.add(new Vector3i(location).addY(growthStage.height-1)));
+        return adjustedLocations;
     }
 }

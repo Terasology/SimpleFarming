@@ -15,10 +15,7 @@
  */
 package org.terasology.simpleFarming.components;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.terasology.math.geom.Vector3i;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.reflection.MappedContainer;
 
 /**
@@ -31,16 +28,10 @@ import org.terasology.reflection.MappedContainer;
 @MappedContainer
 public class TreeGrowthStage {
     /** Number of logs this stage should have. */
-	public int height;
-	
-	/** Locations of each leaf in this stage, relative to the root (the lowest log block). */
-	public Set<Vector3i> leaves = new HashSet<>();
-    
-    /**
-     * Default leaf configuration to use, 0 if custom defined.
-     * There are currently 3 default leaf configurations.
-     */
-    public int defLeaves;
+    public int height;
+
+    /** Prefab containing a {@link LeafStructureComponent} defining the structure of this stage's leaves. */
+    public Prefab leafStructure;
 
     /** Minimum time before this growth stage, in milliseconds. */
     public int minTime;
@@ -52,10 +43,10 @@ public class TreeGrowthStage {
     public TreeGrowthStage() {
     }
 
-    /** Construct a copy of the given {@code GrowthStage}. */
+    /** Construct a copy of the given {@code TreeGrowthStage}. */
     public TreeGrowthStage(TreeGrowthStage clone) {
-    	this.height = clone.height;
-    	this.leaves = clone.leaves;
+        this.height = clone.height;
+        this.leafStructure = clone.leafStructure;
         this.maxTime = clone.maxTime;
         this.minTime = clone.minTime;
     }
