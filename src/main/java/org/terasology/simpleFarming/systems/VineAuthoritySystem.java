@@ -15,8 +15,18 @@
  */
 package org.terasology.simpleFarming.systems;
 
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
+import org.terasology.logic.delay.DelayManager;
+import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.math.geom.Vector3i;
+import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.CheatGrowthComponent;
 import org.terasology.simpleFarming.components.SeedDefinitionComponent;
@@ -25,16 +35,6 @@ import org.terasology.simpleFarming.components.VineNodeComponent;
 import org.terasology.simpleFarming.events.DoDestroyPlant;
 import org.terasology.simpleFarming.events.DoRemoveBud;
 import org.terasology.simpleFarming.events.OnSeedPlanted;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.delay.DelayManager;
-import org.terasology.logic.delay.DelayedActionTriggeredEvent;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
@@ -433,17 +433,6 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * @param max    the maximum duration in milliseconds
      */
     private void resetDelay(EntityRef entity, int min, int max) {
-        delayManager.addDelayedAction(entity, "SimpleFarming:" + entity.getId(), generateRandom(min, max));
-    }
-
-    /**
-     * Returns a random integer in the specified interval.
-     *
-     * @param min The minimum number
-     * @param max The maximum number
-     * @return the random number, or {@code min} if {@code max <= min}
-     */
-    private long generateRandom(int min, int max) {
-        return max == 0 ? min : random.nextInt(min, max);
+        delayManager.addDelayedAction(entity, "SimpleFarming:" + entity.getId(), PlantAuthoritySystem.generateRandom(min, max));
     }
 }

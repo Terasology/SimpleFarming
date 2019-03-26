@@ -24,7 +24,7 @@ import org.terasology.world.block.Block;
  * @see BushDefinitionComponent
  */
 @MappedContainer
-public class GrowthStage {
+public class BushGrowthStage {
     /** The block to use for this stage. */
     public Block block;
 
@@ -35,11 +35,11 @@ public class GrowthStage {
     public int maxTime;
 
     /** Default constructor required for persistence. */
-    public GrowthStage() {
+    public BushGrowthStage() {
     }
 
     /** Construct a copy of the given {@code GrowthStage}. */
-    public GrowthStage(GrowthStage clone) {
+    public BushGrowthStage(BushGrowthStage clone) {
         this.block = clone.block;
         this.maxTime = clone.maxTime;
         this.minTime = clone.minTime;

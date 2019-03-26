@@ -15,17 +15,10 @@
  */
 package org.terasology.simpleFarming.systems;
 
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.players.PlayerCharacterComponent;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.simpleFarming.components.BushDefinitionComponent;
-import org.terasology.simpleFarming.components.CheatGrowthComponent;
-import org.terasology.simpleFarming.components.GrowthStage;
-import org.terasology.simpleFarming.components.SeedDefinitionComponent;
-import org.terasology.simpleFarming.events.DoDestroyPlant;
-import org.terasology.simpleFarming.events.DoRemoveBud;
-import org.terasology.simpleFarming.events.OnSeedPlanted;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
+
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -36,22 +29,25 @@ import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
+import org.terasology.simpleFarming.components.BushDefinitionComponent;
+import org.terasology.simpleFarming.components.BushGrowthStage;
+import org.terasology.simpleFarming.components.CheatGrowthComponent;
+import org.terasology.simpleFarming.components.SeedDefinitionComponent;
+import org.terasology.simpleFarming.events.DoDestroyPlant;
+import org.terasology.simpleFarming.events.DoRemoveBud;
+import org.terasology.simpleFarming.events.OnSeedPlanted;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.entity.CreateBlockDropsEvent;
-import org.terasology.world.block.loader.BlockFamilyDefinition;
-
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * System managing the lifecycle of bushes.
@@ -90,12 +86,12 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param growthStages the prefab GrowthStage data
      * @return the array of growth stages
      */
-    private GrowthStage[] buildGrowthStages(Map<String, GrowthStage> growthStages) {
-        Set<Map.Entry<String, GrowthStage>> entrySet = growthStages.entrySet();
-        GrowthStage[] stages = new GrowthStage[entrySet.size()];
+    private BushGrowthStage[] buildGrowthStages(Map<String, BushGrowthStage> growthStages) {
+        Set<Map.Entry<String, BushGrowthStage>> entrySet = growthStages.entrySet();
+        BushGrowthStage[] stages = new BushGrowthStage[entrySet.size()];
         int i = 0;
-        for (Map.Entry<String, GrowthStage> entry : entrySet) {
-            stages[i] = new GrowthStage(entry.getValue());
+        for (Map.Entry<String, BushGrowthStage> entry : entrySet) {
+            stages[i] = new BushGrowthStage(entry.getValue());
             stages[i].block = blockManager.getBlock(entry.getKey());
             stages[i].block.setKeepActive(true);
             i++;
@@ -107,7 +103,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * Called immediately after a bush seed has been planted.
      * <p>
      * Sets the bush's position and initial growth stage and starts the timer for its next growth
-     * event (according to the {@link GrowthStage#minTime} and {@link GrowthStage#maxTime} values
+     * event (according to the {@link BushGrowthStage#minTime} and {@link BushGrowthStage#maxTime} values
      * for this growth stage).  When the timer expires,
      * {@link #onBushGrowth(DelayedActionTriggeredEvent, EntityRef, BushDefinitionComponent, BlockComponent)}
      * will be called.
@@ -179,7 +175,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
                 // allow negative growth from the last stage
                 || stages < 0) {
             bushComponent.currentStage += stages;
-            Map.Entry<String, GrowthStage> stage = getGrowthStage(bushComponent, bushComponent.currentStage);
+            Map.Entry<String, BushGrowthStage> stage = getGrowthStage(bushComponent, bushComponent.currentStage);
             worldProvider.setBlock(position, blockManager.getBlock(stage.getKey()));
             EntityRef newBush = blockEntityRegistry.getBlockEntityAt(position);
             newBush.addOrSaveComponent(bushComponent);
@@ -199,7 +195,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param index
      * @return
      */
-    public static Map.Entry<String, GrowthStage> getGrowthStage(BushDefinitionComponent bushComponent, int index) {
+    public static Map.Entry<String, BushGrowthStage> getGrowthStage(BushDefinitionComponent bushComponent, int index) {
         return (new ArrayList<>(bushComponent.growthStages.entrySet())).get(Math.min(bushComponent.growthStages.size() - 1, Math.max(0, index)));
     }
 
@@ -288,7 +284,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      */
     private void onBushDestroyed(Vector3i position, BushDefinitionComponent bushComponent) {
         if (bushComponent.currentStage == bushComponent.growthStages.size() - 1) {
-            dropSeeds(random.nextInt(1, 3),
+            dropSeeds(numSeeds(bushComponent),
                     bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
                     position.toVector3f());
         }
@@ -324,6 +320,30 @@ public class BushAuthoritySystem extends BaseComponentSystem {
             seedItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
             seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
         }
+    }
+    
+    /**
+     * Generates a random number of seeds to drop for a bush.
+     * 
+     * @param bushComponent The bush definition whose {@link BushDefinitionComponent#seedDropChances} will be used
+     * @return A randomly generated number of seeds to drop
+     */
+    private int numSeeds(BushDefinitionComponent bushComponent) {
+        int sum = 0;
+        for(int weight : bushComponent.seedDropChances) {
+            sum += weight;
+        }
+        
+        int rand = random.nextInt(sum);
+        
+        for(int i=0; i<bushComponent.seedDropChances.size(); i++) {
+            int weight = bushComponent.seedDropChances.get(i);
+            if(rand < weight) {
+                return i;
+            }
+            rand -= weight;
+        }
+        return 0;
     }
 
     /**
@@ -361,17 +381,6 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param max    the maximum duration in milliseconds
      */
     private void resetDelay(EntityRef entity, int min, int max) {
-        delayManager.addDelayedAction(entity, "SimpleFarming:" + entity.getId(), generateRandom(min, max));
-    }
-
-    /**
-     * Returns a random integer in the specified interval.
-     *
-     * @param min the minimum number
-     * @param max the maximum number
-     * @return the random number, or {@code min} if {@code max <= min}
-     */
-    private long generateRandom(int min, int max) {
-        return max <= min ? min : random.nextLong(min, max);
+        delayManager.addDelayedAction(entity, "SimpleFarming:" + entity.getId(), PlantAuthoritySystem.generateRandom(min, max));
     }
 }

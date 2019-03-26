@@ -1,0 +1,37 @@
+{
+    "parent": "engine:iconItem",
+    "DisplayName": {
+        "name": "Sapling"
+    },
+    "Item": {
+        "icon": "SimpleFarming:DeadBush",
+        "stackId": "SimpleFarming:Sapling"
+    },
+    "SeedDefinition": {
+    },
+    "SaplingDefinition": {
+        "sapling": "SimpleFarming:DeadBush",
+        "log": "SimpleFarming:OakTrunk",
+        "leaf": "SimpleFarming:Leaf",
+        "growthStages": [
+            {
+                "height": 2,
+                "leafStructure": "SimpleFarming:smallLeaves",
+                "minTime": 10000,
+                "maxTime": 10001
+            },
+            {
+                "height": 3,
+                "leafStructure": "SimpleFarming:mediumLeaves",
+                "minTime": 10000,
+                "maxTime": 10001
+            },
+            {
+                "height": 4,
+                "leafStructure": "SimpleFarming:largeLeaves",
+                "minTime": 10000,
+                "maxTime": 10001
+            }
+        ]
+    }
+}
