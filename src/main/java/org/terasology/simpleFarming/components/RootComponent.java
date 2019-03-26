@@ -15,17 +15,17 @@
  */
 package org.terasology.simpleFarming.components;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.simpleFarming.systems.TreeAuthoritySystem;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.ForceBlockActive;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Represents the root (lowest log block) of a tree.
@@ -36,59 +36,59 @@ import org.terasology.world.block.ForceBlockActive;
  */
 @ForceBlockActive
 public class RootComponent implements Component {
-	
-	/**
-	 * The block to use for the sapling in the world.
-	 */
-	public Block sapling;
-	
-	/**
-	 * The block to use for a log in the tree in the world.
-	 */
-	public Block log;
-	
-	/**
-	 * The prefab for the bush to use for the leaf block. This prefab should have
-	 * a {@link BushDefinitionComponent}
-	 */
-	public Prefab leaf;
-	
-	/**
-	 * The stages which this tree should grow through, in order.
-	 */
-	public List<TreeGrowthStage> growthStages = new ArrayList<>();
-	
-	/**
-	 * The current growth stage, represents the index in {@link #growthStages}.
-	 */
-	public int growthStage = 0;
-	
-	/**
-	 * Holds references to all of the leaves in this tree. Note that leaves aren't
-	 * automatically removed from this set when they no longer exist, so any element
-	 * in this set should be verified with {@link EntityRef#exists()}.
-	 */
-	public Set<EntityRef> leaves = new HashSet<>();
-	
-	/**
-	 * Whether or not the tree is alive. The tree is no longer alive if any of the
-	 * log blocks are destroyed, however leaves are not considered. The tree will
-	 * only be able to grow/ungrow (with a {@link CheatGrowthComponent}) if it is
-	 * alive.
-	 */
-	public boolean alive = true;
-	
-	/**
-	 * Default constructor required for persistence.
-	 */
-	public RootComponent() {
-		
-	}
-	
-	public RootComponent(SaplingDefinitionComponent base) {
-		sapling = base.sapling;
-		log = base.log;
-		leaf = base.leaf;
-		growthStages = base.growthStages;
-	}
+
+    /**
+     * The block to use for the sapling in the world.
+     */
+    public Block sapling;
+
+    /**
+     * The block to use for a log in the tree in the world.
+     */
+    public Block log;
+
+    /**
+     * The prefab for the bush to use for the leaf block. This prefab should have
+     * a {@link BushDefinitionComponent}
+     */
+    public Prefab leaf;
+
+    /**
+     * The stages which this tree should grow through, in order.
+     */
+    public List<TreeGrowthStage> growthStages = new ArrayList<>();
+
+    /**
+     * The current growth stage, represents the index in {@link #growthStages}.
+     */
+    public int growthStage = 0;
+
+    /**
+     * Holds references to all of the leaves in this tree. Note that leaves aren't
+     * automatically removed from this set when they no longer exist, so any element
+     * in this set should be verified with {@link EntityRef#exists()}.
+     */
+    public Set<EntityRef> leaves = new HashSet<>();
+
+    /**
+     * Whether or not the tree is alive. The tree is no longer alive if any of the
+     * log blocks are destroyed, however leaves are not considered. The tree will
+     * only be able to grow/ungrow (with a {@link CheatGrowthComponent}) if it is
+     * alive.
+     */
+    public boolean alive = true;
+
+    /**
+     * Default constructor required for persistence.
+     */
+    public RootComponent() {
+
+    }
+
+    public RootComponent(SaplingDefinitionComponent base) {
+        sapling = base.sapling;
+        log = base.log;
+        leaf = base.leaf;
+        growthStages = base.growthStages;
+    }
 }

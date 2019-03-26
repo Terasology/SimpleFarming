@@ -22,28 +22,40 @@ import org.terasology.reflection.MappedContainer;
  * Represents a stage of growth for a tree.
  * <p>
  * Contains the positions of leaves relative to the root block and the number of logs this growth stage should contain.
- * 
+ *
  * @see SaplingDefinitionComponent
  */
 @MappedContainer
 public class TreeGrowthStage {
-    /** Number of logs this stage should have. */
+    /**
+     * Number of logs this stage should have.
+     */
     public int height;
 
-    /** Prefab containing a {@link LeafStructureComponent} defining the structure of this stage's leaves. */
+    /**
+     * Prefab containing a {@link LeafStructureComponent} defining the structure of this stage's leaves.
+     */
     public Prefab leafStructure;
 
-    /** Minimum time before this growth stage, in milliseconds. */
+    /**
+     * Minimum time before this growth stage, in milliseconds.
+     */
     public int minTime;
 
-    /** Maximum time before this growth stage, in milliseconds. */
+    /**
+     * Maximum time before this growth stage, in milliseconds.
+     */
     public int maxTime;
 
-    /** Default constructor required for persistence. */
+    /**
+     * Default constructor required for persistence.
+     */
     public TreeGrowthStage() {
     }
 
-    /** Construct a copy of the given {@code TreeGrowthStage}. */
+    /**
+     * Construct a copy of the given {@code TreeGrowthStage}.
+     */
     public TreeGrowthStage(TreeGrowthStage clone) {
         this.height = clone.height;
         this.leafStructure = clone.leafStructure;

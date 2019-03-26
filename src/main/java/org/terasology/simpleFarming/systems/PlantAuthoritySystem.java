@@ -45,14 +45,20 @@ import org.terasology.world.block.BlockManager;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class PlantAuthoritySystem extends BaseComponentSystem {
 
-    @In private InventoryManager inventoryManager;
-    @In private WorldProvider worldProvider;
-    @In private EntityManager entityManager;
-    @In private BlockManager blockManager;
+    @In
+    private InventoryManager inventoryManager;
+    @In
+    private WorldProvider worldProvider;
+    @In
+    private EntityManager entityManager;
+    @In
+    private BlockManager blockManager;
 
-    /** The standard air block, cached on initialization. */
+    /**
+     * The standard air block, cached on initialization.
+     */
     private Block airBlock;
-    
+
     private static Random random = new FastRandom();
 
     @Override

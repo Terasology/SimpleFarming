@@ -25,20 +25,30 @@ import org.terasology.world.block.Block;
  */
 @MappedContainer
 public class BushGrowthStage {
-    /** The block to use for this stage. */
+    /**
+     * The block to use for this stage.
+     */
     public Block block;
 
-    /** Minimum time before the next growth stage, in milliseconds. */
+    /**
+     * Minimum time before the next growth stage, in milliseconds.
+     */
     public int minTime;
 
-    /** Maximum time before the next growth stage, in milliseconds. */
+    /**
+     * Maximum time before the next growth stage, in milliseconds.
+     */
     public int maxTime;
 
-    /** Default constructor required for persistence. */
+    /**
+     * Default constructor required for persistence.
+     */
     public BushGrowthStage() {
     }
 
-    /** Construct a copy of the given {@code GrowthStage}. */
+    /**
+     * Construct a copy of the given {@code GrowthStage}.
+     */
     public BushGrowthStage(BushGrowthStage clone) {
         this.block = clone.block;
         this.maxTime = clone.maxTime;

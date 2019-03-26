@@ -15,10 +15,6 @@
  */
 package org.terasology.simpleFarming.systems;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
-
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -48,6 +44,10 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.entity.CreateBlockDropsEvent;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * System managing the lifecycle of bushes.
@@ -321,24 +321,24 @@ public class BushAuthoritySystem extends BaseComponentSystem {
             seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
         }
     }
-    
+
     /**
      * Generates a random number of seeds to drop for a bush.
-     * 
+     *
      * @param bushComponent The bush definition whose {@link BushDefinitionComponent#seedDropChances} will be used
      * @return A randomly generated number of seeds to drop
      */
     private int numSeeds(BushDefinitionComponent bushComponent) {
         int sum = 0;
-        for(int weight : bushComponent.seedDropChances) {
+        for (int weight : bushComponent.seedDropChances) {
             sum += weight;
         }
-        
+
         int rand = random.nextInt(sum);
-        
-        for(int i=0; i<bushComponent.seedDropChances.size(); i++) {
+
+        for (int i = 0; i < bushComponent.seedDropChances.size(); i++) {
             int weight = bushComponent.seedDropChances.get(i);
-            if(rand < weight) {
+            if (rand < weight) {
                 return i;
             }
             rand -= weight;

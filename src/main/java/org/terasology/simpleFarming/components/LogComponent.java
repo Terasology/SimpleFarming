@@ -24,21 +24,21 @@ import org.terasology.world.block.ForceBlockActive;
 /**
  * Represents any log in a tree, including the root.
  * Created automatically by {@link TreeAuthoritySystem}.
- * 
+ *
  * @see RootComponent
  */
 @ForceBlockActive
 public class LogComponent implements Component {
-	
-	/**
-	 * The location of this log in the world.
-	 */
-	public Vector3i location;
-	
-	/**
-	 * The root associated with this log's tree. This reference helps
-	 * to identify which tree this log is part of and send important
-	 * events to the root so that the whole tree can react.
-	 */
-	public EntityRef root;
+
+    /**
+     * The location of this log in the world.
+     */
+    public Vector3i location;
+
+    /**
+     * The root associated with this log's tree. This reference helps
+     * to identify which tree this log is part of and send important
+     * events to the root so that the whole tree can react.
+     */
+    public EntityRef root;
 }

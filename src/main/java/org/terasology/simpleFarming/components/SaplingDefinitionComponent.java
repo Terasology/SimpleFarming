@@ -15,14 +15,14 @@
  */
 package org.terasology.simpleFarming.components;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.simpleFarming.systems.TreeAuthoritySystem;
 import org.terasology.world.block.Block;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Stores the necessary data for defining a tree.
@@ -38,55 +38,54 @@ import org.terasology.world.block.Block;
  * definition component.
  */
 public class SaplingDefinitionComponent implements Component {
-	
-	/**
-	 * The location of the sapling. This does not need to be provided with the
-	 * definition, it is automatically set by {@link TreeAuthoritySystem}
-	 */
-	public Vector3i location;
-	
-	/**
-	 * The block to use for the sapling in the world.
-	 */
-	public Block sapling;
-	
-	/**
-	 * The block to use for a log in the tree in the world.
-	 */
-	public Block log;
-	
-	/**
-	 * The prefab for the bush to use for the leaf block. This prefab should have
-	 * a {@link BushDefinitionComponent}
-	 */
-	public Prefab leaf;
-	
-	/**
-	 * The stages which this tree should grow through, in order.
-	 */
-	public List<TreeGrowthStage> growthStages = new ArrayList<>();
-	
-	/**
-	 * Default constructor required for persistence.
-	 */
-	public SaplingDefinitionComponent() {
-		
-	}
-	
-	/**
-	 * Copy constructor to create a sapling from an existing tree. This is used when
-	 * the tree is un-grown into a sapling.
-	 * 
-	 * @param base The root to base this sapling off of.
-	 * @param location The location of the sapling in the world.
-	 * 
-	 * @see CheatGrowthComponent
-	 */
-	public SaplingDefinitionComponent(RootComponent base, Vector3i location) {
-		this.location = location;
-		sapling = base.sapling;
-		log = base.log;
-		leaf = base.leaf;
-		growthStages = base.growthStages;
-	}
+
+    /**
+     * The location of the sapling. This does not need to be provided with the
+     * definition, it is automatically set by {@link TreeAuthoritySystem}
+     */
+    public Vector3i location;
+
+    /**
+     * The block to use for the sapling in the world.
+     */
+    public Block sapling;
+
+    /**
+     * The block to use for a log in the tree in the world.
+     */
+    public Block log;
+
+    /**
+     * The prefab for the bush to use for the leaf block. This prefab should have
+     * a {@link BushDefinitionComponent}
+     */
+    public Prefab leaf;
+
+    /**
+     * The stages which this tree should grow through, in order.
+     */
+    public List<TreeGrowthStage> growthStages = new ArrayList<>();
+
+    /**
+     * Default constructor required for persistence.
+     */
+    public SaplingDefinitionComponent() {
+
+    }
+
+    /**
+     * Copy constructor to create a sapling from an existing tree. This is used when
+     * the tree is un-grown into a sapling.
+     *
+     * @param base     The root to base this sapling off of.
+     * @param location The location of the sapling in the world.
+     * @see CheatGrowthComponent
+     */
+    public SaplingDefinitionComponent(RootComponent base, Vector3i location) {
+        this.location = location;
+        sapling = base.sapling;
+        log = base.log;
+        leaf = base.leaf;
+        growthStages = base.growthStages;
+    }
 }

@@ -15,15 +15,14 @@
  */
 package org.terasology.simpleFarming.components;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.world.block.ForceBlockActive;
 
-import com.google.common.collect.Maps;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Stores all data needed to grow a bush.
@@ -74,7 +73,7 @@ public class BushDefinitionComponent implements Component {
      * seeds.  (This typically represents things like potatoes, which are both produce and seed.)
      */
     public String seed;
-    
+
     /**
      * Determines the chance of each amount of seed dropping.
      * <p>
@@ -91,9 +90,13 @@ public class BushDefinitionComponent implements Component {
      */
     public String produce;
 
-    /** The index of the current stage for this particular bush. */
+    /**
+     * The index of the current stage for this particular bush.
+     */
     public int currentStage;
 
-    /** Used by vine buds to refer to the parent stem. */
+    /**
+     * Used by vine buds to refer to the parent stem.
+     */
     public EntityRef parent;
 }
