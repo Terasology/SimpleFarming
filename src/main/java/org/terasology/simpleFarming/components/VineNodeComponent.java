@@ -32,7 +32,9 @@ import org.terasology.world.block.ForceBlockActive;
 @ForceBlockActive
 public class VineNodeComponent implements Component {
 
-    /** The position of this stem block. */
+    /**
+     * The position of this stem block.
+     */
     public Vector3i position;
 
     /**
@@ -45,20 +47,30 @@ public class VineNodeComponent implements Component {
      */
     public EntityRef bud;
 
-    /** The adjacent stem block that is further from the root.  Null if this is the vine tip. */
+    /**
+     * The adjacent stem block that is further from the root.  Null if this is the vine tip.
+     */
     public EntityRef child;
 
-    /** The adjacent stem block that is closer to the root.  Null if this is the root. */
+    /**
+     * The adjacent stem block that is closer to the root.  Null if this is the root.
+     */
     public EntityRef parent;
 
-    /** The distance (through the vine) from this block to the root.  Zero if this is the root. */
+    /**
+     * The distance (through the vine) from this block to the root.  Zero if this is the root.
+     */
     public int length;
 
-    /** Default constructor required for persistence. */
+    /**
+     * Default constructor required for persistence.
+     */
     public VineNodeComponent() {
     }
 
-    /** Construct a component at the given position. */
+    /**
+     * Construct a component at the given position.
+     */
     public VineNodeComponent(Vector3i position) {
         this.position = position;
     }

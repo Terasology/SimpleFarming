@@ -39,7 +39,9 @@ import org.terasology.world.block.ForceBlockActive;
 @ForceBlockActive
 public class VineDefinitionComponent implements Component {
 
-    /** The block to use for a stem. */
+    /**
+     * The block to use for a stem.
+     */
     public Block stem;
 
     /**

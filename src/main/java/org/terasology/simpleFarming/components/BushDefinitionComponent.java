@@ -18,9 +18,10 @@ package org.terasology.simpleFarming.components;
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.ForceBlockActive;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,13 +47,13 @@ public class BushDefinitionComponent implements Component {
     /**
      * Map associating prefabs with growth stages.  Generally specified by a prefab.
      * <p>
-     * Keys are block names and values are {@link GrowthStage} objects.
+     * Keys are block names and values are {@link BushGrowthStage} objects.
      * <p>
      * The order in which entries occur is significant.  A bush will start in the first stage and
      * progress forward through the list.  When it reaches its final stage, it can be harvested
      * (via the "use" action) to yield {@link #produce}.
      */
-    public Map<String, GrowthStage> growthStages = Maps.newTreeMap();
+    public Map<String, BushGrowthStage> growthStages = Maps.newTreeMap();
 
     /**
      * Whether the bush should survive being harvested.  Defaults to true; specified by prefab.
@@ -74,6 +75,14 @@ public class BushDefinitionComponent implements Component {
     public String seed;
 
     /**
+     * Determines the chance of each amount of seed dropping.
+     * <p>
+     * The value at each index is the "weight" of that amount of seeds dropping.
+     * For example, if the value is [1, 2, 1], then there is a 25% chance of 0 seeds, 50% chance of 1 seed, and 25% chance of 2 seeds.
+     */
+    public List<Integer> seedDropChances = Arrays.asList(0, 1, 1, 1);
+
+    /**
      * The prefab name to use for produce drops.  Generally specified by a prefab.
      * <p>
      * These are dropped when the bush is harvested.  This can only be done when the bush is in its
@@ -81,9 +90,13 @@ public class BushDefinitionComponent implements Component {
      */
     public String produce;
 
-    /** The index of the current stage for this particular bush. */
+    /**
+     * The index of the current stage for this particular bush.
+     */
     public int currentStage;
 
-    /** Used by vine buds to refer to the parent stem. */
+    /**
+     * Used by vine buds to refer to the parent stem.
+     */
     public EntityRef parent;
 }

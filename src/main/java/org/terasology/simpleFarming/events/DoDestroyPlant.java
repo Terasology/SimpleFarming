@@ -25,7 +25,9 @@ import org.terasology.entitySystem.event.Event;
  */
 public class DoDestroyPlant implements Event {
 
-    /** Whether the parent vine is dead.  Relevant only for buds. */
+    /**
+     * Whether the parent vine is dead.  Relevant only for buds.
+     */
     public boolean isParentDead;
 
     public DoDestroyPlant() {

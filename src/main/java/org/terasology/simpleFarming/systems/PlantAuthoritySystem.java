@@ -29,6 +29,10 @@ import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
+import org.terasology.simpleFarming.components.SeedDefinitionComponent;
+import org.terasology.simpleFarming.events.OnSeedPlanted;
+import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -44,13 +48,21 @@ import org.terasology.world.block.BlockManager;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class PlantAuthoritySystem extends BaseComponentSystem {
 
-    @In private InventoryManager inventoryManager;
-    @In private WorldProvider worldProvider;
-    @In private EntityManager entityManager;
-    @In private BlockManager blockManager;
+    @In
+    private InventoryManager inventoryManager;
+    @In
+    private WorldProvider worldProvider;
+    @In
+    private EntityManager entityManager;
+    @In
+    private BlockManager blockManager;
 
-    /** The standard air block, cached on initialization. */
+    /**
+     * The standard air block, cached on initialization.
+     */
     private Block airBlock;
+
+    private static Random random = new FastRandom();
 
     @Override
     public void postBegin() {
@@ -65,8 +77,8 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
      * player was targeting the top of a valid block per {@link #isValidPosition}), creates an
      * entity from the {@linkplain SeedDefinitionComponent#prefab prefab} associated with the seed,
      * and sends that entity an {@link OnSeedPlanted} event.  It is then the responsibility of the
-     * appropriate authority ({@link BushAuthoritySystem} or {@link VineAuthoritySystem}) to manage
-     * the plant.
+     * appropriate authority ({@link BushAuthoritySystem}, {@link VineAuthoritySystem} or
+     * {@link TreeAuthoritySystem}) to manage the plant.
      *
      * @param event         the activation event
      * @param seed          the seed item
@@ -109,5 +121,16 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
         position.addY(1);
 
         return (targetBlock == airBlock && !belowBlock.isPenetrable());
+    }
+
+    /**
+     * Returns a random integer in the specified interval.
+     *
+     * @param min The minimum number
+     * @param max The maximum number
+     * @return the random number, or {@code min} if {@code max <= min}
+     */
+    public static long generateRandom(int min, int max) {
+        return max == 0 ? min : random.nextInt(min, max);
     }
 }
