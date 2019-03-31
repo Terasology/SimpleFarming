@@ -15,6 +15,9 @@
  */
 package org.terasology.simpleFarming.systems;
 
+import org.terasology.entitySystem.event.EventPriority;
+import org.terasology.simpleFarming.components.SeedDefinitionComponent;
+import org.terasology.simpleFarming.events.OnSeedPlanted;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -81,7 +84,7 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
      * @param seed          the seed item
      * @param seedComponent the seed's definition component
      */
-    @ReceiveEvent
+    @ReceiveEvent(priority = EventPriority.PRIORITY_HIGH)
     public void onSeedPlant(ActivateEvent event, EntityRef seed, SeedDefinitionComponent seedComponent) {
         /* The item is being used but not planted */
         if (event.getTargetLocation() == null || event.isConsumed()) {
