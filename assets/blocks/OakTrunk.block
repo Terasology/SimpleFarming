@@ -5,7 +5,7 @@
  * Entirely separate trees would have their own tree + leaf block definitions (rename the plain "Tree" then)
  */
 {
-    "basedOn": "CoreBlocks:wood",
+    "basedOn": "CoreAssets:wood",
     "displayName": "Oak Log",
     // Graphics
     "tiles": {
