@@ -32,10 +32,10 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 
-import static org.junit.Assert.*;
-
 import java.util.Collections;
 import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
 
 public class PlantAuthoritySystemTest extends ModuleTestingEnvironment {
 
@@ -56,7 +56,7 @@ public class PlantAuthoritySystemTest extends ModuleTestingEnvironment {
 
         BlockManager blockManager = getHostContext().get(BlockManager.class);
         air = blockManager.getBlock("engine:air");
-        dirt = blockManager.getBlock("core:dirt");
+        dirt = blockManager.getBlock("CoreBlocks:Dirt");
         bush = blockManager.getBlock(BUSH_BLOCK);
     }
 

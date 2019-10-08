@@ -35,11 +35,11 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 
-import static org.junit.Assert.*;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import static org.junit.Assert.*;
 
 /**
  * Test environment specific to the {@code SimpleFarming} module.
@@ -80,7 +80,7 @@ public class SingleBushTestingEnvironment extends ModuleTestingEnvironment {
 
         BlockManager blockManager = getHostContext().get(BlockManager.class);
         air = blockManager.getBlock("engine:air");
-        dirt = blockManager.getBlock("core:dirt");
+        dirt = blockManager.getBlock("CoreBlocks:Dirt");
     }
 
     private void buildTestEnvironment() {
