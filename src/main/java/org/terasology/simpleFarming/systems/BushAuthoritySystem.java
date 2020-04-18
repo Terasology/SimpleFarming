@@ -27,6 +27,7 @@ import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.events.DropItemEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
@@ -318,7 +319,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         for (int i = 0; i < numSeeds; i++) {
             EntityRef seedItem = entityManager.create(seed);
             seedItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
-            seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
+            seedItem.send(new ImpulseEvent(JomlUtil.from(random.nextVector3f(DROP_IMPULSE_AMOUNT))));
         }
     }
 
@@ -359,7 +360,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         boolean giveSuccess = inventoryManager.giveItem(harvester, target, produceItem);
         if (!giveSuccess) {
             produceItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
-            produceItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
+            produceItem.send(new ImpulseEvent(JomlUtil.from(random.nextVector3f(DROP_IMPULSE_AMOUNT))));
         }
     }
 

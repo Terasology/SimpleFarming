@@ -27,6 +27,7 @@ import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.events.DropItemEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
@@ -201,7 +202,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         String seed = saplingComponent.leaf.getComponent(BushDefinitionComponent.class).seed;
         EntityRef seedItem = entityManager.create(seed);
         seedItem.send(new DropItemEvent(saplingComponent.location.toVector3f().add(0, 0.5f, 0)));
-        seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
+        seedItem.send(new ImpulseEvent(JomlUtil.from(random.nextVector3f(DROP_IMPULSE_AMOUNT))));
     }
 
     /**
@@ -540,7 +541,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         if (doItemDrops) {
             EntityRef logItem = blockItemFactory.newInstance(log.getComponent(BlockComponent.class).block.getBlockFamily(), 1);
             logItem.send(new DropItemEvent(logComponent.location.toVector3f().add(0, 0.5f, 0)));
-            logItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
+            logItem.send(new ImpulseEvent(JomlUtil.from(random.nextVector3f(DROP_IMPULSE_AMOUNT))));
         }
         worldProvider.setBlock(logComponent.location, airBlock);
 
