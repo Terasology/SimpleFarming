@@ -6,7 +6,8 @@
     "description" : "Adds the capability to grow plants using seeds. Ripe plants can be harvested for the fruit that the plant produces.",
     "dependencies" : [
         {"id" : "CoreBlocks", "minVersion" : "1.0.0"},
-        {"id" : "ModuleTestingEnvironment", "minVersion" : "0.1.0"}
+        {"id" : "ModuleTestingEnvironment", "minVersion" : "0.1.0"},
+        {"id": "Inventory", "minVersion": "1.1.0"}
     ],
     "isServerSideOnly" : false,
     "isLibrary": true
