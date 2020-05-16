@@ -1,14 +1,14 @@
 {
-    "id" : "SimpleFarming",
-    "version" : "2.1.0",
-    "author" : "Josharias, Mandar Juvekar, patrick Wang, Harry Wang, mdj117, SufurElite, He Who Shall Not Be Named (VaibhavBajaj), andriii25, smsunarto, DhananjayGarg, Jay Gupta",
-    "displayName" : "Simple Farming",
-    "description" : "Adds the capability to grow plants using seeds. Ripe plants can be harvested for the fruit that the plant produces.",
-    "dependencies" : [
-        {"id" : "CoreBlocks", "minVersion" : "1.0.0"},
-        {"id" : "ModuleTestingEnvironment", "minVersion" : "0.1.0"},
-        {"id": "Inventory", "minVersion": "1.1.0"}
+    "id": "SimpleFarming",
+    "version": "2.1.0",
+    "author": "Josharias, Mandar Juvekar, patrick Wang, Harry Wang, mdj117, SufurElite, He Who Shall Not Be Named (VaibhavBajaj), andriii25, smsunarto, DhananjayGarg, Jay Gupta",
+    "displayName": "Simple Farming",
+    "description": "Adds the capability to grow plants using seeds. Ripe plants can be harvested for the fruit that the plant produces.",
+    "dependencies": [
+        { "id": "CoreAssets", "minVersion": "2.0.1" },
+        { "id": "Inventory", "minVersion": "1.1.0" },
+        { "id": "ModuleTestingEnvironment", "minVersion": "0.1.0" }
     ],
-    "isServerSideOnly" : false,
+    "isServerSideOnly": false,
     "isLibrary": true
 }
