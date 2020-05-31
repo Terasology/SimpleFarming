@@ -7,7 +7,7 @@
     "dependencies": [
         { "id": "CoreAssets", "minVersion": "2.0.1" },
         { "id": "Inventory", "minVersion": "1.1.0" },
-        { "id": "ModuleTestingEnvironment", "minVersion": "0.1.0" }
+        { "id": "ModuleTestingEnvironment", "minVersion": "0.2.0", "optional": true }
     ],
     "isServerSideOnly": false,
     "isLibrary": true
