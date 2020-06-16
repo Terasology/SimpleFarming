@@ -115,7 +115,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onBushPlanted(OnSeedPlanted event, EntityRef bush, BushDefinitionComponent bushComponent) {
         bushComponent.currentStage = -1;
-
+//        bush.send(new BeforeSeedPlanted())
         doBushGrowth(event.getPosition(), bushComponent, 1);
         bush.saveComponent(bushComponent);
     }
@@ -292,7 +292,8 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         if (bushComponent.currentStage == bushComponent.growthStages.size() - 1) {
             dropSeeds(numSeeds(bushComponent),
                     bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
-                    position.toVector3f());
+                    position.toVector3f(),bushComponent);
+            //seedItem.send(new ProduceCreated(bushComponent.parent,seedItem));
         }
     }
 
@@ -309,7 +310,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         worldProvider.setBlock(position, blockManager.getBlock(BlockManager.AIR_ID));
         dropSeeds(1,
                 bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
-                position.toVector3f());
+                position.toVector3f(),bushComponent);
 
     }
 
@@ -320,11 +321,12 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param seed the prefab of the seed entity
      * @param position the position to drop above
      */
-    private void dropSeeds(int numSeeds, String seed, Vector3f position) {
+    private void dropSeeds(int numSeeds, String seed, Vector3f position,BushDefinitionComponent bushComponent) {
         for (int i = 0; i < numSeeds; i++) {
             EntityRef seedItem = entityManager.create(seed);
             seedItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
             seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
+            seedItem.send(new ProduceCreated(bushComponent.parent, seedItem));
         }
     }
 
