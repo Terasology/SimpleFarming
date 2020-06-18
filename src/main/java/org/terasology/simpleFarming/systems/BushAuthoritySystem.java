@@ -15,12 +15,15 @@
  */
 package org.terasology.simpleFarming.systems;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.genome.component.GenomeComponent;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
@@ -80,6 +83,8 @@ public class BushAuthoritySystem extends BaseComponentSystem {
 
     private FastRandom random = new FastRandom();
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BushAuthoritySystem.class);
+
     /**
      * Builds the list of growth stages from the prefab data.
      *
@@ -114,9 +119,9 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      */
     @ReceiveEvent
     public void onBushPlanted(OnSeedPlanted event, EntityRef bush, BushDefinitionComponent bushComponent) {
+//        bush.send(new BeforeSeedPlanted());
         bushComponent.currentStage = -1;
-//        bush.send(new BeforeSeedPlanted())
-        doBushGrowth(event.getPosition(), bushComponent, 1);
+        doBushGrowth(event.getPosition(), bush, bushComponent, 1);
         bush.saveComponent(bushComponent);
     }
 
@@ -132,7 +137,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onBushGrowth(DelayedActionTriggeredEvent event, EntityRef bush, BushDefinitionComponent bushComponent
             , BlockComponent blockComponent) {
-        doBushGrowth(blockComponent.getPosition(), bushComponent, 1);
+        doBushGrowth(blockComponent.getPosition(), bush, bushComponent, 1);
     }
 
 
@@ -157,9 +162,9 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         BlockComponent blockComponent = target.getComponent(BlockComponent.class);
         BushDefinitionComponent bushDefinitionComponent = target.getComponent(BushDefinitionComponent.class);
         if (cheatGrowthComponent.causesUnGrowth) {
-            doBushGrowth(blockComponent.getPosition(), bushDefinitionComponent, -1);
+            doBushGrowth(blockComponent.getPosition(), target, bushDefinitionComponent, -1);
         } else {
-            doBushGrowth(blockComponent.getPosition(), bushDefinitionComponent, 1);
+            doBushGrowth(blockComponent.getPosition(), target, bushDefinitionComponent, 1);
         }
     }
 
@@ -171,7 +176,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param bushComponent the definition of the bush being grown
      * @param stages the number of stages to grow; negative values represent un-growth
      */
-    private void doBushGrowth(Vector3i position, BushDefinitionComponent bushComponent, int stages) {
+    private void doBushGrowth(Vector3i position, EntityRef bush, BushDefinitionComponent bushComponent, int stages) {
         if (!isInLastStage(bushComponent)
                 // allow negative growth from the last stage
                 || stages < 0) {
@@ -179,7 +184,14 @@ public class BushAuthoritySystem extends BaseComponentSystem {
             Map.Entry<String, BushGrowthStage> stage = getGrowthStage(bushComponent, bushComponent.currentStage);
             worldProvider.setBlock(position, blockManager.getBlock(stage.getKey()));
             EntityRef newBush = blockEntityRegistry.getBlockEntityAt(position);
+            //change this to event based if it works
+            if (bush.hasComponent(GenomeComponent.class)) {
+                newBush.addOrSaveComponent(bush.getComponent(GenomeComponent.class));
+                LOGGER.info("on growth this the genes "+bush.getComponent(GenomeComponent.class).genes);
+                LOGGER.info("for checking growth, this the newBush genes "+newBush.getComponent(GenomeComponent.class).genes);
+            }
             newBush.addOrSaveComponent(bushComponent);
+
 
             if (stage.getValue().maxTime > 0 && stage.getValue().minTime > 0) {
                 resetDelay(newBush,
@@ -218,10 +230,20 @@ public class BushAuthoritySystem extends BaseComponentSystem {
             if (isInLastStage(bushComponent)) {
                 EntityRef produceItem = dropProduce(bushComponent.produce, event.getTargetLocation(), harvester,
                         entity);
+                //remove this if needed and remove dependency if not needed
+                if (entity.hasComponent(GenomeComponent.class)) {
+                    LOGGER.info("Has genes before!");
+                    LOGGER.info(entity.getComponent(GenomeComponent.class).genes);
+                }
                 entity.send(new ProduceCreated(entity, produceItem));
-
+                //remove this if needed and remove dependency if not needed
+                if (entity.hasComponent(GenomeComponent.class)) {
+                    LOGGER.info("Has genes after!");
+                    LOGGER.info(entity.getComponent(GenomeComponent.class).genes);
+                    LOGGER.info("entity is " + entity.getParentPrefab().getName());
+                }
                 if (bushComponent.sustainable) {
-                    doBushGrowth(blockComponent.getPosition(), bushComponent, -1);
+                    doBushGrowth(blockComponent.getPosition(), entity, bushComponent, -1);
                 } else {
                     entity.send(new DoDestroyPlant());
                     worldProvider.setBlock(blockComponent.getPosition(), blockManager.getBlock(BlockManager.AIR_ID));
@@ -292,7 +314,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         if (bushComponent.currentStage == bushComponent.growthStages.size() - 1) {
             dropSeeds(numSeeds(bushComponent),
                     bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
-                    position.toVector3f(),bushComponent);
+                    position.toVector3f(), bushComponent);
             //seedItem.send(new ProduceCreated(bushComponent.parent,seedItem));
         }
     }
@@ -310,7 +332,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         worldProvider.setBlock(position, blockManager.getBlock(BlockManager.AIR_ID));
         dropSeeds(1,
                 bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
-                position.toVector3f(),bushComponent);
+                position.toVector3f(), bushComponent);
 
     }
 
@@ -321,7 +343,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param seed the prefab of the seed entity
      * @param position the position to drop above
      */
-    private void dropSeeds(int numSeeds, String seed, Vector3f position,BushDefinitionComponent bushComponent) {
+    private void dropSeeds(int numSeeds, String seed, Vector3f position, BushDefinitionComponent bushComponent) {
         for (int i = 0; i < numSeeds; i++) {
             EntityRef seedItem = entityManager.create(seed);
             seedItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));

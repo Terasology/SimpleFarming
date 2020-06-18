@@ -15,8 +15,12 @@
  */
 package org.terasology.simpleFarming.systems;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.event.EventPriority;
+import org.terasology.genome.component.GenomeComponent;
 import org.terasology.simpleFarming.components.SeedDefinitionComponent;
+import org.terasology.simpleFarming.events.BeforePlanted;
 import org.terasology.simpleFarming.events.OnSeedPlanted;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -57,6 +61,8 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
     @In
     private BlockManager blockManager;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlantAuthoritySystem.class);
+
     /**
      * The standard air block, cached on initialization.
      */
@@ -94,7 +100,9 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
         if (Side.inDirection(event.getHitNormal()) == Side.TOP && isValidPosition(position)) {
             /* If the prefab field is null, there is a DefinitionComponent on the seed */
             EntityRef plantEntity = seedComponent.prefab == null ? seed : entityManager.create(seedComponent.prefab);
+            plantEntity.send(new BeforePlanted(seed));
             plantEntity.send(new OnSeedPlanted(position));
+            LOGGER.info("Seed was planted. genes of the bush are now "+plantEntity.getComponent(GenomeComponent.class).genes);
             inventoryManager.removeItem(seed.getOwner(), seed, seed, true, 1);
             event.consume();
         }
