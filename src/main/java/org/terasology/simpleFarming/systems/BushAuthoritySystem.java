@@ -15,6 +15,7 @@
  */
 package org.terasology.simpleFarming.systems;
 
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -25,11 +26,13 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.genome.component.GenomeComponent;
 import org.terasology.logic.common.ActivateEvent;
+import org.terasology.logic.common.RetainComponentsComponent;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.events.DropItemEvent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
@@ -180,23 +183,28 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         if (!isInLastStage(bushComponent)
                 // allow negative growth from the last stage
                 || stages < 0) {
+            RetainComponentsComponent retainComponentsComponent = new RetainComponentsComponent();
+            retainComponentsComponent.components.add(GenomeComponent.class);
+            bush.addOrSaveComponent(retainComponentsComponent);
             bushComponent.currentStage += stages;
             Map.Entry<String, BushGrowthStage> stage = getGrowthStage(bushComponent, bushComponent.currentStage);
             worldProvider.setBlock(position, blockManager.getBlock(stage.getKey()));
             EntityRef newBush = blockEntityRegistry.getBlockEntityAt(position);
-            //change this to event based if it works
-            if (bush.hasComponent(GenomeComponent.class)) {
-                newBush.addOrSaveComponent(bush.getComponent(GenomeComponent.class));
-                LOGGER.info("on growth this the genes "+bush.getComponent(GenomeComponent.class).genes);
-                LOGGER.info("for checking growth, this the newBush genes "+newBush.getComponent(GenomeComponent.class).genes);
-            }
+            newBush.addOrSaveComponent(retainComponentsComponent);
             newBush.addOrSaveComponent(bushComponent);
-
 
             if (stage.getValue().maxTime > 0 && stage.getValue().minTime > 0) {
                 resetDelay(newBush,
                         stage.getValue().minTime,
                         stage.getValue().maxTime);
+            }
+            newBush.addOrSaveComponent(retainComponentsComponent);
+
+            if (bush.hasComponent(GenomeComponent.class)) {
+                newBush.addOrSaveComponent(retainComponentsComponent);
+                newBush.addOrSaveComponent(bush.getComponent(GenomeComponent.class));
+                LOGGER.info("on growth this the genes " + bush.getComponent(GenomeComponent.class).genes);
+                LOGGER.info("for checking growth, this the newBush genes " + newBush.getComponent(GenomeComponent.class).genes);
             }
         }
     }
@@ -224,7 +232,16 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onHarvest(ActivateEvent event, EntityRef entity, BushDefinitionComponent bushComponent,
                           BlockComponent blockComponent) {
+        RetainComponentsComponent retainComponentsComponent = new RetainComponentsComponent();
+        retainComponentsComponent.components.add(GenomeComponent.class);
+        entity.addOrSaveComponent(retainComponentsComponent);
         EntityRef harvester = event.getInstigator();
+        //remove this block
+        if (entity.hasComponent(GenomeComponent.class)) {
+            LOGGER.info("Activate event was called on" + entity.getId() + "this stage has genome comp");
+        } else {
+            LOGGER.info("Activate event was called on" + entity.getId() + "no genome comp");
+        }
         if (!event.isConsumed() && areValidHarvestEntities(entity, harvester)) {
             /* Produce is only given in the final stage */
             if (isInLastStage(bushComponent)) {
