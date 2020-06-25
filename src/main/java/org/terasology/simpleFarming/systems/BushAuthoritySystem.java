@@ -15,7 +15,6 @@
  */
 package org.terasology.simpleFarming.systems;
 
-import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -24,15 +23,12 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.genome.component.GenomeComponent;
 import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.common.RetainComponentsComponent;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.events.DropItemEvent;
-import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
@@ -41,10 +37,12 @@ import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.BushGrowthStage;
 import org.terasology.simpleFarming.components.CheatGrowthComponent;
 import org.terasology.simpleFarming.components.SeedDefinitionComponent;
+import org.terasology.simpleFarming.events.AddGenomeRetention;
 import org.terasology.simpleFarming.events.DoDestroyPlant;
 import org.terasology.simpleFarming.events.DoRemoveBud;
 import org.terasology.simpleFarming.events.OnSeedPlanted;
 import org.terasology.simpleFarming.events.ProduceCreated;
+import org.terasology.simpleFarming.events.TransferGenomeEvent;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
@@ -122,7 +120,6 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      */
     @ReceiveEvent
     public void onBushPlanted(OnSeedPlanted event, EntityRef bush, BushDefinitionComponent bushComponent) {
-//        bush.send(new BeforeSeedPlanted());
         bushComponent.currentStage = -1;
         doBushGrowth(event.getPosition(), bush, bushComponent, 1);
         bush.saveComponent(bushComponent);
@@ -183,14 +180,12 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         if (!isInLastStage(bushComponent)
                 // allow negative growth from the last stage
                 || stages < 0) {
-            RetainComponentsComponent retainComponentsComponent = new RetainComponentsComponent();
-            retainComponentsComponent.components.add(GenomeComponent.class);
-            bush.addOrSaveComponent(retainComponentsComponent);
+            bush.send(new AddGenomeRetention());
             bushComponent.currentStage += stages;
             Map.Entry<String, BushGrowthStage> stage = getGrowthStage(bushComponent, bushComponent.currentStage);
             worldProvider.setBlock(position, blockManager.getBlock(stage.getKey()));
             EntityRef newBush = blockEntityRegistry.getBlockEntityAt(position);
-            newBush.addOrSaveComponent(retainComponentsComponent);
+            newBush.send(new AddGenomeRetention());
             newBush.addOrSaveComponent(bushComponent);
 
             if (stage.getValue().maxTime > 0 && stage.getValue().minTime > 0) {
@@ -198,14 +193,8 @@ public class BushAuthoritySystem extends BaseComponentSystem {
                         stage.getValue().minTime,
                         stage.getValue().maxTime);
             }
-            newBush.addOrSaveComponent(retainComponentsComponent);
 
-            if (bush.hasComponent(GenomeComponent.class)) {
-                newBush.addOrSaveComponent(retainComponentsComponent);
-                newBush.addOrSaveComponent(bush.getComponent(GenomeComponent.class));
-                LOGGER.info("on growth this the genes " + bush.getComponent(GenomeComponent.class).genes);
-                LOGGER.info("for checking growth, this the newBush genes " + newBush.getComponent(GenomeComponent.class).genes);
-            }
+            bush.send(new TransferGenomeEvent(newBush));
         }
     }
 
@@ -232,33 +221,14 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onHarvest(ActivateEvent event, EntityRef entity, BushDefinitionComponent bushComponent,
                           BlockComponent blockComponent) {
-        RetainComponentsComponent retainComponentsComponent = new RetainComponentsComponent();
-        retainComponentsComponent.components.add(GenomeComponent.class);
-        entity.addOrSaveComponent(retainComponentsComponent);
+        entity.send(new AddGenomeRetention());
         EntityRef harvester = event.getInstigator();
-        //remove this block
-        if (entity.hasComponent(GenomeComponent.class)) {
-            LOGGER.info("Activate event was called on" + entity.getId() + "this stage has genome comp");
-        } else {
-            LOGGER.info("Activate event was called on" + entity.getId() + "no genome comp");
-        }
         if (!event.isConsumed() && areValidHarvestEntities(entity, harvester)) {
             /* Produce is only given in the final stage */
             if (isInLastStage(bushComponent)) {
                 EntityRef produceItem = dropProduce(bushComponent.produce, event.getTargetLocation(), harvester,
                         entity);
-                //remove this if needed and remove dependency if not needed
-                if (entity.hasComponent(GenomeComponent.class)) {
-                    LOGGER.info("Has genes before!");
-                    LOGGER.info(entity.getComponent(GenomeComponent.class).genes);
-                }
                 entity.send(new ProduceCreated(entity, produceItem));
-                //remove this if needed and remove dependency if not needed
-                if (entity.hasComponent(GenomeComponent.class)) {
-                    LOGGER.info("Has genes after!");
-                    LOGGER.info(entity.getComponent(GenomeComponent.class).genes);
-                    LOGGER.info("entity is " + entity.getParentPrefab().getName());
-                }
                 if (bushComponent.sustainable) {
                     doBushGrowth(blockComponent.getPosition(), entity, bushComponent, -1);
                 } else {
@@ -305,8 +275,8 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     /**
      * Called when a bush or bud is destroyed.
      * <p>
-     * Delegates to either {@link #onBushDestroyed(Vector3i, BushDefinitionComponent)} or {@link
-     * #onBudDestroyed(Vector3i, BushDefinitionComponent, boolean)} as appropriate.
+     * Delegates to either {@link #onBushDestroyed(Vector3i, EntityRef, BushDefinitionComponent)} or {@link
+     * #onBudDestroyed(Vector3i, EntityRef, BushDefinitionComponent, boolean)} as appropriate.
      *
      * @param event the destroy plant event
      * @param entity the entity sending the event; not used
@@ -316,9 +286,9 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     public void onPlantDestroyed(DoDestroyPlant event, EntityRef entity, BushDefinitionComponent bushComponent,
                                  BlockComponent blockComponent) {
         if (bushComponent.parent == null) {
-            onBushDestroyed(blockComponent.getPosition(), bushComponent);
+            onBushDestroyed(blockComponent.getPosition(), entity, bushComponent);
         } else {
-            onBudDestroyed(blockComponent.getPosition(), bushComponent, event.isParentDead);
+            onBudDestroyed(blockComponent.getPosition(), entity, bushComponent, event.isParentDead);
         }
     }
 
@@ -327,12 +297,11 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      *
      * @param bushComponent the bush component of the entity
      */
-    private void onBushDestroyed(Vector3i position, BushDefinitionComponent bushComponent) {
+    private void onBushDestroyed(Vector3i position, EntityRef bush, BushDefinitionComponent bushComponent) {
         if (bushComponent.currentStage == bushComponent.growthStages.size() - 1) {
             dropSeeds(numSeeds(bushComponent),
                     bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
-                    position.toVector3f(), bushComponent);
-            //seedItem.send(new ProduceCreated(bushComponent.parent,seedItem));
+                    position.toVector3f(), bush);
         }
     }
 
@@ -342,14 +311,15 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param bushComponent the component of the bud
      * @param isParentDead whether the parent vine still exists
      */
-    private void onBudDestroyed(Vector3i position, BushDefinitionComponent bushComponent, boolean isParentDead) {
+    private void onBudDestroyed(Vector3i position, EntityRef bud, BushDefinitionComponent bushComponent,
+                                boolean isParentDead) {
         if (!isParentDead) {
             bushComponent.parent.send(new DoRemoveBud());
         }
         worldProvider.setBlock(position, blockManager.getBlock(BlockManager.AIR_ID));
         dropSeeds(1,
                 bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
-                position.toVector3f(), bushComponent);
+                position.toVector3f(), bud);
 
     }
 
@@ -360,12 +330,13 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param seed the prefab of the seed entity
      * @param position the position to drop above
      */
-    private void dropSeeds(int numSeeds, String seed, Vector3f position, BushDefinitionComponent bushComponent) {
+    private void dropSeeds(int numSeeds, String seed, Vector3f position,
+                           EntityRef parent) {
         for (int i = 0; i < numSeeds; i++) {
             EntityRef seedItem = entityManager.create(seed);
             seedItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
             seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
-            seedItem.send(new ProduceCreated(bushComponent.parent, seedItem));
+            seedItem.send(new ProduceCreated(parent, seedItem));
         }
     }
 

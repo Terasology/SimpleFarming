@@ -17,6 +17,7 @@ package org.terasology.simpleFarming.systems;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.genome.component.GenomeComponent;
 import org.terasology.logic.common.RetainComponentsComponent;
@@ -34,8 +35,6 @@ import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
-import org.terasology.simpleFarming.components.SeedDefinitionComponent;
-import org.terasology.simpleFarming.events.OnSeedPlanted;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
@@ -99,14 +98,13 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
         if (event.getTargetLocation() == null || event.isConsumed()) {
             return;
         }
+
         Vector3i position = new Vector3i(event.getTargetLocation()).addY(1);
         if (Side.inDirection(event.getHitNormal()) == Side.TOP && isValidPosition(position)) {
             /* If the prefab field is null, there is a DefinitionComponent on the seed */
             EntityRef plantEntity = seedComponent.prefab == null ? seed : entityManager.create(seedComponent.prefab);
             plantEntity.send(new BeforePlanted(seed));
             plantEntity.send(new OnSeedPlanted(position));
-            plantEntity.addOrSaveComponent(retainComponentsComponent);
-            LOGGER.info("Seed was planted. genes of the bush are now "+plantEntity.getComponent(GenomeComponent.class).genes);
             inventoryManager.removeItem(seed.getOwner(), seed, seed, true, 1);
             event.consume();
         }
