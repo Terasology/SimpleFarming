@@ -19,6 +19,9 @@ package org.terasology.simpleFarming.events;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 
+/**
+ * Sent to a plant just before it has been planted
+ */
 public class BeforePlanted implements Event {
     private EntityRef seed;
 

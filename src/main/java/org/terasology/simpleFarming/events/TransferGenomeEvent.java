@@ -6,7 +6,14 @@ package org.terasology.simpleFarming.events;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 
+/**
+ * Transfers GenomeComponent of the calling entity to another entity
+ * used to enforce optional dependencies
+ */
 public class TransferGenomeEvent implements Event {
+    /**
+     * The entity to which the GenomeComponent is to be transferred
+     */
     private EntityRef transferEntity;
 
     public TransferGenomeEvent(EntityRef transferEntity) {

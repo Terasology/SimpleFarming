@@ -22,6 +22,10 @@ package org.terasology.simpleFarming.events;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 
+/**
+ * Sent when produce is harvested from a bush
+ * This can be used to identify both the bush that was harvested as well as the produce
+ */
 public class ProduceCreated implements Event {
     private EntityRef creator;
     private EntityRef produce;
