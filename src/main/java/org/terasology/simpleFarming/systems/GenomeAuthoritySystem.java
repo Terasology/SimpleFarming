@@ -31,12 +31,15 @@ import org.terasology.genome.breed.ContinuousBreedingAlgorithm;
 import org.terasology.genome.breed.mutator.GeneMutator;
 import org.terasology.genome.breed.mutator.VocabularyGeneMutator;
 import org.terasology.genome.component.GenomeComponent;
+import org.terasology.genome.genomeMap.GenomeMap;
 import org.terasology.genome.genomeMap.SeedBasedGenomeMap;
+import org.terasology.genome.system.SimpleGenomeManager;
 import org.terasology.logic.common.RetainComponentsComponent;
 import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.events.AddGenomeRetention;
 import org.terasology.simpleFarming.events.BeforePlanted;
+import org.terasology.simpleFarming.events.ModifyFilling;
 import org.terasology.simpleFarming.events.ProduceCreated;
 import org.terasology.simpleFarming.events.TransferGenomeEvent;
 import org.terasology.utilities.random.FastRandom;
@@ -90,6 +93,12 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
             }
         }
         produce.addOrSaveComponent(genomeComponent);
+
+        GenomeMap genomeMap =
+                genomeRegistry.getGenomeDefinition(produce.getComponent(GenomeComponent.class).genomeId).getGenomeMap();
+        float newFilling = genomeMap.getProperty("filling", produce.getComponent(GenomeComponent.class).genes,
+                Float.class);
+        produce.send(new ModifyFilling(newFilling));
     }
 
     /**
@@ -111,40 +120,73 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
 
     /**
      * Transfers the GenomeComponent across different stages of bush growth
+     *
      * @param event the Transfer Genome Event
      * @param bush the bush that is growing
      * @param bushComponent bushComponent to check if it is a bush
      * @param genomeComponent genomeComponent to check if the bush has a genomeComponent to pass on
      */
     @ReceiveEvent
-    public void onTransferGenomeEvent(TransferGenomeEvent event, EntityRef bush, BushDefinitionComponent bushComponent, GenomeComponent genomeComponent) {
+    public void onTransferGenomeEvent(TransferGenomeEvent event, EntityRef bush,
+                                      BushDefinitionComponent bushComponent, GenomeComponent genomeComponent) {
         event.getTransferEntity().addOrSaveComponent(genomeComponent);
     }
 
     /**
-     * Adds the GenomeComponent to the RetainComponentsComponent of an entity
-     * Event handler added to maintain Genome optional dependency
+     * Adds the GenomeComponent to the RetainComponentsComponent of an entity Event handler added to maintain Genome
+     * optional dependency
+     *
      * @param event the AddGenomeRetention event
      * @param entity the entity whose RetainComponentsComponent is to be modified
      */
     @ReceiveEvent
-    public void addGenomeRetentionEvent(AddGenomeRetention event, EntityRef entity){
+    public void addGenomeRetentionEvent(AddGenomeRetention event, EntityRef entity) {
         RetainComponentsComponent retainComponentsComponent = new RetainComponentsComponent();
         retainComponentsComponent.components.add(GenomeComponent.class);
         entity.addOrSaveComponent(retainComponentsComponent);
     }
+
+    @ReceiveEvent
+    public void onRecipeCraftedEvent(OnRecipeCrafted event, EntityRef entity) {
+        EntityRef ingredients[] = event.getIngredients();
+        LOGGER.info(ingredients[0].getComponent(GenomeComponent.class).genes);
+        LOGGER.info(ingredients[1].getComponent(GenomeComponent.class).genes);
+        LOGGER.info(entity.toString());
+        //ingredients[0].send(new OnBreed(ingredients[0], ingredients[1], entity));
+        SimpleGenomeManager genomeManager = new SimpleGenomeManager();
+        boolean result = genomeManager.applyBreeding(ingredients[0],ingredients[1],entity);
+        LOGGER.info(result+"");
+        if (entity.hasComponent(GenomeComponent.class)) {
+            LOGGER.info(entity.getComponent(GenomeComponent.class).genes);
+        }
+    }
+
+//    @ReceiveEvent
+//    public void onModifyTraitEvent(ModifyTrait event, EntityRef entity) {
+//        Class<? extends Component> componentType = event.getComponentType();
+//        String traitName = event.getTraitName();
+//        LOGGER.info("Modifying " + componentType.getName() + " trait: " + traitName);
+//        SeedDefinitionComponent c = new SeedDefinitionComponent();
+//        try {
+//            LOGGER.info(componentType.getField(traitName).get(entity.getComponent(componentType)).toString());
+//            componentType.getField(traitName).setInt(entity.getComponent(componentType),1000);
+//            LOGGER.info(componentType.getField(traitName).get(entity.getComponent(componentType))+" is the filling");
+//        } catch (Exception e) {
+//            LOGGER.info("Got an error");
+//        }
+//    }
 
     private void addPropertyMap(EntityRef entity, String genomeId) {
         SeedBasedGenomeMap genomeMap = new SeedBasedGenomeMap(worldProvider.getSeed().hashCode());
         String geneVocabulary = "ABCDEFGHIJK";
         GeneMutator geneMutator = new VocabularyGeneMutator(geneVocabulary);
         BreedingAlgorithm continuousBreedingAlgorithm = new ContinuousBreedingAlgorithm(0.3f, geneMutator);
-        genomeMap.addSeedBasedProperty("filling", 0, 1, 2, Integer.class, continuousBreedingAlgorithm,
-                new Function<String, Integer>() {
+        genomeMap.addSeedBasedProperty("filling", 0, 2, 3, Float.class, continuousBreedingAlgorithm,
+                new Function<String, Float>() {
                     @Nullable
                     @Override
-                    public Integer apply(@Nullable String input) {
-                        return (input.charAt(0) - 'A' + 5);
+                    public Float apply(@Nullable String input) {
+                        return (input.charAt(0) - 'A' + 5f);
                     }
                 });
         GenomeDefinition genomeDefinition = new GenomeDefinition(continuousBreedingAlgorithm, genomeMap);
