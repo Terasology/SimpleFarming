@@ -19,6 +19,7 @@ package org.terasology.simpleFarming.systems;
 import com.google.common.base.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.crafting.events.OnRecipeCrafted;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -154,27 +155,12 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
         LOGGER.info(entity.toString());
         //ingredients[0].send(new OnBreed(ingredients[0], ingredients[1], entity));
         SimpleGenomeManager genomeManager = new SimpleGenomeManager();
-        boolean result = genomeManager.applyBreeding(ingredients[0],ingredients[1],entity);
-        LOGGER.info(result+"");
+        boolean result = genomeManager.applyBreeding(ingredients[0], ingredients[1], entity);
+        LOGGER.info(result + "");
         if (entity.hasComponent(GenomeComponent.class)) {
             LOGGER.info(entity.getComponent(GenomeComponent.class).genes);
         }
     }
-
-//    @ReceiveEvent
-//    public void onModifyTraitEvent(ModifyTrait event, EntityRef entity) {
-//        Class<? extends Component> componentType = event.getComponentType();
-//        String traitName = event.getTraitName();
-//        LOGGER.info("Modifying " + componentType.getName() + " trait: " + traitName);
-//        SeedDefinitionComponent c = new SeedDefinitionComponent();
-//        try {
-//            LOGGER.info(componentType.getField(traitName).get(entity.getComponent(componentType)).toString());
-//            componentType.getField(traitName).setInt(entity.getComponent(componentType),1000);
-//            LOGGER.info(componentType.getField(traitName).get(entity.getComponent(componentType))+" is the filling");
-//        } catch (Exception e) {
-//            LOGGER.info("Got an error");
-//        }
-//    }
 
     private void addPropertyMap(EntityRef entity, String genomeId) {
         SeedBasedGenomeMap genomeMap = new SeedBasedGenomeMap(worldProvider.getSeed().hashCode());
