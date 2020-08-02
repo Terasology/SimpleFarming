@@ -158,7 +158,11 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
         boolean result = genomeManager.applyBreeding(ingredients[0], ingredients[1], entity);
         LOGGER.info(result + "");
         if (entity.hasComponent(GenomeComponent.class)) {
-            LOGGER.info(entity.getComponent(GenomeComponent.class).genes);
+            GenomeMap genomeMap =
+                    genomeRegistry.getGenomeDefinition(entity.getComponent(GenomeComponent.class).genomeId).getGenomeMap();
+            float newFilling = genomeMap.getProperty("filling", entity.getComponent(GenomeComponent.class).genes,
+                    Float.class);
+            entity.send(new ModifyFilling(newFilling));
         }
     }
 
