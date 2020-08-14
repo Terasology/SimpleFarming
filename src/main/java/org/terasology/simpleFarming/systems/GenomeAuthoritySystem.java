@@ -147,6 +147,11 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
         entity.addOrSaveComponent(retainComponentsComponent);
     }
 
+    /**
+     * Adds genes to the crafted entity if breeding is possible.
+     * @param event the OnRecipeCrafted event
+     * @param entity the crafted entity which is to be modified
+     */
     @ReceiveEvent
     public void onRecipeCraftedEvent(OnRecipeCrafted event, EntityRef entity) {
         EntityRef ingredients[] = event.getIngredients();
@@ -157,9 +162,9 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
         if (!(ingredients[0].hasComponent(GenomeComponent.class) || ingredients[1].hasComponent(GenomeComponent.class))) {
             return;
         }
+
         SimpleGenomeManager genomeManager = new SimpleGenomeManager();
         boolean result = genomeManager.applyBreeding(ingredients[0], ingredients[1], entity);
-        LOGGER.info(result + "");
         if (entity.hasComponent(GenomeComponent.class)) {
             GenomeMap genomeMap =
                     genomeRegistry.getGenomeDefinition(entity.getComponent(GenomeComponent.class).genomeId).getGenomeMap();
@@ -179,7 +184,7 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
                     @Nullable
                     @Override
                     public Float apply(@Nullable String input) {
-                        return (input.charAt(0) - 'A' + 5f);
+                        return (input.charAt(0) - 'A' + 5f)/5f;
                     }
                 });
         GenomeDefinition genomeDefinition = new GenomeDefinition(continuousBreedingAlgorithm, genomeMap);
