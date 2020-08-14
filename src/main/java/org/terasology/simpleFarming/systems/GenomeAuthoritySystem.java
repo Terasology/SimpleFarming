@@ -150,10 +150,13 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onRecipeCraftedEvent(OnRecipeCrafted event, EntityRef entity) {
         EntityRef ingredients[] = event.getIngredients();
-        LOGGER.info(ingredients[0].getComponent(GenomeComponent.class).genes);
-        LOGGER.info(ingredients[1].getComponent(GenomeComponent.class).genes);
-        LOGGER.info(entity.toString());
-        //ingredients[0].send(new OnBreed(ingredients[0], ingredients[1], entity));
+        if (ingredients.length != 2) {
+            return;
+        }
+
+        if (!(ingredients[0].hasComponent(GenomeComponent.class) || ingredients[1].hasComponent(GenomeComponent.class))) {
+            return;
+        }
         SimpleGenomeManager genomeManager = new SimpleGenomeManager();
         boolean result = genomeManager.applyBreeding(ingredients[0], ingredients[1], entity);
         LOGGER.info(result + "");
