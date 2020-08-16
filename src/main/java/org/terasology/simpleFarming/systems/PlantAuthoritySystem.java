@@ -19,8 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.event.EventPriority;
-import org.terasology.genome.component.GenomeComponent;
-import org.terasology.logic.common.RetainComponentsComponent;
 import org.terasology.simpleFarming.components.SeedDefinitionComponent;
 import org.terasology.simpleFarming.events.BeforePlanted;
 import org.terasology.simpleFarming.events.OnSeedPlanted;
@@ -92,8 +90,6 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
      */
     @ReceiveEvent(priority = EventPriority.PRIORITY_HIGH)
     public void onSeedPlant(ActivateEvent event, EntityRef seed, SeedDefinitionComponent seedComponent) {
-        RetainComponentsComponent retainComponentsComponent = new RetainComponentsComponent();
-        retainComponentsComponent.components.add(GenomeComponent.class);
         /* The item is being used but not planted */
         if (event.getTargetLocation() == null || event.isConsumed()) {
             return;
