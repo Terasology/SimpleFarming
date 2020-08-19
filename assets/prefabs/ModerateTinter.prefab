@@ -1,0 +1,8 @@
+{
+  "substance": {
+    "name": "ModerateTinter",
+    "hue": 200,
+    "saturationScale": 0.5,
+    "brightnessScale": 1
+  }
+}

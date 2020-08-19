@@ -9,7 +9,8 @@
         { "id": "Inventory", "minVersion": "1.1.0" },
         { "id": "ModuleTestingEnvironment", "minVersion": "0.2.0", "optional": true },
         { "id": "Genome", "minVersion": "1.0.0", "optional": true },
-        { "id": "BasicCrafting", "minVersion": "1.0.0", "optional": true }
+        { "id": "BasicCrafting", "minVersion": "1.0.0", "optional": true },
+        { "id": "SubstanceMatters", "minVersion": "2.0.0", "optional": true }
     ],
     "isServerSideOnly": false,
     "isLibrary": true

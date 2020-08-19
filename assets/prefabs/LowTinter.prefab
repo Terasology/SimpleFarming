@@ -1,0 +1,8 @@
+{
+  "substance": {
+    "name": "LowTinter",
+    "hue": 150,
+    "saturationScale": 0.5,
+    "brightnessScale": 1
+  }
+}
