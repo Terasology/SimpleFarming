@@ -41,8 +41,11 @@ import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.events.AddGenomeRetention;
 import org.terasology.simpleFarming.events.BeforePlanted;
 import org.terasology.simpleFarming.events.ModifyFilling;
+import org.terasology.simpleFarming.events.ModifyTint;
 import org.terasology.simpleFarming.events.ProduceCreated;
 import org.terasology.simpleFarming.events.TransferGenomeEvent;
+import org.terasology.substanceMatters.components.MaterialCompositionComponent;
+import org.terasology.substanceMatters.components.MaterialItemComponent;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.WorldProvider;
 
@@ -97,9 +100,10 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
 
         GenomeMap genomeMap =
                 genomeRegistry.getGenomeDefinition(produce.getComponent(GenomeComponent.class).genomeId).getGenomeMap();
-        float newFilling = genomeMap.getProperty("filling", produce.getComponent(GenomeComponent.class).genes,
+        float fillingModifier = genomeMap.getProperty("filling", produce.getComponent(GenomeComponent.class).genes,
                 Float.class);
-        produce.send(new ModifyFilling(newFilling));
+        float newFilling = produce.send(new ModifyFilling(fillingModifier)).filling.getValue();
+        produce.send(new ModifyTint(newFilling));
     }
 
     /**
@@ -168,9 +172,10 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
         if (entity.hasComponent(GenomeComponent.class)) {
             GenomeMap genomeMap =
                     genomeRegistry.getGenomeDefinition(entity.getComponent(GenomeComponent.class).genomeId).getGenomeMap();
-            float newFilling = genomeMap.getProperty("filling", entity.getComponent(GenomeComponent.class).genes,
+            float fillingModifier = genomeMap.getProperty("filling", entity.getComponent(GenomeComponent.class).genes,
                     Float.class);
-            entity.send(new ModifyFilling(newFilling));
+            float newFilling = entity.send(new ModifyFilling(fillingModifier)).filling.getValue();
+            entity.send(new ModifyTint(newFilling));
         }
     }
 
