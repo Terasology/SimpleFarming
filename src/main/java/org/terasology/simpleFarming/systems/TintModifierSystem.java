@@ -12,7 +12,7 @@ import org.terasology.simpleFarming.events.ModifyTint;
 import org.terasology.substanceMatters.components.MaterialCompositionComponent;
 import org.terasology.substanceMatters.components.MaterialItemComponent;
 
-@RegisterSystem(RegisterMode.AUTHORITY)
+@RegisterSystem(value = RegisterMode.AUTHORITY, requiresOptional = {"SubstanceMatters"})
 public class TintModifierSystem extends BaseComponentSystem {
 
     @ReceiveEvent
