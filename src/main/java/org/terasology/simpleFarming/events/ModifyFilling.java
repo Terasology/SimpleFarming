@@ -3,14 +3,14 @@
 
 package org.terasology.simpleFarming.events;
 
-import org.terasology.entitySystem.event.Event;
-import org.terasology.utilities.modifiable.ModifiableValue;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.utilities.modifiable.ModifiableValue;
 
 /**
  * Event sent to modify the filling of harvested produce.
  */
 public class ModifyFilling implements Event {
-    private float newFilling;
+    private final float newFilling;
     public ModifiableValue filling;
 
     public ModifyFilling(float newFilling) {

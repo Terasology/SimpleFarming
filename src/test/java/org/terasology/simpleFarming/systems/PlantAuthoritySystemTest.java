@@ -1,37 +1,24 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.systems;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.Region3i;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.common.ActivateEvent;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.math.Region3i;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockManager;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.moduletestingenvironment.ModuleTestingEnvironment;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.BushGrowthStage;
 import org.terasology.simpleFarming.components.SeedDefinitionComponent;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
 
 import java.util.Collections;
 import java.util.Set;
@@ -40,7 +27,9 @@ import static org.junit.Assert.assertEquals;
 
 public class PlantAuthoritySystemTest extends ModuleTestingEnvironment {
 
-    /** The block our test bush should use. */
+    /**
+     * The block our test bush should use.
+     */
     private static final String BUSH_BLOCK = "SimpleFarming:BaseBush";
 
     private EntityManager entityManager;
@@ -87,11 +76,10 @@ public class PlantAuthoritySystemTest extends ModuleTestingEnvironment {
     /**
      * Generic test trying to plant a seed and observing the result.
      * <p>
-     * Sets the target block and the block above the target to the given materials and attempts to
-     * plant a seed on the target block.  Then makes assertions according to the value of
-     * {@code shouldSucceed}: if {@code shouldSucceed} is true, the block above the target should
-     * now be the block specified by {@code BUSH_BLOCK}; if not, it should remain
-     * {@code materialAbove}.  In either case, the target block should be unchanged.
+     * Sets the target block and the block above the target to the given materials and attempts to plant a seed on the
+     * target block.  Then makes assertions according to the value of {@code shouldSucceed}: if {@code shouldSucceed} is
+     * true, the block above the target should now be the block specified by {@code BUSH_BLOCK}; if not, it should
+     * remain {@code materialAbove}.  In either case, the target block should be unchanged.
      *
      * @param material the block the seed should be planted on
      * @param materialAbove the block above the target block
@@ -138,8 +126,8 @@ public class PlantAuthoritySystemTest extends ModuleTestingEnvironment {
     /**
      * Creates a seed entity, using parameters appropriate to the test.
      * <p>
-     * To avoid coupling the test to any particular seed prefab, generates a seed definition from
-     * scratch, with a null prefab and a basic, single-stage bush definition on the same entity.
+     * To avoid coupling the test to any particular seed prefab, generates a seed definition from scratch, with a null
+     * prefab and a basic, single-stage bush definition on the same entity.
      */
     private EntityRef makeTestSeed() {
         final BushDefinitionComponent bushDefinition = new BushDefinitionComponent();
@@ -151,7 +139,9 @@ public class PlantAuthoritySystemTest extends ModuleTestingEnvironment {
         );
     }
 
-    /** Attempts to plant the given seed at the given position. */
+    /**
+     * Attempts to plant the given seed at the given position.
+     */
     private void plantSeed(EntityRef seed, Vector3i position) {
         final EntityRef target = entityManager.create(new LocationComponent(position.toVector3f()));
         final ActivateEvent event = new ActivateEvent(

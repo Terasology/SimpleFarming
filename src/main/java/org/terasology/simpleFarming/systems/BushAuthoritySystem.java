@@ -1,38 +1,31 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.systems;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.delay.DelayManager;
-import org.terasology.logic.delay.DelayedActionTriggeredEvent;
-import org.terasology.logic.inventory.InventoryManager;
-import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.inventory.events.DropItemEvent;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.logic.common.ActivateEvent;
+import org.terasology.engine.logic.delay.DelayManager;
+import org.terasology.engine.logic.delay.DelayedActionTriggeredEvent;
+import org.terasology.engine.logic.inventory.ItemComponent;
+import org.terasology.engine.logic.inventory.events.DropItemEvent;
+import org.terasology.engine.physics.events.ImpulseEvent;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.utilities.random.FastRandom;
+import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.entity.CreateBlockDropsEvent;
+import org.terasology.inventory.logic.InventoryManager;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.physics.events.ImpulseEvent;
-import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.BushGrowthStage;
 import org.terasology.simpleFarming.components.CheatGrowthComponent;
@@ -43,12 +36,6 @@ import org.terasology.simpleFarming.events.DoRemoveBud;
 import org.terasology.simpleFarming.events.OnSeedPlanted;
 import org.terasology.simpleFarming.events.ProduceCreated;
 import org.terasology.simpleFarming.events.TransferGenomeEvent;
-import org.terasology.utilities.random.FastRandom;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.entity.CreateBlockDropsEvent;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -68,7 +55,8 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * Maximum single-axis impulse for seed and produce drops.
      */
     private static final float DROP_IMPULSE_AMOUNT = 22.0f;
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(BushAuthoritySystem.class);
+    private final FastRandom random = new FastRandom();
     @In
     private WorldProvider worldProvider;
     @In
@@ -82,9 +70,16 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     @In
     private DelayManager delayManager;
 
-    private FastRandom random = new FastRandom();
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BushAuthoritySystem.class);
+    /**
+     * Safely get the growth stage from the given index
+     *
+     * @param bushComponent
+     * @param index
+     * @return
+     */
+    public static Map.Entry<String, BushGrowthStage> getGrowthStage(BushDefinitionComponent bushComponent, int index) {
+        return (new ArrayList<>(bushComponent.growthStages.entrySet())).get(Math.min(bushComponent.growthStages.size() - 1, Math.max(0, index)));
+    }
 
     /**
      * Builds the list of growth stages from the prefab data.
@@ -139,7 +134,6 @@ public class BushAuthoritySystem extends BaseComponentSystem {
             , BlockComponent blockComponent) {
         doBushGrowth(blockComponent.getPosition(), bush, bushComponent, 1);
     }
-
 
     /**
      * Called when an item with the cheat component is used on a block
@@ -196,17 +190,6 @@ public class BushAuthoritySystem extends BaseComponentSystem {
 
             bush.send(new TransferGenomeEvent(newBush));
         }
-    }
-
-    /**
-     * Safely get the growth stage from the given index
-     *
-     * @param bushComponent
-     * @param index
-     * @return
-     */
-    public static Map.Entry<String, BushGrowthStage> getGrowthStage(BushDefinitionComponent bushComponent, int index) {
-        return (new ArrayList<>(bushComponent.growthStages.entrySet())).get(Math.min(bushComponent.growthStages.size() - 1, Math.max(0, index)));
     }
 
     /**

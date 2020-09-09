@@ -1,18 +1,5 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.simpleFarming.systems;
 
@@ -20,11 +7,15 @@ import com.google.common.base.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.crafting.events.OnRecipeCrafted;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.logic.common.RetainComponentsComponent;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.utilities.random.FastRandom;
+import org.terasology.engine.world.WorldProvider;
 import org.terasology.genome.GenomeDefinition;
 import org.terasology.genome.GenomeRegistry;
 import org.terasology.genome.breed.BreedingAlgorithm;
@@ -35,8 +26,6 @@ import org.terasology.genome.component.GenomeComponent;
 import org.terasology.genome.genomeMap.GenomeMap;
 import org.terasology.genome.genomeMap.SeedBasedGenomeMap;
 import org.terasology.genome.system.SimpleGenomeManager;
-import org.terasology.logic.common.RetainComponentsComponent;
-import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.events.AddGenomeRetention;
 import org.terasology.simpleFarming.events.BeforePlanted;
@@ -44,10 +33,6 @@ import org.terasology.simpleFarming.events.ModifyFilling;
 import org.terasology.simpleFarming.events.ModifyTint;
 import org.terasology.simpleFarming.events.ProduceCreated;
 import org.terasology.simpleFarming.events.TransferGenomeEvent;
-import org.terasology.substanceMatters.components.MaterialCompositionComponent;
-import org.terasology.substanceMatters.components.MaterialItemComponent;
-import org.terasology.utilities.random.FastRandom;
-import org.terasology.world.WorldProvider;
 
 import javax.annotation.Nullable;
 
@@ -56,19 +41,18 @@ import javax.annotation.Nullable;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class GenomeAuthoritySystem extends BaseComponentSystem {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenomeAuthoritySystem.class);
     @In
     private GenomeRegistry genomeRegistry;
     @In
     private WorldProvider worldProvider;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenomeAuthoritySystem.class);
-
     /**
      * Called immediately after a bush has been harvested.
      * <p>
-     * Checks the genome component of the bush and assigns it to the seed if it had genes already.
-     * If the bush did not have a GenomeComponent, it is assigned as this is the first harvest
-     * A new Genome Definition is created for the family
+     * Checks the genome component of the bush and assigns it to the seed if it had genes already. If the bush did not
+     * have a GenomeComponent, it is assigned as this is the first harvest A new Genome Definition is created for the
+     * family
      *
      * @param event the Produce created event
      * @param creator the creator(bush) of the produce
@@ -109,8 +93,8 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
     /**
      * Called immediately after a bush has been harvested.
      * <p>
-     * Checks the genome component of the seed and transfers it to the plant that was planted
-     * if the seed does not contain a genome component, the component is assigned on first harvest
+     * Checks the genome component of the seed and transfers it to the plant that was planted if the seed does not
+     * contain a genome component, the component is assigned on first harvest
      *
      * @param event the Before Planted event
      * @param plant the plant that is being planted
@@ -153,12 +137,13 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
 
     /**
      * Adds genes to the crafted entity if breeding is possible.
+     *
      * @param event the OnRecipeCrafted event
      * @param entity the crafted entity which is to be modified
      */
     @ReceiveEvent
     public void onRecipeCraftedEvent(OnRecipeCrafted event, EntityRef entity) {
-        EntityRef ingredients[] = event.getIngredients();
+        EntityRef[] ingredients = event.getIngredients();
         if (ingredients.length != 2) {
             return;
         }
@@ -189,7 +174,7 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
                     @Nullable
                     @Override
                     public Float apply(@Nullable String input) {
-                        return (input.charAt(0) - 'A' + 5f)/5f;
+                        return (input.charAt(0) - 'A' + 5f) / 5f;
                     }
                 });
         GenomeDefinition genomeDefinition = new GenomeDefinition(continuousBreedingAlgorithm, genomeMap);

@@ -1,25 +1,12 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.components;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.world.block.Block;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.simpleFarming.systems.TreeAuthoritySystem;
-import org.terasology.world.block.Block;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,21 +14,17 @@ import java.util.List;
 /**
  * Stores the necessary data for defining a tree.
  * <p>
- * In order to use it, add the component to a prefab, then link to that
- * prefab from a {@link SeedDefinitionComponent}. Alternatively, the component
- * can be included directly in the item and the SeedDefinitionComponent left
- * empty.
+ * In order to use it, add the component to a prefab, then link to that prefab from a {@link SeedDefinitionComponent}.
+ * Alternatively, the component can be included directly in the item and the SeedDefinitionComponent left empty.
  * <p>
- * After the sapling has been placed, this component is transferred to
- * the sapling block's associated entity. When the sapling grows, the
- * {@link RootComponent} of a tree is created based on the sapling's
- * definition component.
+ * After the sapling has been placed, this component is transferred to the sapling block's associated entity. When the
+ * sapling grows, the {@link RootComponent} of a tree is created based on the sapling's definition component.
  */
 public class SaplingDefinitionComponent implements Component {
 
     /**
-     * The location of the sapling. This does not need to be provided with the
-     * definition, it is automatically set by {@link TreeAuthoritySystem}
+     * The location of the sapling. This does not need to be provided with the definition, it is automatically set by
+     * {@link TreeAuthoritySystem}
      */
     public Vector3i location;
 
@@ -56,8 +39,7 @@ public class SaplingDefinitionComponent implements Component {
     public Block log;
 
     /**
-     * The prefab for the bush to use for the leaf block. This prefab should have
-     * a {@link BushDefinitionComponent}
+     * The prefab for the bush to use for the leaf block. This prefab should have a {@link BushDefinitionComponent}
      */
     public Prefab leaf;
 
@@ -74,10 +56,10 @@ public class SaplingDefinitionComponent implements Component {
     }
 
     /**
-     * Copy constructor to create a sapling from an existing tree. This is used when
-     * the tree is un-grown into a sapling.
+     * Copy constructor to create a sapling from an existing tree. This is used when the tree is un-grown into a
+     * sapling.
      *
-     * @param base     The root to base this sapling off of.
+     * @param base The root to base this sapling off of.
      * @param location The location of the sapling in the world.
      * @see CheatGrowthComponent
      */

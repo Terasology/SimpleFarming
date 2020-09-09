@@ -3,9 +3,7 @@
 
 package org.terasology.simpleFarming.events;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.logic.common.RetainComponentsComponent;
+import org.terasology.engine.entitySystem.event.Event;
 
 public class AddGenomeRetention implements Event {
 }

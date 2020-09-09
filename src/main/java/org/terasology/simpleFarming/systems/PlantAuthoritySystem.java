@@ -1,55 +1,43 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.systems;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.logic.common.ActivateEvent;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.utilities.random.FastRandom;
+import org.terasology.engine.utilities.random.Random;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.inventory.logic.InventoryManager;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.simpleFarming.components.SeedDefinitionComponent;
 import org.terasology.simpleFarming.events.BeforePlanted;
 import org.terasology.simpleFarming.events.OnSeedPlanted;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.inventory.InventoryManager;
-import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.registry.In;
-import org.terasology.utilities.random.FastRandom;
-import org.terasology.utilities.random.Random;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
 
 /**
  * System handling the planting of seeds.
  * <p>
- * After the seed has been planted, management of the resulting bush or vine is passed off to
- * {@link BushAuthoritySystem} or {@link VineAuthoritySystem}, as appropriate.
+ * After the seed has been planted, management of the resulting bush or vine is passed off to {@link
+ * BushAuthoritySystem} or {@link VineAuthoritySystem}, as appropriate.
  *
  * @see SeedDefinitionComponent
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class PlantAuthoritySystem extends BaseComponentSystem {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlantAuthoritySystem.class);
+    private static final Random random = new FastRandom();
     @In
     private InventoryManager inventoryManager;
     @In
@@ -58,15 +46,21 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
     private EntityManager entityManager;
     @In
     private BlockManager blockManager;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlantAuthoritySystem.class);
-
     /**
      * The standard air block, cached on initialization.
      */
     private Block airBlock;
 
-    private static Random random = new FastRandom();
+    /**
+     * Returns a random integer in the specified interval.
+     *
+     * @param min The minimum number
+     * @param max The maximum number
+     * @return the random number, or {@code min} if {@code max <= min}
+     */
+    public static long generateRandom(int min, int max) {
+        return max == 0 ? min : random.nextInt(min, max);
+    }
 
     @Override
     public void postBegin() {
@@ -77,15 +71,14 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
     /**
      * Called when a seed is activated, typically by right-clicking on the ground.
      * <p>
-     * If the planting is valid (the event was not consumed by a higher priority handler, and the
-     * player was targeting the top of a valid block per {@link #isValidPosition}), creates an
-     * entity from the {@linkplain SeedDefinitionComponent#prefab prefab} associated with the seed,
-     * and sends that entity an {@link OnSeedPlanted} event.  It is then the responsibility of the
-     * appropriate authority ({@link BushAuthoritySystem}, {@link VineAuthoritySystem} or
-     * {@link TreeAuthoritySystem}) to manage the plant.
+     * If the planting is valid (the event was not consumed by a higher priority handler, and the player was targeting
+     * the top of a valid block per {@link #isValidPosition}), creates an entity from the {@linkplain
+     * SeedDefinitionComponent#prefab prefab} associated with the seed, and sends that entity an {@link OnSeedPlanted}
+     * event.  It is then the responsibility of the appropriate authority ({@link BushAuthoritySystem}, {@link
+     * VineAuthoritySystem} or {@link TreeAuthoritySystem}) to manage the plant.
      *
-     * @param event         the activation event
-     * @param seed          the seed item
+     * @param event the activation event
+     * @param seed the seed item
      * @param seedComponent the seed's definition component
      */
     @ReceiveEvent(priority = EventPriority.PRIORITY_HIGH)
@@ -109,8 +102,8 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
     /**
      * Determines whether a seed can be planted at the given position.
      * <p>
-     * A position is considered valid if it is currently an air block, and if the block below it is not
-     * {@linkplain Block#isPenetrable() penetrable}.
+     * A position is considered valid if it is currently an air block, and if the block below it is not {@linkplain
+     * Block#isPenetrable() penetrable}.
      *
      * @param position the position the new plant will occupy (should be air currently); null returns false
      * @return true if the position is valid, false otherwise
@@ -127,16 +120,5 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
         position.addY(1);
 
         return (targetBlock == airBlock && !belowBlock.isPenetrable());
-    }
-
-    /**
-     * Returns a random integer in the specified interval.
-     *
-     * @param min The minimum number
-     * @param max The maximum number
-     * @return the random number, or {@code min} if {@code max <= min}
-     */
-    public static long generateRandom(int min, int max) {
-        return max == 0 ? min : random.nextInt(min, max);
     }
 }

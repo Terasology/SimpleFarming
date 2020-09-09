@@ -1,32 +1,25 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.systems;
 
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.delay.DelayManager;
-import org.terasology.logic.delay.DelayedActionTriggeredEvent;
-import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.logic.common.ActivateEvent;
+import org.terasology.engine.logic.delay.DelayManager;
+import org.terasology.engine.logic.delay.DelayedActionTriggeredEvent;
+import org.terasology.engine.logic.inventory.ItemComponent;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.utilities.random.FastRandom;
+import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.entity.CreateBlockDropsEvent;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.CheatGrowthComponent;
 import org.terasology.simpleFarming.components.SeedDefinitionComponent;
@@ -35,12 +28,6 @@ import org.terasology.simpleFarming.components.VineNodeComponent;
 import org.terasology.simpleFarming.events.DoDestroyPlant;
 import org.terasology.simpleFarming.events.DoRemoveBud;
 import org.terasology.simpleFarming.events.OnSeedPlanted;
-import org.terasology.utilities.random.FastRandom;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.entity.CreateBlockDropsEvent;
 
 /**
  * System managing the lifecycle of vines.
@@ -58,11 +45,14 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     /**
      * The percentage chance that a new bud will spawn each growth cycle.
      * <p>
-     * This is checked for each vine stem block that doesn't already have a bud, every growth
-     * cycle.
+     * This is checked for each vine stem block that doesn't already have a bud, every growth cycle.
      */
     private static final double BUD_CHANCE = 0.2;
-
+    private final FastRandom random = new FastRandom();
+    /**
+     * Array holding all possible spawn directions.
+     */
+    private final Vector3i[] spawnPos = new Vector3i[4];
     @In
     private WorldProvider worldProvider;
     @In
@@ -73,18 +63,10 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     private DelayManager delayManager;
     @In
     private EntityManager entityManager;
-
-    private FastRandom random = new FastRandom();
-
     /**
      * The standard air block, cached on initialization.
      */
     private Block airBlock;
-
-    /**
-     * Array holding all possible spawn directions.
-     */
-    private Vector3i[] spawnPos = new Vector3i[4];
 
     @Override
     public void postBegin() {
@@ -99,14 +81,13 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     /**
      * Called immediately after a new vine has been planted.
      * <p>
-     * Places the root block, creates the {@link VineNodeComponent} associated to the root, and
-     * starts the growth timer.  When the timer expires,
-     * {@link #onVineGrowth(DelayedActionTriggeredEvent, EntityRef, VineNodeComponent, VineDefinitionComponent)}
-     * will be called.
+     * Places the root block, creates the {@link VineNodeComponent} associated to the root, and starts the growth timer.
+     *  When the timer expires, {@link #onVineGrowth(DelayedActionTriggeredEvent, EntityRef, VineNodeComponent,
+     * VineDefinitionComponent)} will be called.
      *
-     * @param event            the seed planting event
+     * @param event the seed planting event
      * @param definitionEntity the newly-created vine entity
-     * @param vineComponent    the vine's definition
+     * @param vineComponent the vine's definition
      * @see PlantAuthoritySystem#onSeedPlant(ActivateEvent, EntityRef, SeedDefinitionComponent)
      */
     @ReceiveEvent
@@ -124,12 +105,13 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * See {@link #recurseGrow(EntityRef, VineDefinitionComponent)} for details of what happens during a growth cycle.
      * After the growth cycle is complete, restarts the growth timer.
      *
-     * @param event         the event indicating the timer has ended
-     * @param root          the vine root
+     * @param event the event indicating the timer has ended
+     * @param root the vine root
      * @param nodeComponent The vine's definition
      */
     @ReceiveEvent
-    public void onVineGrowth(DelayedActionTriggeredEvent event, EntityRef root, VineNodeComponent nodeComponent, VineDefinitionComponent vineComponent) {
+    public void onVineGrowth(DelayedActionTriggeredEvent event, EntityRef root, VineNodeComponent nodeComponent,
+                             VineDefinitionComponent vineComponent) {
         doGrowVine(root, nodeComponent, vineComponent);
     }
 
@@ -153,7 +135,8 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * @param itemComponent
      */
     @ReceiveEvent
-    public void onCheatGrowth(ActivateEvent event, EntityRef item, CheatGrowthComponent cheatGrowthComponent, ItemComponent itemComponent) {
+    public void onCheatGrowth(ActivateEvent event, EntityRef item, CheatGrowthComponent cheatGrowthComponent,
+                              ItemComponent itemComponent) {
         EntityRef target = event.getTarget();
         if (!target.hasComponent(VineDefinitionComponent.class) || !target.hasComponent(VineNodeComponent.class)) {
             return;
@@ -170,11 +153,10 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     /**
      * Recursively grows the vine.
      * <p>
-     * Called once for each stem block in the vine.  Each stem block that doesn't already have a bud
-     * has a chance to grow one, and if the vine is not already at maximum length (20 blocks),
-     * a new stem block is added at the end.
+     * Called once for each stem block in the vine.  Each stem block that doesn't already have a bud has a chance to
+     * grow one, and if the vine is not already at maximum length (20 blocks), a new stem block is added at the end.
      *
-     * @param node          the current node to process
+     * @param node the current node to process
      * @param vineComponent the vine's definition
      * @return the {@link VineNodeComponent#length} of this node, after all growth is complete
      */
@@ -202,12 +184,12 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     /**
      * Attempts to add a new bud to the vine.
      * <p>
-     * After the new bud entity has been created, passes control to the {@link BushAuthoritySystem}
-     * via an {@link OnSeedPlanted} event.  The {@code BushAuthoritySystem} is responsible for
-     * managing the remainder of the bud's lifecycle.
+     * After the new bud entity has been created, passes control to the {@link BushAuthoritySystem} via an {@link
+     * OnSeedPlanted} event.  The {@code BushAuthoritySystem} is responsible for managing the remainder of the bud's
+     * lifecycle.
      * <p>
-     * This method can fail to add a bud if there are no valid positions adjacent to {@code parent}.
-     * See {@link #isValidPosition(Vector3i)} for the definition of a valid position.
+     * This method can fail to add a bud if there are no valid positions adjacent to {@code parent}. See {@link
+     * #isValidPosition(Vector3i)} for the definition of a valid position.
      *
      * @param parent the budding vine node
      * @return true if a bud was added, or false if no valid position for a bud could be found
@@ -234,11 +216,10 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     /**
      * Attempts to grow a new block of vine stem.
      * <p>
-     * This method can fail to add a new stem block if there are no valid positions adjacent to
-     * {@code parent}.  See {@link #isValidPosition(Vector3i)} for the definition of a valid
-     * position.
+     * This method can fail to add a new stem block if there are no valid positions adjacent to {@code parent}.  See
+     * {@link #isValidPosition(Vector3i)} for the definition of a valid position.
      *
-     * @param parent        the vine node to attach to
+     * @param parent the vine node to attach to
      * @param vineComponent the vine's definition
      * @return true if the child was added, or false if no valid position could be found
      */
@@ -258,17 +239,16 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     /**
      * Returns the position to spawn a new vine element in.
      * <p>
-     * The positions considered are the four positions adjacent to {@code parent} and on the same Y-level.
-     * See {@link #isValidPosition(Vector3i)} for the definition of a valid position; additionally, a
-     * position is considered invalid if it is horizontally adjacent to more than {@link #MAX_NEIGHBOURS}
-     * non-air blocks.
+     * The positions considered are the four positions adjacent to {@code parent} and on the same Y-level. See {@link
+     * #isValidPosition(Vector3i)} for the definition of a valid position; additionally, a position is considered
+     * invalid if it is horizontally adjacent to more than {@link #MAX_NEIGHBOURS} non-air blocks.
      * <p>
      * If a valid position exists, returns one selected at random; otherwise returns null.
      * <p>
      * Get the position to spawn a new vine element in
      *
      * @param parent the node this new element will be attached to
-     * @param isBud  if the node is to be a bud.
+     * @param isBud if the node is to be a bud.
      * @return a position to grow in, or null if none exist
      */
     private Vector3i getGrowthPosition(VineNodeComponent parent, boolean isBud) {
@@ -308,10 +288,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
         }
         Block belowBlock = worldProvider.getBlock(position.addY(-1));
         position.addY(1);
-        if (belowBlock.isPenetrable()) {
-            return false;
-        }
-        return true;
+        return !belowBlock.isPenetrable();
     }
 
     /**
@@ -342,7 +319,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     /**
      * Called when a bud is destroyed.
      *
-     * @param event  the removal event
+     * @param event the removal event
      * @param parent the bud's parent node
      * @see BushAuthoritySystem#onBudDestroyed(Vector3i, BushDefinitionComponent, boolean)
      */
@@ -357,7 +334,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * <p>
      * Destroys all vine blocks (both stems and buds) that are now disconnected from the root.
      *
-     * @param event  the block destruction event
+     * @param event the block destruction event
      * @param entity the vine stem block being destroyed
      */
     @ReceiveEvent
@@ -395,7 +372,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
     /**
      * Recursively recalculates the length for each node from the end towards the root.
      *
-     * @param node   the node to calculate the length for
+     * @param node the node to calculate the length for
      * @param length the length of this node
      */
     private void rebuildLength(EntityRef node, int length) {
@@ -429,10 +406,11 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      * Starts a new growth timer with random duration, subject to the given bounds.
      *
      * @param entity the entity to set the timer on
-     * @param min    the minimum duration in milliseconds
-     * @param max    the maximum duration in milliseconds
+     * @param min the minimum duration in milliseconds
+     * @param max the maximum duration in milliseconds
      */
     private void resetDelay(EntityRef entity, int min, int max) {
-        delayManager.addDelayedAction(entity, "SimpleFarming:" + entity.getId(), PlantAuthoritySystem.generateRandom(min, max));
+        delayManager.addDelayedAction(entity, "SimpleFarming:" + entity.getId(),
+                PlantAuthoritySystem.generateRandom(min, max));
     }
 }

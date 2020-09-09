@@ -1,51 +1,40 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.testing;
 
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.health.DestroyEvent;
-import org.terasology.logic.health.EngineDamageTypes;
-import org.terasology.logic.inventory.events.DropItemEvent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.logic.players.PlayerCharacterComponent;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.common.ActivateEvent;
+import org.terasology.engine.logic.destruction.DestroyEvent;
+import org.terasology.engine.logic.destruction.EngineDamageTypes;
+import org.terasology.engine.logic.inventory.events.DropItemEvent;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.logic.players.PlayerCharacterComponent;
+import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.engine.world.block.BlockManager;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.moduletestingenvironment.ModuleTestingEnvironment;
 import org.terasology.moduletestingenvironment.TestEventReceiver;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.systems.BushAuthoritySystem;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.BlockManager;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test environment specific to the {@code SimpleFarming} module.
  * <p>
- * Each test run in this environment has access to a single bush, based on a test-specific prefab.
- * The methods on this class can be used to manipulate and make assertions about this bush.
+ * Each test run in this environment has access to a single bush, based on a test-specific prefab. The methods on this
+ * class can be used to manipulate and make assertions about this bush.
  */
 public class SingleBushTestingEnvironment extends ModuleTestingEnvironment {
     private static final Vector3i BUSH_LOCATION = Vector3i.zero();
@@ -59,6 +48,15 @@ public class SingleBushTestingEnvironment extends ModuleTestingEnvironment {
 
     private EntityRef bush;
     private BushDefinitionComponent component;
+
+    private static void assertListContainsEntityFromPrefab(List<EntityRef> items, String prefab) {
+        assertTrue(String.format("Operation did not drop %s", prefab),
+                items.stream().anyMatch(item -> entityIsFromPrefab(item, prefab)));
+    }
+
+    private static boolean entityIsFromPrefab(EntityRef entity, String prefab) {
+        return entity.getParentPrefab().getName().equals(prefab);
+    }
 
     @Override
     public Set<String> getDependencies() {
@@ -128,8 +126,8 @@ public class SingleBushTestingEnvironment extends ModuleTestingEnvironment {
     /**
      * Harvests the test bush.
      * <p>
-     * The entity doing the harvesting has no inventory, so produce drops should spawn into the
-     * world (and therefore be detectable via {@link #assertActionDropsProduce(Runnable)}).
+     * The entity doing the harvesting has no inventory, so produce drops should spawn into the world (and therefore be
+     * detectable via {@link #assertActionDropsProduce(Runnable)}).
      */
     protected final void harvestBush() {
         EntityRef player = entityManager.create();
@@ -165,8 +163,8 @@ public class SingleBushTestingEnvironment extends ModuleTestingEnvironment {
     /**
      * Asserts that the test bush is in the expected growth stage.
      * <p>
-     * This checks both that the {@link BushDefinitionComponent#currentStage} field has the correct
-     * value, and that the block used is correct.
+     * This checks both that the {@link BushDefinitionComponent#currentStage} field has the correct value, and that the
+     * block used is correct.
      */
     protected final void assertBushInStage(int stage) {
         assertEquals(stage, component.currentStage);
@@ -175,7 +173,9 @@ public class SingleBushTestingEnvironment extends ModuleTestingEnvironment {
         assertEquals(block, worldProvider.getBlock(blockComponent.getPosition()).toString());
     }
 
-    /** Asserts that both the bush block and the bush entity have been destroyed. */
+    /**
+     * Asserts that both the bush block and the bush entity have been destroyed.
+     */
     protected final void assertBushDestroyed() {
         assertFalse(bush.exists());
         assertEquals(air, worldProvider.getBlock(BUSH_LOCATION));
@@ -199,15 +199,6 @@ public class SingleBushTestingEnvironment extends ModuleTestingEnvironment {
         for (String prefab : prefabs) {
             assertListContainsEntityFromPrefab(dropSpy.getEntityRefs(), prefab);
         }
-    }
-
-    private static void assertListContainsEntityFromPrefab(List<EntityRef> items, String prefab) {
-        assertTrue(String.format("Operation did not drop %s", prefab),
-                items.stream().anyMatch(item -> entityIsFromPrefab(item, prefab)));
-    }
-
-    private static boolean entityIsFromPrefab(EntityRef entity, String prefab) {
-        return entity.getParentPrefab().getName().equals(prefab);
     }
 
 }
