@@ -6,7 +6,7 @@ package org.terasology.simpleFarming.systems;
 import com.google.common.base.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.crafting.events.OnRecipeCrafted;
+import org.terasology.basiccrafting.events.OnRecipeCrafted;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
