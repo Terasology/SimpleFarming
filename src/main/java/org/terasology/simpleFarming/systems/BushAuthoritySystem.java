@@ -29,6 +29,7 @@ import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.events.DropItemEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
@@ -226,7 +227,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         if (!event.isConsumed() && areValidHarvestEntities(entity, harvester)) {
             /* Produce is only given in the final stage */
             if (isInLastStage(bushComponent)) {
-                EntityRef produceItem = dropProduce(bushComponent.produce, event.getTargetLocation(), harvester,
+                EntityRef produceItem = dropProduce(bushComponent.produce, JomlUtil.from(event.getTargetLocation()), harvester,
                         entity);
                 entity.send(new ProduceCreated(entity, produceItem));
                 if (bushComponent.sustainable) {

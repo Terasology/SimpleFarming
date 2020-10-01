@@ -17,22 +17,22 @@ package org.terasology.simpleFarming.systems;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.event.EventPriority;
-import org.terasology.simpleFarming.components.SeedDefinitionComponent;
-import org.terasology.simpleFarming.events.BeforePlanted;
-import org.terasology.simpleFarming.events.OnSeedPlanted;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
+import org.terasology.simpleFarming.components.SeedDefinitionComponent;
+import org.terasology.simpleFarming.events.BeforePlanted;
+import org.terasology.simpleFarming.events.OnSeedPlanted;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
@@ -95,7 +95,7 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
             return;
         }
 
-        Vector3i position = new Vector3i(event.getTargetLocation()).addY(1);
+        Vector3i position = new Vector3i(JomlUtil.from(event.getTargetLocation())).addY(1);
         if (Side.inDirection(event.getHitNormal()) == Side.TOP && isValidPosition(position)) {
             /* If the prefab field is null, there is a DefinitionComponent on the seed */
             EntityRef plantEntity = seedComponent.prefab == null ? seed : entityManager.create(seedComponent.prefab);

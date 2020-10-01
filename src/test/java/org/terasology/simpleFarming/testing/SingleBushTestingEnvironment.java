@@ -23,6 +23,7 @@ import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.PlayerCharacterComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.moduletestingenvironment.ModuleTestingEnvironment;
@@ -105,8 +106,8 @@ public class SingleBushTestingEnvironment extends ModuleTestingEnvironment {
                 EntityRef.NULL,  // instigator
                 null,            // origin
                 null,            // direction
-                dirtPosition,    // hit position
-                Vector3f.up(),   // hit normal
+            JomlUtil.from(dirtPosition),    // hit position
+                JomlUtil.from(Vector3f.up()),   // hit normal
                 0                // activation id
         ));
     }

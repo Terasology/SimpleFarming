@@ -22,6 +22,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -159,8 +160,8 @@ public class PlantAuthoritySystemTest extends ModuleTestingEnvironment {
                 EntityRef.NULL,         // instigator
                 null,                   // origin
                 null,                   // direction
-                position.toVector3f(),  // hit position
-                Vector3f.up(),          // hit normal
+            JomlUtil.from(position.toVector3f()),  // hit position
+                JomlUtil.from(Vector3f.up()),          // hit normal
                 0                       // activation id
         );
         seed.send(event);
