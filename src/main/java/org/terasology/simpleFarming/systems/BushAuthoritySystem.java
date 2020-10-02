@@ -336,7 +336,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         for (int i = 0; i < numSeeds; i++) {
             EntityRef seedItem = entityManager.create(seed);
             seedItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
-            seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
+            seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT, new org.joml.Vector3f())));
             seedItem.send(new ProduceCreated(parent, seedItem));
         }
     }
@@ -379,7 +379,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         boolean giveSuccess = inventoryManager.giveItem(harvester, target, produceItem);
         if (!giveSuccess) {
             produceItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
-            produceItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
+            produceItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT, new org.joml.Vector3f())));
         }
         return produceItem;
     }

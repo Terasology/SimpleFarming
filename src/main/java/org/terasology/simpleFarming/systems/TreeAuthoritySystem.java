@@ -15,6 +15,7 @@
  */
 package org.terasology.simpleFarming.systems;
 
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -201,7 +202,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         String seed = saplingComponent.leaf.getComponent(BushDefinitionComponent.class).seed;
         EntityRef seedItem = entityManager.create(seed);
         seedItem.send(new DropItemEvent(saplingComponent.location.toVector3f().add(0, 0.5f, 0)));
-        seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
+        seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT, new Vector3f())));
     }
 
     /**
@@ -540,7 +541,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         if (doItemDrops) {
             EntityRef logItem = blockItemFactory.newInstance(log.getComponent(BlockComponent.class).block.getBlockFamily(), 1);
             logItem.send(new DropItemEvent(logComponent.location.toVector3f().add(0, 0.5f, 0)));
-            logItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT)));
+            logItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT, new Vector3f())));
         }
         worldProvider.setBlock(logComponent.location, airBlock);
 
