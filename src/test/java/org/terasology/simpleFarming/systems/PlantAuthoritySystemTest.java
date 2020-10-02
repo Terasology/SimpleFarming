@@ -160,7 +160,7 @@ public class PlantAuthoritySystemTest extends ModuleTestingEnvironment {
                 EntityRef.NULL,         // instigator
                 null,                   // origin
                 null,                   // direction
-            JomlUtil.from(position.toVector3f()),  // hit position
+                JomlUtil.from(position.toVector3f()),  // hit position
                 JomlUtil.from(Vector3f.up()),          // hit normal
                 0                       // activation id
         );

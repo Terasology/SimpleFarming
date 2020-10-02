@@ -102,13 +102,13 @@ public class SingleBushTestingEnvironment extends ModuleTestingEnvironment {
         final Vector3f dirtPosition = BUSH_LOCATION.toVector3f().add(Vector3f.down());
         final EntityRef target = entityManager.create(new LocationComponent(dirtPosition));
         seed.send(new ActivateEvent(
-                target,          // target
-                EntityRef.NULL,  // instigator
-                null,            // origin
-                null,            // direction
+            target,          // target
+            EntityRef.NULL,  // instigator
+            null,            // origin
+            null,            // direction
             JomlUtil.from(dirtPosition),    // hit position
-                JomlUtil.from(Vector3f.up()),   // hit normal
-                0                // activation id
+            JomlUtil.from(Vector3f.up()),   // hit normal
+            0                // activation id
         ));
     }
 
