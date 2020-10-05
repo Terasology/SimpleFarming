@@ -1,20 +1,9 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.systems;
 
+import org.joml.RoundingMode;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -26,9 +15,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.InventoryManager;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.SeedDefinitionComponent;
 import org.terasology.simpleFarming.events.BeforePlanted;
@@ -95,7 +82,7 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
             return;
         }
 
-        Vector3i position = new Vector3i(JomlUtil.from(event.getTargetLocation())).addY(1);
+        Vector3i position = new Vector3i(event.getTargetLocation(), RoundingMode.FLOOR).add(0, 1, 0);
         if (Side.inDirection(event.getHitNormal()) == Side.TOP && isValidPosition(position)) {
             /* If the prefab field is null, there is a DefinitionComponent on the seed */
             EntityRef plantEntity = seedComponent.prefab == null ? seed : entityManager.create(seedComponent.prefab);
@@ -122,9 +109,9 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
         Block targetBlock = worldProvider.getBlock(position);
 
         /* Avoid construction of a transient Vector3i in order to save memory */
-        position.addY(-1);
+        position.y += -1;
         Block belowBlock = worldProvider.getBlock(position);
-        position.addY(1);
+        position.y += 1;
 
         return (targetBlock == airBlock && !belowBlock.isPenetrable());
     }

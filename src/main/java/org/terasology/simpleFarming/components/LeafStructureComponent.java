@@ -1,8 +1,9 @@
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.components;
 
+import org.joml.Vector3i;
 import org.terasology.entitySystem.Component;
-import org.terasology.math.geom.Vector3i;
-
 import java.util.HashSet;
 import java.util.Set;
 

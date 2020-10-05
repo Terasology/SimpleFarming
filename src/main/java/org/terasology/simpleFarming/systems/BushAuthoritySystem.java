@@ -1,20 +1,12 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.simpleFarming.systems;
 
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -30,8 +22,6 @@ import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
@@ -138,7 +128,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onBushGrowth(DelayedActionTriggeredEvent event, EntityRef bush, BushDefinitionComponent bushComponent
             , BlockComponent blockComponent) {
-        doBushGrowth(blockComponent.getPosition(), bush, bushComponent, 1);
+        doBushGrowth(JomlUtil.from(blockComponent.position), bush, bushComponent, 1);
     }
 
 
@@ -163,9 +153,9 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         BlockComponent blockComponent = target.getComponent(BlockComponent.class);
         BushDefinitionComponent bushDefinitionComponent = target.getComponent(BushDefinitionComponent.class);
         if (cheatGrowthComponent.causesUnGrowth) {
-            doBushGrowth(blockComponent.getPosition(), target, bushDefinitionComponent, -1);
+            doBushGrowth(JomlUtil.from(blockComponent.position), target, bushDefinitionComponent, -1);
         } else {
-            doBushGrowth(blockComponent.getPosition(), target, bushDefinitionComponent, 1);
+            doBushGrowth(JomlUtil.from(blockComponent.position), target, bushDefinitionComponent, 1);
         }
     }
 
@@ -227,14 +217,14 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         if (!event.isConsumed() && areValidHarvestEntities(entity, harvester)) {
             /* Produce is only given in the final stage */
             if (isInLastStage(bushComponent)) {
-                EntityRef produceItem = dropProduce(bushComponent.produce, JomlUtil.from(event.getTargetLocation()), harvester,
+                EntityRef produceItem = dropProduce(bushComponent.produce, event.getTargetLocation(), harvester,
                         entity);
                 entity.send(new ProduceCreated(entity, produceItem));
                 if (bushComponent.sustainable) {
-                    doBushGrowth(blockComponent.getPosition(), entity, bushComponent, -1);
+                    doBushGrowth(JomlUtil.from(blockComponent.position), entity, bushComponent, -1);
                 } else {
                     entity.send(new DoDestroyPlant());
-                    worldProvider.setBlock(blockComponent.getPosition(), blockManager.getBlock(BlockManager.AIR_ID));
+                    worldProvider.setBlock(JomlUtil.from(blockComponent.position), blockManager.getBlock(BlockManager.AIR_ID));
                     entity.destroy();
                 }
                 event.consume();
@@ -276,8 +266,8 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     /**
      * Called when a bush or bud is destroyed.
      * <p>
-     * Delegates to either {@link #onBushDestroyed(Vector3i, EntityRef, BushDefinitionComponent)} or {@link
-     * #onBudDestroyed(Vector3i, EntityRef, BushDefinitionComponent, boolean)} as appropriate.
+     * Delegates to either {@link #onBushDestroyed(Vector3ic, EntityRef, BushDefinitionComponent)} or {@link
+     * #onBudDestroyed(Vector3ic, EntityRef, BushDefinitionComponent, boolean)} as appropriate.
      *
      * @param event the destroy plant event
      * @param entity the entity sending the event; not used
@@ -287,9 +277,9 @@ public class BushAuthoritySystem extends BaseComponentSystem {
     public void onPlantDestroyed(DoDestroyPlant event, EntityRef entity, BushDefinitionComponent bushComponent,
                                  BlockComponent blockComponent) {
         if (bushComponent.parent == null) {
-            onBushDestroyed(blockComponent.getPosition(), entity, bushComponent);
+            onBushDestroyed(JomlUtil.from(blockComponent.position), entity, bushComponent);
         } else {
-            onBudDestroyed(blockComponent.getPosition(), entity, bushComponent, event.isParentDead);
+            onBudDestroyed(JomlUtil.from(blockComponent.position), entity, bushComponent, event.isParentDead);
         }
     }
 
@@ -298,11 +288,11 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      *
      * @param bushComponent the bush component of the entity
      */
-    private void onBushDestroyed(Vector3i position, EntityRef bush, BushDefinitionComponent bushComponent) {
+    private void onBushDestroyed(Vector3ic position, EntityRef bush, BushDefinitionComponent bushComponent) {
         if (bushComponent.currentStage == bushComponent.growthStages.size() - 1) {
             dropSeeds(numSeeds(bushComponent),
                     bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
-                    position.toVector3f(), bush);
+                    new Vector3f(position), bush);
         }
     }
 
@@ -312,7 +302,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param bushComponent the component of the bud
      * @param isParentDead whether the parent vine still exists
      */
-    private void onBudDestroyed(Vector3i position, EntityRef bud, BushDefinitionComponent bushComponent,
+    private void onBudDestroyed(Vector3ic position, EntityRef bud, BushDefinitionComponent bushComponent,
                                 boolean isParentDead) {
         if (!isParentDead) {
             bushComponent.parent.send(new DoRemoveBud());
@@ -320,7 +310,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
         worldProvider.setBlock(position, blockManager.getBlock(BlockManager.AIR_ID));
         dropSeeds(1,
                 bushComponent.seed == null ? bushComponent.produce : bushComponent.seed,
-                position.toVector3f(), bud);
+                new Vector3f(position), bud);
 
     }
 
@@ -331,11 +321,11 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param seed the prefab of the seed entity
      * @param position the position to drop above
      */
-    private void dropSeeds(int numSeeds, String seed, Vector3f position,
+    private void dropSeeds(int numSeeds, String seed, Vector3fc position,
                            EntityRef parent) {
         for (int i = 0; i < numSeeds; i++) {
             EntityRef seedItem = entityManager.create(seed);
-            seedItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
+            seedItem.send(new DropItemEvent(JomlUtil.from(position).add(0, 0.5f, 0)));
             seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT, new org.joml.Vector3f())));
             seedItem.send(new ProduceCreated(parent, seedItem));
         }
@@ -374,11 +364,11 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param harvester the entity to give the item to
      * @param target the bush or vine bud (the "giver" of the item)
      */
-    private EntityRef dropProduce(String produce, Vector3f position, EntityRef harvester, EntityRef target) {
+    private EntityRef dropProduce(String produce, Vector3fc position, EntityRef harvester, EntityRef target) {
         EntityRef produceItem = entityManager.create(produce);
         boolean giveSuccess = inventoryManager.giveItem(harvester, target, produceItem);
         if (!giveSuccess) {
-            produceItem.send(new DropItemEvent(position.add(0, 0.5f, 0)));
+            produceItem.send(new DropItemEvent(JomlUtil.from(new Vector3f(position).add(0, 0.5f, 0))));
             produceItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT, new org.joml.Vector3f())));
         }
         return produceItem;
