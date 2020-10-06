@@ -4,7 +4,7 @@
     "name": "Test Seed"
   },
   "Item": {
-    "icon": "SimpleFarming:TestSeed",
+    "icon": "SimpleFarming:SimpleFarming#TestBerrySeed",
     "stackId": "Test Seed"
   },
   "SeedDefinition": {},
