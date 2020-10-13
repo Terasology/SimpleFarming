@@ -52,7 +52,7 @@ import javax.annotation.Nullable;
 /**
  * System managing genetics of all plants
  */
-@RegisterSystem(RegisterMode.AUTHORITY)
+@RegisterSystem(value = RegisterMode.AUTHORITY, requiresOptional = {"Genome"})
 public class GenomeAuthoritySystem extends BaseComponentSystem {
     @In
     private GenomeRegistry genomeRegistry;
