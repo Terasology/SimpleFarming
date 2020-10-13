@@ -44,8 +44,6 @@ import org.terasology.simpleFarming.events.ModifyFilling;
 import org.terasology.simpleFarming.events.ModifyTint;
 import org.terasology.simpleFarming.events.ProduceCreated;
 import org.terasology.simpleFarming.events.TransferGenomeEvent;
-import org.terasology.substanceMatters.components.MaterialCompositionComponent;
-import org.terasology.substanceMatters.components.MaterialItemComponent;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.WorldProvider;
 
