@@ -3,6 +3,7 @@
 package org.terasology.simpleFarming.events;
 
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.event.Event;
 
 /**
@@ -21,7 +22,7 @@ public class OnSeedPlanted implements Event {
         rootPosition = position;
     }
 
-    public Vector3i getPosition() {
+    public Vector3ic getPosition() {
         return rootPosition;
     }
 

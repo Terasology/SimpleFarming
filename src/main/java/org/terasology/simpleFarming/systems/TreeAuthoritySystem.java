@@ -85,7 +85,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onTreePlanted(OnSeedPlanted event, EntityRef definitionEntity, SaplingDefinitionComponent saplingComponent) {
         worldProvider.setBlock(event.getPosition(), saplingComponent.sapling);
-        saplingComponent.location = event.getPosition();
+        saplingComponent.location = new Vector3i(event.getPosition());
         EntityRef sapling = blockEntityRegistry.getExistingEntityAt(event.getPosition());
         sapling.addOrSaveComponent(saplingComponent);
         TreeGrowthStage currentStage = saplingComponent.growthStages.get(0);

@@ -167,7 +167,7 @@ public class BushAuthoritySystem extends BaseComponentSystem {
      * @param bushComponent the definition of the bush being grown
      * @param stages the number of stages to grow; negative values represent un-growth
      */
-    private void doBushGrowth(Vector3i position, EntityRef bush, BushDefinitionComponent bushComponent, int stages) {
+    private void doBushGrowth(Vector3ic position, EntityRef bush, BushDefinitionComponent bushComponent, int stages) {
         if (!isInLastStage(bushComponent)
                 // allow negative growth from the last stage
                 || stages < 0) {

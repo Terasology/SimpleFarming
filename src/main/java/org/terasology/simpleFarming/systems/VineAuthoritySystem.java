@@ -102,7 +102,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
         worldProvider.setBlock(event.getPosition(), vineComponent.stem);
         EntityRef vine = blockEntityRegistry.getExistingEntityAt(event.getPosition());
         vine.addOrSaveComponent(vineComponent);
-        vine.addComponent(new VineNodeComponent(event.getPosition()));
+        vine.addComponent(new VineNodeComponent(new Vector3i(event.getPosition())));
         resetDelay(vine, vineComponent.minGrowTime, vineComponent.maxGrowTime);
     }
 
