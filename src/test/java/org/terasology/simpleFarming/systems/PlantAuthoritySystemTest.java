@@ -58,7 +58,7 @@ public class PlantAuthoritySystemTest extends BaseAuthorityTest {
 
     @Test
     public void seedShouldGrowWherePlanted() {
-        setBlock(new Vector3i(), dirt);
+        setBlock(new Vector3i(0, 0, 0), dirt);
         setBlock(new Vector3i(0, 1, 0), air);
 
         EntityRef seed = testSeed();
