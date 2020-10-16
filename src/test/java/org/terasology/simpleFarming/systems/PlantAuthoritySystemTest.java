@@ -69,7 +69,7 @@ public class PlantAuthoritySystemTest extends BaseAuthorityTest {
     }
 
     @Test
-    public void tryPlanSeedOnAir() {
+    public void tryPlantSeedOnAir() {
         setBlock(new Vector3i(), air);
         setBlock(new Vector3i(0, 1, 0), air);
 
