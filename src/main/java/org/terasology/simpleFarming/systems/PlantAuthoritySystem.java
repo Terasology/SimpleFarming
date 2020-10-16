@@ -109,7 +109,7 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
         Block targetBlock = worldProvider.getBlock(position);
 
         /* Avoid construction of a transient Vector3i in order to save memory */
-        position.y += -1;
+        position.y -= 1;
         Block belowBlock = worldProvider.getBlock(position);
         position.y += 1;
 
