@@ -62,7 +62,7 @@ public class PlantAuthoritySystemTest extends BaseAuthorityTest {
         setBlock(new Vector3i(0, 1, 0), air);
 
         EntityRef seed = testSeed();
-        plant(seed, new Vector3f());
+        plant(seed, new Vector3f(0, 0, 0));
 
         Assertions.assertEquals(bush, worldProvider.getBlock(new Vector3i(0, 1, 0)));
         Assertions.assertEquals(dirt, worldProvider.getBlock(new Vector3i(0, 0, 0)));
