@@ -1,6 +1,5 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-
 package org.terasology.simpleFarming.systems;
 
 import org.terasology.entitySystem.entity.EntityRef;

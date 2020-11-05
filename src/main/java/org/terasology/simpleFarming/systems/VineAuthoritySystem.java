@@ -1,20 +1,9 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.systems;
 
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -25,7 +14,6 @@ import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.CheatGrowthComponent;
@@ -114,7 +102,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
         worldProvider.setBlock(event.getPosition(), vineComponent.stem);
         EntityRef vine = blockEntityRegistry.getExistingEntityAt(event.getPosition());
         vine.addOrSaveComponent(vineComponent);
-        vine.addComponent(new VineNodeComponent(event.getPosition()));
+        vine.addComponent(new VineNodeComponent(new Vector3i(event.getPosition())));
         resetDelay(vine, vineComponent.minGrowTime, vineComponent.maxGrowTime);
     }
 
@@ -306,8 +294,8 @@ public class VineAuthoritySystem extends BaseComponentSystem {
         if (targetBlock != airBlock) {
             return false;
         }
-        Block belowBlock = worldProvider.getBlock(position.addY(-1));
-        position.addY(1);
+        Block belowBlock = worldProvider.getBlock(position.add(0,-1,0));
+        position.add(0,1,0);
         if (belowBlock.isPenetrable()) {
             return false;
         }
@@ -344,7 +332,7 @@ public class VineAuthoritySystem extends BaseComponentSystem {
      *
      * @param event  the removal event
      * @param parent the bud's parent node
-     * @see BushAuthoritySystem#onBudDestroyed(Vector3i, BushDefinitionComponent, boolean)
+     * @see BushAuthoritySystem#onBudDestroyed(Vector3ic, EntityRef, BushDefinitionComponent, boolean)
      */
     @ReceiveEvent
     public void onBudRemove(DoRemoveBud event, EntityRef parent, VineNodeComponent nodeComponent) {
