@@ -29,12 +29,12 @@ public abstract class BaseAuthorityTest {
     }
 
     protected void setBlock(Vector3i position, Block block) {
-        getModuleTestingHelper().forceAndWaitForGeneration(JomlUtil.from(position));
+        getModuleTestingHelper().forceAndWaitForGeneration(position);
         getWorldProvider().setBlock(position, block);
     }
 
     protected void plant(EntityRef seed, Vector3f position) {
-        final EntityRef target = getEntityManager().create(new LocationComponent(JomlUtil.from(position)));
+        final EntityRef target = getEntityManager().create(new LocationComponent(position));
         seed.send(new ActivateEvent(target, EntityRef.NULL, null, null, position, new Vector3f(0, 1, 0), 0));
     }
 }
