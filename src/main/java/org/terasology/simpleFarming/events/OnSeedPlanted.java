@@ -18,15 +18,15 @@ public class OnSeedPlanted implements Event {
      */
     private Vector3i rootPosition;
 
-    public OnSeedPlanted(Vector3i position) {
-        rootPosition = position;
+    public OnSeedPlanted(Vector3ic position) {
+        rootPosition = new Vector3i(position);
     }
 
     public Vector3ic getPosition() {
         return rootPosition;
     }
 
-    public void setPosition(Vector3i position) {
-        this.rootPosition = position;
+    public void setPosition(Vector3ic position) {
+        this.rootPosition.set(position);
     }
 }
