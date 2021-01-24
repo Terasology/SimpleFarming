@@ -16,7 +16,6 @@ import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.events.DropItemEvent;
-import org.terasology.math.JomlUtil;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
@@ -191,7 +190,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
     public void onSaplingDestroyed(DoDestroyPlant event, EntityRef sapling, SaplingDefinitionComponent saplingComponent) {
         String seed = saplingComponent.leaf.getComponent(BushDefinitionComponent.class).seed;
         EntityRef seedItem = entityManager.create(seed);
-        seedItem.send(new DropItemEvent(JomlUtil.from(new Vector3f(saplingComponent.location).add(0, 0.5f, 0))));
+        seedItem.send(new DropItemEvent(new Vector3f(saplingComponent.location).add(0, 0.5f, 0)));
         seedItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT, new Vector3f())));
     }
 
@@ -535,7 +534,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
 
         if (doItemDrops) {
             EntityRef logItem = blockItemFactory.newInstance(log.getComponent(BlockComponent.class).block.getBlockFamily(), 1);
-            logItem.send(new DropItemEvent(JomlUtil.from(new Vector3f(logComponent.location).add(0, 0.5f, 0))));
+            logItem.send(new DropItemEvent(new Vector3f(logComponent.location).add(0, 0.5f, 0)));
             logItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT, new Vector3f())));
         }
         worldProvider.setBlock(logComponent.location, airBlock);
@@ -564,7 +563,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
     private void destroyLeaves(Set<EntityRef> leaves, boolean doItemDrops) {
         for (EntityRef leaf : leaves) {
             if (leaf.exists() && leaf.hasComponent(BushDefinitionComponent.class)) {
-                Vector3i leafLocation = JomlUtil.from(leaf.getComponent(BlockComponent.class).position);
+                Vector3i leafLocation = leaf.getComponent(BlockComponent.class).getPosition(new Vector3i());
                 if (doItemDrops) {
                     leaf.send(new DoDestroyPlant());
                 }
