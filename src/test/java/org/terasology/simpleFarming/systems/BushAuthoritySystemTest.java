@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.systems;
 
@@ -71,7 +71,7 @@ public class BushAuthoritySystemTest extends BaseAuthorityTest {
             assertEquals(stage, component.currentStage);
             BlockComponent blockComponent = entity.getComponent(BlockComponent.class);
             String block = BushAuthoritySystem.getGrowthStage(component, stage).getKey();
-            assertEquals(block, worldProvider.getBlock(blockComponent.position).toString());
+            assertEquals(block, worldProvider.getBlock(blockComponent.getPosition()).toString());
 
             final int startStage = component.currentStage;
             helper.runWhile(() -> component.currentStage == startStage);
@@ -98,7 +98,7 @@ public class BushAuthoritySystemTest extends BaseAuthorityTest {
         assertEquals(component.growthStages.size() - 2, component.currentStage);
         BlockComponent blockComponent = entity.getComponent(BlockComponent.class);
         String block = BushAuthoritySystem.getGrowthStage(component, component.growthStages.size() - 2).getKey();
-        assertEquals(block, worldProvider.getBlock(blockComponent.position).toString());
+        assertEquals(block, worldProvider.getBlock(blockComponent.getPosition()).toString());
     }
 
     @Test
