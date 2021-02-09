@@ -9,7 +9,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.PlayerCharacterComponent;
-import org.terasology.math.JomlUtil;
 import org.terasology.moduletestingenvironment.ModuleTestingHelper;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
