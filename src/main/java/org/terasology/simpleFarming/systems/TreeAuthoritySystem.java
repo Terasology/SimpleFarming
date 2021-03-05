@@ -533,7 +533,7 @@ public class TreeAuthoritySystem extends BaseComponentSystem {
         }
 
         if (doItemDrops) {
-            EntityRef logItem = blockItemFactory.newInstance(log.getComponent(BlockComponent.class).block.getBlockFamily(), 1);
+            EntityRef logItem = blockItemFactory.newInstance(log.getComponent(BlockComponent.class).getBlock().getBlockFamily(), 1);
             logItem.send(new DropItemEvent(new Vector3f(logComponent.location).add(0, 0.5f, 0)));
             logItem.send(new ImpulseEvent(random.nextVector3f(DROP_IMPULSE_AMOUNT, new Vector3f())));
         }
