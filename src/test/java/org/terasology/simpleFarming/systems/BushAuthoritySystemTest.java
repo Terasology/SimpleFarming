@@ -14,7 +14,8 @@ import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.events.DropItemEvent;
-import org.terasology.moduletestingenvironment.IsolatedMTEExtension;
+import org.terasology.math.Direction;
+import org.terasology.moduletestingenvironment.MTEExtension;
 import org.terasology.moduletestingenvironment.ModuleTestingHelper;
 import org.terasology.moduletestingenvironment.TestEventReceiver;
 import org.terasology.moduletestingenvironment.extension.Dependencies;
@@ -30,9 +31,9 @@ import org.terasology.world.block.BlockManager;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@ExtendWith(IsolatedMTEExtension.class)
+@ExtendWith(MTEExtension.class)
 @UseWorldGenerator("ModuleTestingEnvironment:empty")
-@Dependencies({"SimpleFarming", "CoreAssets", "ModuleTestingEnvironment"})
+@Dependencies({"SimpleFarming", "CoreAssets"})
 public class BushAuthoritySystemTest extends BaseAuthorityTest {
 
     private Block air;
@@ -54,8 +55,8 @@ public class BushAuthoritySystemTest extends BaseAuthorityTest {
         air = blockManager.getBlock("engine:air");
         dirt = blockManager.getBlock("CoreAssets:Dirt");
 
-        setBlock(new Vector3i(0, -1, 0), dirt);
-        setBlock(new Vector3i(), air);
+        setBlock(new Vector3i(Direction.UP.asVector3i()), air);
+        setBlock(new Vector3i(), dirt);
 
         final EntityRef seed = entityManager.create("SimpleFarming:TestSeed");
         this.plant(seed, new Vector3f());
@@ -64,7 +65,7 @@ public class BushAuthoritySystemTest extends BaseAuthorityTest {
 
     @Test
     public void bushShouldGrowInOrder() {
-        EntityRef entity = blockEntityRegistry.getExistingBlockEntityAt(new Vector3i());
+        EntityRef entity = blockEntityRegistry.getExistingBlockEntityAt(new Vector3i(Direction.UP.asVector3i()));
         BushDefinitionComponent component = entity.getComponent(BushDefinitionComponent.class);
         for (int stage = 0; stage < component.growthStages.size(); stage++) {
             // verify the the bush is on the current stage
@@ -80,7 +81,7 @@ public class BushAuthoritySystemTest extends BaseAuthorityTest {
 
     @Test
     public void harvestingSustainableBushShouldResetGrowthAndDropProduce() {
-        EntityRef entity = blockEntityRegistry.getExistingBlockEntityAt(new Vector3i());
+        EntityRef entity = blockEntityRegistry.getExistingBlockEntityAt(new Vector3i(Direction.UP.asVector3i()));
         Assertions.assertNotNull(entity);
         BushDefinitionComponent component = entity.getComponent(BushDefinitionComponent.class);
 
@@ -103,7 +104,7 @@ public class BushAuthoritySystemTest extends BaseAuthorityTest {
 
     @Test
     public void harvestingUnsustainableBushShouldDestroyBushAndDropBothSeedsAndProduce() {
-        EntityRef entity = blockEntityRegistry.getExistingBlockEntityAt(new Vector3i());
+        EntityRef entity = blockEntityRegistry.getExistingBlockEntityAt(new Vector3i(Direction.UP.asVector3i()));
         Assertions.assertNotNull(entity);
         BushDefinitionComponent component = entity.getComponent(BushDefinitionComponent.class);
         component.sustainable = false; // set bush to unsustainable
@@ -126,7 +127,7 @@ public class BushAuthoritySystemTest extends BaseAuthorityTest {
 
     @Test
     public void destroyingMatureBushShouldDropSeeds() {
-        EntityRef entity = blockEntityRegistry.getExistingBlockEntityAt(new Vector3i());
+        EntityRef entity = blockEntityRegistry.getExistingBlockEntityAt(new Vector3i(Direction.UP.asVector3i()));
         Assertions.assertNotNull(entity);
         BushDefinitionComponent component = entity.getComponent(BushDefinitionComponent.class);
 

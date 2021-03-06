@@ -9,6 +9,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.PlayerCharacterComponent;
+import org.terasology.math.Direction;
 import org.terasology.moduletestingenvironment.ModuleTestingHelper;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -34,6 +35,6 @@ public abstract class BaseAuthorityTest {
 
     protected void plant(EntityRef seed, Vector3f position) {
         final EntityRef target = getEntityManager().create(new LocationComponent(position));
-        seed.send(new ActivateEvent(target, EntityRef.NULL, null, null, position, new Vector3f(0, 1, 0), 0));
+        seed.send(new ActivateEvent(target, EntityRef.NULL, null, new Vector3f(Direction.UP.asVector3f()), position, new Vector3f(0, 1, 0), 0));
     }
 }

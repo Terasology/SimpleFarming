@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.systems;
 
-import org.joml.RoundingMode;
 import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +24,7 @@ import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.Blocks;
 
 /**
  * System handling the planting of seeds.
@@ -82,7 +82,7 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
             return;
         }
 
-        Vector3i position = new Vector3i(event.getTargetLocation(), RoundingMode.FLOOR).add(0, 1, 0);
+        Vector3i position = Blocks.toBlockPos(event.getTargetLocation(), new Vector3i()).add(0, 1, 0);
         if (Side.inDirection(event.getHitNormal()) == Side.TOP && isValidPosition(position)) {
             /* If the prefab field is null, there is a DefinitionComponent on the seed */
             EntityRef plantEntity = seedComponent.prefab == null ? seed : entityManager.create(seedComponent.prefab);
