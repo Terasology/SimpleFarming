@@ -27,7 +27,7 @@ import java.util.Collections;
 
 @ExtendWith(MTEExtension.class)
 @UseWorldGenerator("ModuleTestingEnvironment:empty")
-@Dependencies({"SimpleFarming", "CoreAssets", "ModuleTestingEnvironment"})
+@Dependencies({"SimpleFarming", "CoreAssets"})
 public class PlantAuthoritySystemTest extends BaseAuthorityTest {
 
     /**
