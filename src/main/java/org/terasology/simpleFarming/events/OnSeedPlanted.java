@@ -4,7 +4,7 @@ package org.terasology.simpleFarming.events;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.event.Event;
 
 /**
  * Sent to a new bush or vine immediately after it has been planted.

@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.components;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.ForceBlockActive;
 import org.terasology.simpleFarming.systems.TreeAuthoritySystem;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.ForceBlockActive;
 
 import java.util.ArrayList;
 import java.util.HashSet;

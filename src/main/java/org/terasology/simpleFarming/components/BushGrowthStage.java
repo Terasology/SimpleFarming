@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.components;
 
+import org.terasology.engine.world.block.Block;
 import org.terasology.reflection.MappedContainer;
-import org.terasology.world.block.Block;
 
 /**
  * Represents a stage of growth for a bush.

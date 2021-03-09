@@ -3,9 +3,9 @@
 package org.terasology.simpleFarming.components;
 
 import org.joml.Vector3i;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.world.block.ForceBlockActive;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.world.block.ForceBlockActive;
 
 /**
  * Component used to store information about the current state of a particular vine.

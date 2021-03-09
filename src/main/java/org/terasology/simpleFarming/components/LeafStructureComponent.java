@@ -3,7 +3,8 @@
 package org.terasology.simpleFarming.components;
 
 import org.joml.Vector3i;
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.entitySystem.Component;
+
 import java.util.HashSet;
 import java.util.Set;
 

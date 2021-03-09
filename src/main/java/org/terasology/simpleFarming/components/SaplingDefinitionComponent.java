@@ -3,10 +3,10 @@
 package org.terasology.simpleFarming.components;
 
 import org.joml.Vector3i;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.world.block.Block;
 import org.terasology.simpleFarming.systems.TreeAuthoritySystem;
-import org.terasology.world.block.Block;
 
 import java.util.ArrayList;
 import java.util.List;

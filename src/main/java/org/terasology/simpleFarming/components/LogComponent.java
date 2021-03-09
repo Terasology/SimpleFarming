@@ -3,10 +3,10 @@
 package org.terasology.simpleFarming.components;
 
 import org.joml.Vector3i;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.world.block.ForceBlockActive;
 import org.terasology.simpleFarming.systems.TreeAuthoritySystem;
-import org.terasology.world.block.ForceBlockActive;
 
 /**
  * Represents any log in a tree, including the root.
