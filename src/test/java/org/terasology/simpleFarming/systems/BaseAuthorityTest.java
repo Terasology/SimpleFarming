@@ -4,6 +4,7 @@ package org.terasology.simpleFarming.systems;
 
 import org.joml.Vector3f;
 import org.joml.Vector3i;
+import org.junit.jupiter.api.Tag;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.common.ActivateEvent;
@@ -14,6 +15,7 @@ import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
 import org.terasology.moduletestingenvironment.ModuleTestingHelper;
 
+@Tag("MteTest")
 public abstract class BaseAuthorityTest {
 
     public abstract EntityManager getEntityManager();
