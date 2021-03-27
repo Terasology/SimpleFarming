@@ -6,6 +6,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.entitySystem.entity.EntityManager;
@@ -34,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @ExtendWith(MTEExtension.class)
 @UseWorldGenerator("ModuleTestingEnvironment:empty")
 @Dependencies({"SimpleFarming", "CoreAssets"})
+@Tag("MteTest")
 public class BushAuthoritySystemTest extends BaseAuthorityTest {
 
     private Block air;
