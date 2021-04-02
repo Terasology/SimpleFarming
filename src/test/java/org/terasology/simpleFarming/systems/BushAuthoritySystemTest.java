@@ -124,7 +124,7 @@ public class BushAuthoritySystemTest extends BaseAuthorityTest {
 
         // bush removed and replaced with air
         assertFalse(entity.exists());
-        assertEquals(air, worldProvider.getBlock(new Vector3f()));
+        assertEquals(air, worldProvider.getBlock(new Vector3i(Direction.UP.asVector3i())));
     }
 
     @Test
@@ -144,7 +144,7 @@ public class BushAuthoritySystemTest extends BaseAuthorityTest {
 
         // bush removed and replaced with air
         assertFalse(entity.exists());
-        assertEquals(air, worldProvider.getBlock(new Vector3f()));
+        assertEquals(air, worldProvider.getBlock(new Vector3i(Direction.UP.asVector3i())));
     }
 
 
