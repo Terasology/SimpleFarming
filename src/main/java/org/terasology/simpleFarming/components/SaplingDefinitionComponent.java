@@ -1,15 +1,16 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.components;
 
 import org.joml.Vector3i;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.world.block.Block;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.simpleFarming.systems.TreeAuthoritySystem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Stores the necessary data for defining a tree.
@@ -24,7 +25,7 @@ import java.util.List;
  * {@link RootComponent} of a tree is created based on the sapling's
  * definition component.
  */
-public class SaplingDefinitionComponent implements Component {
+public class SaplingDefinitionComponent implements Component<SaplingDefinitionComponent> {
 
     /**
      * The location of the sapling. This does not need to be provided with the
@@ -74,5 +75,16 @@ public class SaplingDefinitionComponent implements Component {
         log = base.log;
         leaf = base.leaf;
         growthStages = base.growthStages;
+    }
+
+    @Override
+    public void copy(SaplingDefinitionComponent other) {
+        this.location = new Vector3i(other.location);
+        sapling = other.sapling;
+        log = other.log;
+        leaf = other.leaf;
+        this.growthStages = other.growthStages.stream()
+                .map(TreeGrowthStage::new)
+                .collect(Collectors.toList());
     }
 }

@@ -1,18 +1,19 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.components;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.ForceBlockActive;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.simpleFarming.systems.TreeAuthoritySystem;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Represents the root (lowest log block) of a tree.
@@ -22,7 +23,7 @@ import java.util.Set;
  * to a single block in specific.
  */
 @ForceBlockActive
-public class RootComponent implements Component {
+public class RootComponent implements Component<RootComponent> {
 
     /**
      * The block to use for the sapling in the world.
@@ -77,5 +78,18 @@ public class RootComponent implements Component {
         log = base.log;
         leaf = base.leaf;
         growthStages = base.growthStages;
+    }
+
+    @Override
+    public void copy(RootComponent other) {
+        this.sapling = other.sapling;
+        this.log = other.log;
+        this.leaf = other.leaf;
+        this.growthStages = other.growthStages.stream()
+                .map(TreeGrowthStage::new)
+                .collect(Collectors.toList());
+        this.growthStage = other.growthStage;
+        this.leaves = other.leaves;
+        this.alive = other.alive;
     }
 }
