@@ -6,6 +6,7 @@ package org.terasology.simpleFarming.systems;
 import org.terasology.crafting.events.OnRecipeCrafted;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.registry.In;
@@ -19,7 +20,7 @@ import org.terasology.genome.system.SimpleGenomeManager;
  * This component system is only loaded if both "Genome" and "BasicCrafting" are enabled.
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class GenomeCraftingExtensionAuthoritySystem {
+public class GenomeCraftingExtensionAuthoritySystem extends BaseComponentSystem {
 
     @In
     private GenomeRegistry genomeRegistry;
