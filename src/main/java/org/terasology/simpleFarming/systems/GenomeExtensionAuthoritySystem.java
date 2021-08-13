@@ -5,7 +5,6 @@ package org.terasology.simpleFarming.systems;
 import com.google.common.base.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.crafting.events.OnRecipeCrafted;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
@@ -22,37 +21,34 @@ import org.terasology.genome.breed.ContinuousBreedingAlgorithm;
 import org.terasology.genome.breed.mutator.GeneMutator;
 import org.terasology.genome.breed.mutator.VocabularyGeneMutator;
 import org.terasology.genome.component.GenomeComponent;
-import org.terasology.genome.genomeMap.GenomeMap;
 import org.terasology.genome.genomeMap.SeedBasedGenomeMap;
-import org.terasology.genome.system.SimpleGenomeManager;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.events.AddGenomeRetention;
 import org.terasology.simpleFarming.events.BeforePlanted;
-import org.terasology.simpleFarming.events.ModifyFilling;
-import org.terasology.simpleFarming.events.ModifyTint;
 import org.terasology.simpleFarming.events.ProduceCreated;
 import org.terasology.simpleFarming.events.TransferGenomeEvent;
 
 import javax.annotation.Nullable;
 
 /**
- * System managing genetics of all plants
+ * Extension system managing genetics of all plants.
+ *
+ * This component system is only loaded if the "Genome" module is active.
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class GenomeAuthoritySystem extends BaseComponentSystem {
+public class GenomeExtensionAuthoritySystem extends BaseComponentSystem {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenomeExtensionAuthoritySystem.class);
+
     @In
     private GenomeRegistry genomeRegistry;
     @In
     private WorldProvider worldProvider;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenomeAuthoritySystem.class);
-
     /**
      * Called immediately after a bush has been harvested.
      * <p>
-     * Checks the genome component of the bush and assigns it to the seed if it had genes already.
-     * If the bush did not have a GenomeComponent, it is assigned as this is the first harvest
-     * A new Genome Definition is created for the family
+     * Checks the genome component of the bush and assigns it to the seed if it had genes already. If the bush did not have a
+     * GenomeComponent, it is assigned as this is the first harvest A new Genome Definition is created for the family
      *
      * @param event the Produce created event
      * @param creator the creator(bush) of the produce
@@ -82,19 +78,14 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
         }
         produce.addOrSaveComponent(genomeComponent);
 
-        GenomeMap genomeMap =
-                genomeRegistry.getGenomeDefinition(produce.getComponent(GenomeComponent.class).genomeId).getGenomeMap();
-        float fillingModifier = genomeMap.getProperty("filling", produce.getComponent(GenomeComponent.class).genes,
-                Float.class);
-        float newFilling = produce.send(new ModifyFilling(fillingModifier)).filling.getValue();
-        produce.send(new ModifyTint(newFilling));
+        GenomeUtil.updateFilling(genomeRegistry, produce);
     }
 
     /**
      * Called immediately after a bush has been harvested.
      * <p>
-     * Checks the genome component of the seed and transfers it to the plant that was planted
-     * if the seed does not contain a genome component, the component is assigned on first harvest
+     * Checks the genome component of the seed and transfers it to the plant that was planted if the seed does not contain a genome
+     * component, the component is assigned on first harvest
      *
      * @param event the Before Planted event
      * @param plant the plant that is being planted
@@ -122,8 +113,7 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
     }
 
     /**
-     * Adds the GenomeComponent to the RetainComponentsComponent of an entity Event handler added to maintain Genome
-     * optional dependency
+     * Adds the GenomeComponent to the RetainComponentsComponent of an entity Event handler added to maintain Genome optional dependency
      *
      * @param event the AddGenomeRetention event
      * @param entity the entity whose RetainComponentsComponent is to be modified
@@ -133,34 +123,6 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
         RetainComponentsComponent retainComponentsComponent = new RetainComponentsComponent();
         retainComponentsComponent.components.add(GenomeComponent.class);
         entity.addOrSaveComponent(retainComponentsComponent);
-    }
-
-    /**
-     * Adds genes to the crafted entity if breeding is possible.
-     * @param event the OnRecipeCrafted event
-     * @param entity the crafted entity which is to be modified
-     */
-    @ReceiveEvent
-    public void onRecipeCraftedEvent(OnRecipeCrafted event, EntityRef entity) {
-        EntityRef ingredients[] = event.getIngredients();
-        if (ingredients.length != 2) {
-            return;
-        }
-
-        if (!(ingredients[0].hasComponent(GenomeComponent.class) || ingredients[1].hasComponent(GenomeComponent.class))) {
-            return;
-        }
-
-        SimpleGenomeManager genomeManager = new SimpleGenomeManager();
-        boolean result = genomeManager.applyBreeding(ingredients[0], ingredients[1], entity);
-        if (entity.hasComponent(GenomeComponent.class)) {
-            GenomeMap genomeMap =
-                    genomeRegistry.getGenomeDefinition(entity.getComponent(GenomeComponent.class).genomeId).getGenomeMap();
-            float fillingModifier = genomeMap.getProperty("filling", entity.getComponent(GenomeComponent.class).genes,
-                    Float.class);
-            float newFilling = entity.send(new ModifyFilling(fillingModifier)).filling.getValue();
-            entity.send(new ModifyTint(newFilling));
-        }
     }
 
     private void addPropertyMap(EntityRef entity, String genomeId) {
@@ -173,7 +135,7 @@ public class GenomeAuthoritySystem extends BaseComponentSystem {
                     @Nullable
                     @Override
                     public Float apply(@Nullable String input) {
-                        return (input.charAt(0) - 'A' + 5f)/5f;
+                        return (input.charAt(0) - 'A' + 5f) / 5f;
                     }
                 });
         GenomeDefinition genomeDefinition = new GenomeDefinition(continuousBreedingAlgorithm, genomeMap);
