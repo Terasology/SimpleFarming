@@ -81,7 +81,7 @@ public class RootComponent implements Component<RootComponent> {
     }
 
     @Override
-    public void copy(RootComponent other) {
+    public void copyFrom(RootComponent other) {
         this.sapling = other.sapling;
         this.log = other.log;
         this.leaf = other.leaf;

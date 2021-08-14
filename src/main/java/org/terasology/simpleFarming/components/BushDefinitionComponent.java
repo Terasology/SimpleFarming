@@ -88,7 +88,7 @@ public class BushDefinitionComponent implements Component<BushDefinitionComponen
     public EntityRef parent;
 
     @Override
-    public void copy(BushDefinitionComponent other) {
+    public void copyFrom(BushDefinitionComponent other) {
         this.growthStages.clear();
         for (Map.Entry<String, BushGrowthStage> entry : other.growthStages.entrySet()) {
             BushGrowthStage newStage = new BushGrowthStage(entry.getValue());

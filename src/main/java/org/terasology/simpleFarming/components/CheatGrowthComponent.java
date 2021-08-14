@@ -8,7 +8,7 @@ public class CheatGrowthComponent implements Component<CheatGrowthComponent> {
     public boolean causesUnGrowth = false;
 
     @Override
-    public void copy(CheatGrowthComponent other) {
+    public void copyFrom(CheatGrowthComponent other) {
         this.causesUnGrowth = other.causesUnGrowth;
     }
 }

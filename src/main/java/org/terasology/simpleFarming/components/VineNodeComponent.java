@@ -73,7 +73,7 @@ public class VineNodeComponent implements Component<VineNodeComponent> {
     }
 
     @Override
-    public void copy(VineNodeComponent other) {
+    public void copyFrom(VineNodeComponent other) {
         this.position = new Vector3i(other.position);
         this.bud = other.bud;
         this.child = other.child;

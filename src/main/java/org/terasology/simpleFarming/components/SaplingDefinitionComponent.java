@@ -78,7 +78,7 @@ public class SaplingDefinitionComponent implements Component<SaplingDefinitionCo
     }
 
     @Override
-    public void copy(SaplingDefinitionComponent other) {
+    public void copyFrom(SaplingDefinitionComponent other) {
         this.location = new Vector3i(other.location);
         sapling = other.sapling;
         log = other.log;

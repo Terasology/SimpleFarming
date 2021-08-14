@@ -25,7 +25,7 @@ public class SeedDefinitionComponent implements Component<SeedDefinitionComponen
     public String prefab;
 
     @Override
-    public void copy(SeedDefinitionComponent other) {
+    public void copyFrom(SeedDefinitionComponent other) {
         this.prefab = other.prefab;
     }
 }

@@ -58,7 +58,7 @@ public class VineDefinitionComponent implements Component<VineDefinitionComponen
     public int maxLength = 20;
 
     @Override
-    public void copy(VineDefinitionComponent other) {
+    public void copyFrom(VineDefinitionComponent other) {
         this.stem = other.stem;
         this.bud = other.bud;
         this.minGrowTime = other.minGrowTime;

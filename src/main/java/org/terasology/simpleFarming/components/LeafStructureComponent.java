@@ -21,7 +21,7 @@ public class LeafStructureComponent implements Component<LeafStructureComponent>
     public Set<Vector3i> leaves = new HashSet<>();
 
     @Override
-    public void copy(LeafStructureComponent other) {
+    public void copyFrom(LeafStructureComponent other) {
         this.leaves = other.leaves.stream()
                 .map(Vector3i::new)
                 .collect(Collectors.toSet());

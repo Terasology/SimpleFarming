@@ -30,7 +30,7 @@ public class LogComponent implements Component<LogComponent> {
     public EntityRef root;
 
     @Override
-    public void copy(LogComponent other) {
+    public void copyFrom(LogComponent other) {
         this.location = new Vector3i(other.location);
         this.root = other.root;
     }
