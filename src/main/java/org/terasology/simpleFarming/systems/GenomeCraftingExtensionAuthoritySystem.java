@@ -19,7 +19,7 @@ import org.terasology.genome.system.SimpleGenomeManager;
  *
  * This component system is only loaded if both "Genome" and "BasicCrafting" are enabled.
  */
-@RegisterSystem(RegisterMode.AUTHORITY)
+@RegisterSystem(value = RegisterMode.AUTHORITY, requiresOptional = {"Genome", "BasicCrafting"})
 public class GenomeCraftingExtensionAuthoritySystem extends BaseComponentSystem {
 
     @In

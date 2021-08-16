@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.systems;
 
@@ -35,7 +35,7 @@ import javax.annotation.Nullable;
  *
  * This component system is only loaded if the "Genome" module is active.
  */
-@RegisterSystem(RegisterMode.AUTHORITY)
+@RegisterSystem(value = RegisterMode.AUTHORITY, requiresOptional = "Genome")
 public class GenomeExtensionAuthoritySystem extends BaseComponentSystem {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenomeExtensionAuthoritySystem.class);
 
