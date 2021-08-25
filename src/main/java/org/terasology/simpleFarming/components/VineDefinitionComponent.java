@@ -1,11 +1,11 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.components;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.ForceBlockActive;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 /**
  * Stores all data needed to grow a vine.
@@ -24,7 +24,7 @@ import org.terasology.engine.world.block.ForceBlockActive;
  * @see org.terasology.simpleFarming.systems.VineAuthoritySystem
  */
 @ForceBlockActive
-public class VineDefinitionComponent implements Component {
+public class VineDefinitionComponent implements Component<VineDefinitionComponent> {
 
     /**
      * The block to use for a stem.
@@ -56,4 +56,13 @@ public class VineDefinitionComponent implements Component {
      * The maximum length a vine can grow
      */
     public int maxLength = 20;
+
+    @Override
+    public void copyFrom(VineDefinitionComponent other) {
+        this.stem = other.stem;
+        this.bud = other.bud;
+        this.minGrowTime = other.minGrowTime;
+        this.maxGrowTime = other.maxGrowTime;
+        this.maxLength = other.maxLength;
+    }
 }

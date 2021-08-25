@@ -1,11 +1,11 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.components;
 
 import com.google.common.collect.Maps;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.world.block.ForceBlockActive;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.Map;
  * @see org.terasology.simpleFarming.systems.BushAuthoritySystem
  */
 @ForceBlockActive
-public class BushDefinitionComponent implements Component {
+public class BushDefinitionComponent implements Component<BushDefinitionComponent> {
 
     /**
      * Map associating prefabs with growth stages.  Generally specified by a prefab.
@@ -86,4 +86,19 @@ public class BushDefinitionComponent implements Component {
      * Used by vine buds to refer to the parent stem.
      */
     public EntityRef parent;
+
+    @Override
+    public void copyFrom(BushDefinitionComponent other) {
+        this.growthStages.clear();
+        for (Map.Entry<String, BushGrowthStage> entry : other.growthStages.entrySet()) {
+            BushGrowthStage newStage = new BushGrowthStage(entry.getValue());
+            this.growthStages.put(entry.getKey(), newStage);
+        }
+        this.sustainable = other.sustainable;
+        this.seed = other.seed;
+        this.seedDropChances = other.seedDropChances;
+        this.produce = other.produce;
+        this.currentStage = other.currentStage;
+        this.parent = other.parent;
+    }
 }

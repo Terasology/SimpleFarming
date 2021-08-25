@@ -1,11 +1,11 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.components;
 
 import org.joml.Vector3i;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.world.block.ForceBlockActive;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 /**
  * Component used to store information about the current state of a particular vine.
@@ -17,7 +17,7 @@ import org.terasology.engine.world.block.ForceBlockActive;
  * @see org.terasology.simpleFarming.systems.VineAuthoritySystem
  */
 @ForceBlockActive
-public class VineNodeComponent implements Component {
+public class VineNodeComponent implements Component<VineNodeComponent> {
 
     /**
      * The position of this stem block.
@@ -70,5 +70,14 @@ public class VineNodeComponent implements Component {
     public VineNodeComponent(EntityRef parent, Vector3i position) {
         this.parent = parent;
         this.position = position;
+    }
+
+    @Override
+    public void copyFrom(VineNodeComponent other) {
+        this.position = new Vector3i(other.position);
+        this.bud = other.bud;
+        this.child = other.child;
+        this.parent = other.parent;
+        this.length = other.length;
     }
 }

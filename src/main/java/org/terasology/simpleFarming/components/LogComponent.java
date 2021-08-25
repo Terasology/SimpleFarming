@@ -1,11 +1,11 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.components;
 
 import org.joml.Vector3i;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.world.block.ForceBlockActive;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.simpleFarming.systems.TreeAuthoritySystem;
 
 /**
@@ -15,7 +15,7 @@ import org.terasology.simpleFarming.systems.TreeAuthoritySystem;
  * @see RootComponent
  */
 @ForceBlockActive
-public class LogComponent implements Component {
+public class LogComponent implements Component<LogComponent> {
 
     /**
      * The location of this log in the world.
@@ -28,4 +28,10 @@ public class LogComponent implements Component {
      * events to the root so that the whole tree can react.
      */
     public EntityRef root;
+
+    @Override
+    public void copyFrom(LogComponent other) {
+        this.location = new Vector3i(other.location);
+        this.root = other.root;
+    }
 }

@@ -1,8 +1,8 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.components;
 
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 /**
  * Indicates the item is a seed and links to the prefab to be used to create the plant.
@@ -12,7 +12,7 @@ import org.terasology.engine.entitySystem.Component;
  *
  * @see org.terasology.simpleFarming.systems.PlantAuthoritySystem
  */
-public class SeedDefinitionComponent implements Component {
+public class SeedDefinitionComponent implements Component<SeedDefinitionComponent> {
     /**
      * The prefab name for the plant that grows from this seed.
      * <p>
@@ -23,4 +23,9 @@ public class SeedDefinitionComponent implements Component {
      * to be found on the same entity.
      */
     public String prefab;
+
+    @Override
+    public void copyFrom(SeedDefinitionComponent other) {
+        this.prefab = other.prefab;
+    }
 }
