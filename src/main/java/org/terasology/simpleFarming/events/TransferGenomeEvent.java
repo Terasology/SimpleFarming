@@ -3,7 +3,7 @@
 package org.terasology.simpleFarming.events;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * Transfers GenomeComponent of the calling entity to another entity

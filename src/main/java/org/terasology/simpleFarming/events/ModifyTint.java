@@ -3,7 +3,7 @@
 
 package org.terasology.simpleFarming.events;
 
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 public class ModifyTint implements Event {
     public float tintParameter;
