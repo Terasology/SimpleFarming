@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.Priority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.logic.common.ActivateEvent;
-import org.terasology.module.inventory.systems.InventoryManager;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.utilities.random.FastRandom;
@@ -22,6 +22,7 @@ import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.Blocks;
+import org.terasology.module.inventory.systems.InventoryManager;
 import org.terasology.simpleFarming.components.SeedDefinitionComponent;
 import org.terasology.simpleFarming.events.BeforePlanted;
 import org.terasology.simpleFarming.events.OnSeedPlanted;
@@ -75,7 +76,8 @@ public class PlantAuthoritySystem extends BaseComponentSystem {
      * @param seed          the seed item
      * @param seedComponent the seed's definition component
      */
-    @ReceiveEvent(priority = EventPriority.PRIORITY_HIGH)
+    @Priority(EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent
     public void onSeedPlant(ActivateEvent event, EntityRef seed, SeedDefinitionComponent seedComponent) {
         /* The item is being used but not planted */
         if (event.getTargetLocation() == null || event.isConsumed()) {
