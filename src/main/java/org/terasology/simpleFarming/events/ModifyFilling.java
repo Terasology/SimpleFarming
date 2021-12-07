@@ -3,8 +3,8 @@
 
 package org.terasology.simpleFarming.events;
 
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.utilities.modifiable.ModifiableValue;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * Event sent to modify the filling of harvested produce.

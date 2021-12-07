@@ -5,7 +5,6 @@ package org.terasology.simpleFarming.systems;
 
 import org.terasology.crafting.events.OnRecipeCrafted;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
@@ -13,6 +12,7 @@ import org.terasology.engine.registry.In;
 import org.terasology.genome.GenomeRegistry;
 import org.terasology.genome.component.GenomeComponent;
 import org.terasology.genome.system.SimpleGenomeManager;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 /**
  * Extension system integrating genetics with basic crafting.
