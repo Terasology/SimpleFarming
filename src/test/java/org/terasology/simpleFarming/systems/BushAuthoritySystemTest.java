@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.systems;
 
@@ -11,6 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.integrationenvironment.ModuleTestingHelper;
+import org.terasology.engine.integrationenvironment.TestEventReceiver;
+import org.terasology.engine.integrationenvironment.jupiter.Dependencies;
+import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
+import org.terasology.engine.integrationenvironment.jupiter.UseWorldGenerator;
 import org.terasology.engine.logic.common.ActivateEvent;
 import org.terasology.engine.logic.health.DestroyEvent;
 import org.terasology.engine.logic.health.EngineDamageTypes;
@@ -22,24 +27,16 @@ import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.engine.world.block.BlockManager;
-import org.terasology.moduletestingenvironment.MTEExtension;
-import org.terasology.moduletestingenvironment.ModuleTestingHelper;
-import org.terasology.moduletestingenvironment.TestEventReceiver;
-import org.terasology.moduletestingenvironment.extension.Dependencies;
-import org.terasology.moduletestingenvironment.extension.UseWorldGenerator;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @ExtendWith(MTEExtension.class)
-@UseWorldGenerator("ModuleTestingEnvironment:empty")
+@UseWorldGenerator("unittest:empty")
 @Dependencies({"SimpleFarming", "CoreAssets"})
 @Tag("MteTest")
 public class BushAuthoritySystemTest extends BaseAuthorityTest {
-
-    private Block air;
-    private Block dirt;
 
     @In
     EntityManager entityManager;
@@ -52,10 +49,12 @@ public class BushAuthoritySystemTest extends BaseAuthorityTest {
     @In
     BlockEntityRegistry blockEntityRegistry;
 
+    private Block air;
+
     @BeforeEach
     public void initialize() {
         air = blockManager.getBlock("engine:air");
-        dirt = blockManager.getBlock("CoreAssets:Dirt");
+        Block dirt = blockManager.getBlock("CoreAssets:Dirt");
 
         setBlock(new Vector3i(Direction.UP.asVector3i()), air);
         setBlock(new Vector3i(), dirt);

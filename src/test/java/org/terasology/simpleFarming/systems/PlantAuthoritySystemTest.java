@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.systems;
 
@@ -11,14 +11,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.integrationenvironment.ModuleTestingHelper;
+import org.terasology.engine.integrationenvironment.jupiter.Dependencies;
+import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
+import org.terasology.engine.integrationenvironment.jupiter.UseWorldGenerator;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
-import org.terasology.moduletestingenvironment.MTEExtension;
-import org.terasology.moduletestingenvironment.ModuleTestingHelper;
-import org.terasology.moduletestingenvironment.extension.Dependencies;
-import org.terasology.moduletestingenvironment.extension.UseWorldGenerator;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.BushGrowthStage;
 import org.terasology.simpleFarming.components.SeedDefinitionComponent;
@@ -27,7 +27,7 @@ import java.util.Collections;
 
 
 @ExtendWith(MTEExtension.class)
-@UseWorldGenerator("ModuleTestingEnvironment:empty")
+@UseWorldGenerator("unittest:empty")
 @Dependencies({"SimpleFarming", "CoreAssets"})
 @Tag("MteTest")
 public class PlantAuthoritySystemTest extends BaseAuthorityTest {

@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.simpleFarming.systems;
 
@@ -6,13 +6,13 @@ import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.integrationenvironment.ModuleTestingHelper;
 import org.terasology.engine.logic.common.ActivateEvent;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.players.PlayerCharacterComponent;
 import org.terasology.engine.math.Direction;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
-import org.terasology.moduletestingenvironment.ModuleTestingHelper;
 
 public abstract class BaseAuthorityTest {
 
