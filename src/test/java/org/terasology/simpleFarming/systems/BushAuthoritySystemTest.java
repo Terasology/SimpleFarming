@@ -6,16 +6,12 @@ import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.integrationenvironment.ModuleTestingHelper;
 import org.terasology.engine.integrationenvironment.TestEventReceiver;
-import org.terasology.engine.integrationenvironment.jupiter.Dependencies;
-import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
-import org.terasology.engine.integrationenvironment.jupiter.UseWorldGenerator;
+import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 import org.terasology.engine.logic.common.ActivateEvent;
 import org.terasology.engine.logic.health.DestroyEvent;
 import org.terasology.engine.logic.health.EngineDamageTypes;
@@ -32,10 +28,7 @@ import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@ExtendWith(MTEExtension.class)
-@UseWorldGenerator("unittest:empty")
-@Dependencies({"SimpleFarming", "CoreAssets"})
-@Tag("MteTest")
+@IntegrationEnvironment(dependencies = {"SimpleFarming", "CoreAssets"}, worldGenerator = "unittest:empty")
 public class BushAuthoritySystemTest extends BaseAuthorityTest {
 
     @In
