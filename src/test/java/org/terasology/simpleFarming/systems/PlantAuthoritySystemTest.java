@@ -6,15 +6,10 @@ import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.integrationenvironment.ModuleTestingHelper;
-import org.terasology.engine.integrationenvironment.jupiter.Dependencies;
-import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
-import org.terasology.engine.integrationenvironment.jupiter.UseWorldGenerator;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
@@ -22,14 +17,12 @@ import org.terasology.engine.world.block.BlockManager;
 import org.terasology.simpleFarming.components.BushDefinitionComponent;
 import org.terasology.simpleFarming.components.BushGrowthStage;
 import org.terasology.simpleFarming.components.SeedDefinitionComponent;
+import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 
 import java.util.Collections;
 
 
-@ExtendWith(MTEExtension.class)
-@UseWorldGenerator("unittest:empty")
-@Dependencies({"SimpleFarming", "CoreAssets"})
-@Tag("MteTest")
+@IntegrationEnvironment(dependencies = {"SimpleFarming", "CoreAssets"}, worldGenerator = "unittest:empty")
 public class PlantAuthoritySystemTest extends BaseAuthorityTest {
 
     /**
