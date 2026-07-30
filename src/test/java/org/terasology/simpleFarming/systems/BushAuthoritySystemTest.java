@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 
-@IntegrationEnvironment(dependencies = {"SimpleFarming", "CoreAssets"}, worldGenerator = "unittest:empty")
+@IntegrationEnvironment(dependencies = {"SimpleFarming", "CoreAssets"})
 public class BushAuthoritySystemTest extends BaseAuthorityTest {
 
     @In

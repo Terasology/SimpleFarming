@@ -22,7 +22,7 @@ import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironme
 import java.util.Collections;
 
 
-@IntegrationEnvironment(dependencies = {"SimpleFarming", "CoreAssets"}, worldGenerator = "unittest:empty")
+@IntegrationEnvironment(dependencies = {"SimpleFarming", "CoreAssets"})
 public class PlantAuthoritySystemTest extends BaseAuthorityTest {
 
     /**
